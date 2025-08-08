@@ -12,15 +12,12 @@ interface UiIterationsProps {
   id: string;
   /** Labels for each variation (optional, falls back to indices) */
   labels?: string[];
-  /** Default variation index (0-based) */
-  defaultIndex?: number;
   children: React.ReactNode[];
 }
 
 function UiIterations({ 
   id, 
   labels, 
-  defaultIndex = 0,
   children 
 }: UiIterationsProps): JSX.Element
 ```
