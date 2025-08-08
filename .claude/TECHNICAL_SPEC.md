@@ -46,15 +46,15 @@ function UiIterations({
 ### State Management
 
 ```tsx
-interface IterationState {
+interface UiIterationsState {
   [iterationId: string]: {
     activeIndex: number;
     labels: string[];
   };
 }
 
-const IterationContext = createContext<{
-  state: IterationState;
+const UiIterationsContext = createContext<{
+  state: UiIterationsState;
   setActiveIndex: (id: string, index: number) => void;
 }>({});
 ```
@@ -66,7 +66,7 @@ Simple development-only toolbar with:
 - Previous/Next navigation for each group
 - Keyboard shortcuts (Ctrl/Cmd + Arrow keys)
 
-The toolbar accesses the `IterationContext` directly and uses `setActiveIndex` for all navigation.
+The toolbar accesses the `UiIterationsContext` directly and uses `setActiveIndex` for all navigation.
 
 ## Production Behavior
 
