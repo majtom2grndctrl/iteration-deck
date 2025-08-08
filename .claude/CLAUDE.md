@@ -12,19 +12,23 @@ This project builds an NPM module containing a React component called `UiIterati
 ## Key Component
 - Main component: `UiIterations` (not `Iteration`)
 - Props interface: `UiIterationsProps`
+- State interface: `UiIterationsState`
+- Context: `UiIterationsContext`
 - Focuses on simplicity over complex features
 
 ## Development Guidelines
 - Use TypeScript throughout
 - Keep the API minimal and focused
 - Production builds should render only the first child by default
-- Development mode includes simple toolbar for navigation
+- Development mode includes simple toolbar for navigation with keyboard shortcuts (Ctrl/Cmd + Arrow keys)
 - Build for distribution with proper bundling
+- Bundle size target: < 10kb gzipped
 
 ## Distribution
-- Bundle component for npm distribution
+- Bundle component for npm distribution using Rollup
 - Include TypeScript declarations (.d.ts files)
-- Support tree-shaking
+- Support tree-shaking with separate ESM and CJS builds
+- Export configuration in package.json with proper "exports" field
 - Minimal bundle size for production usage
 
 ## Testing
