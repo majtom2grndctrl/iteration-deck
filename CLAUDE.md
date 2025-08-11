@@ -63,14 +63,73 @@ pnpm publish
 
 ## Project Architecture
 
-### Core Components Structure
+### Multi-Framework Package Structure
 ```
 src/
-├── index.ts              # Main exports
-├── IterationDeck.tsx     # Main wrapper component
-├── IterationDeckSlide.tsx # Individual slide wrapper
-├── context.ts            # React context for state management
-└── toolbar.tsx           # Development-only navigation toolbar
+├── index.ts                    # Main exports (React by default)
+├── core/                       # Framework-agnostic core logic
+│   ├── state.ts               # State management primitives
+│   ├── url-params.ts          # URL parameter handling
+│   ├── keyboard.ts            # Keyboard event handling
+│   └── types.ts               # TypeScript definitions
+├── react/                     # React implementation (primary)
+│   ├── index.ts               # React exports
+│   ├── IterationDeck.tsx      # Main wrapper component
+│   ├── IterationDeckSlide.tsx # Individual slide wrapper
+│   ├── context.tsx            # React context provider
+│   ├── toolbar.tsx            # Development toolbar
+│   └── hooks.ts               # React hooks
+├── web-components/            # Future: Web components bridge
+│   ├── index.ts               # Web component exports
+│   ├── iteration-deck.ts      # Custom element definitions
+│   └── bridge.ts              # React-to-WebComponent bridge
+├── svelte/                    # Future: Svelte implementation
+│   ├── index.ts               # Svelte exports
+│   ├── IterationDeck.svelte   # Main component
+│   └── stores.ts              # Svelte stores
+└── vue/                       # Future: Vue implementation
+    ├── index.ts               # Vue exports
+    ├── IterationDeck.vue      # Main component
+    └── composables.ts         # Vue composables
+```
+
+### Package Exports Strategy
+```json
+{
+  "name": "iteration-deck",
+  "exports": {
+    ".": {
+      "types": "./dist/react/index.d.ts",
+      "import": "./dist/react/index.js",
+      "require": "./dist/react/index.cjs"
+    },
+    "./react": {
+      "types": "./dist/react/index.d.ts", 
+      "import": "./dist/react/index.js",
+      "require": "./dist/react/index.cjs"
+    },
+    "./web-components": {
+      "types": "./dist/web-components/index.d.ts",
+      "import": "./dist/web-components/index.js",
+      "require": "./dist/web-components/index.cjs"
+    },
+    "./svelte": {
+      "types": "./dist/svelte/index.d.ts",
+      "import": "./dist/svelte/index.js",
+      "require": "./dist/svelte/index.cjs"
+    },
+    "./vue": {
+      "types": "./dist/vue/index.d.ts",
+      "import": "./dist/vue/index.js", 
+      "require": "./dist/vue/index.cjs"
+    },
+    "./core": {
+      "types": "./dist/core/index.d.ts",
+      "import": "./dist/core/index.js",
+      "require": "./dist/core/index.cjs"
+    }
+  }
+}
 ```
 
 ### Component API Design
@@ -159,13 +218,57 @@ Uses React Context pattern with automatic provider creation:
 - No toolbar or navigation UI
 - Minimal runtime footprint
 
+### Implementation Phases
+
+#### Phase 1: React-First Foundation (v1.0)
+- Implement complete React version with all AI-first features
+- Framework-agnostic core logic in `src/core/`
+- Full TypeScript support and documentation
+- Complete testing suite and examples
+- **Target**: Production-ready React implementation
+
+#### Phase 2: Web Components Bridge (v1.1)
+- Custom elements wrapping React components
+- Framework-agnostic usage via `<iteration-deck>` tags
+- Maintains full feature parity with React version
+- **Target**: Universal framework compatibility
+
+#### Phase 3: Native Framework Implementations (v1.2+)
+- Native Svelte implementation using Svelte stores
+- Native Vue implementation using Vue 3 Composition API
+- Shared core logic ensures consistent behavior
+- **Target**: Optimal performance per framework
+
+### Multi-Framework Usage Examples
+```javascript
+// React (default import)
+import { IterationDeck, IterationDeckSlide } from 'iteration-deck'
+
+// React (explicit import)
+import { IterationDeck, IterationDeckSlide } from 'iteration-deck/react'
+
+// Web Components (framework-agnostic)
+import 'iteration-deck/web-components'
+// Use: <iteration-deck id="cards"><iteration-deck-slide label="Modern">...</iteration-deck-slide></iteration-deck>
+
+// Svelte
+import { IterationDeck, IterationDeckSlide } from 'iteration-deck/svelte'
+
+// Vue
+import { IterationDeck, IterationDeckSlide } from 'iteration-deck/vue'
+
+// Core utilities only
+import { createDeckState, parseURLParams } from 'iteration-deck/core'
+```
+
 ## Build Configuration
 
 The module will use:
-- **Rollup** for bundling with tree-shaking support
-- **TypeScript** compilation with declaration files
-- **Vite** configured for library mode instead of app mode
-- Proper `package.json` exports field for dual ESM/CJS support
+- **Rollup** for bundling with tree-shaking support per framework
+- **TypeScript** compilation with declaration files for all targets
+- **Vite** configured for library mode with multiple entry points
+- Framework-specific build targets with shared core bundle
+- Proper `package.json` exports field for all framework variants
 
 ## Development Workflow
 
@@ -446,13 +549,55 @@ The module will use:
 - Use appropriate button types and form elements
 - Maintain logical tab order through toolbar controls
 
+### Web Components Bridge Strategy
+
+**Why Web Components as Phase 2:**
+- Universal compatibility across all frameworks
+- Server-side rendering friendly
+- Future-proofs the AI design workflow tooling
+- Allows gradual adoption in mixed-framework codebases
+
+**Technical Approach:**
+```javascript
+// Bridge implementation concept
+class IterationDeckElement extends HTMLElement {
+  private reactRoot: ReactRoot
+  
+  connectedCallback() {
+    // Mount React component inside custom element
+    this.reactRoot = createRoot(this)
+    this.reactRoot.render(
+      <IterationDeck 
+        id={this.getAttribute('id')}
+        label={this.getAttribute('label')}
+        // ... other props from attributes
+      >
+        {this.parseSlotChildren()}
+      </IterationDeck>
+    )
+  }
+}
+```
+
+**Benefits:**
+- ✅ Framework-agnostic usage
+- ✅ Maintains full React feature set under the hood  
+- ✅ Familiar custom element API
+- ✅ Works with any bundler/build system
+- ✅ Enables AI code generation for any framework
+
 ## Implementation Notes
 
+### Core Philosophy
 - Focus on simplicity over complex features
-- Prioritize bundle size optimization
+- Prioritize bundle size optimization (< 10kb per framework target)
 - Use TypeScript throughout for better DX
+- **Zero-config approach**: No providers or setup required - components work out of the box
+
+### Technical Implementation
 - Component registration happens automatically on mount/unmount
 - Keyboard shortcuts operate on the currently active deck in dev mode
 - Production detection should use `process.env.NODE_ENV`
 - **Multi-deck support**: Automatic handling of multiple IterationDeck instances with deck selector UI
-- **Zero-config approach**: No providers or setup required - components work out of the box
+- **Framework-agnostic core**: All state management and URL handling shared across implementations
+- **Progressive enhancement**: Web components bridge allows universal framework compatibility
