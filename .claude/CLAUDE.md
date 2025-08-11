@@ -1,19 +1,20 @@
-# UI Iterations - Claude Code Instructions
+# Iteration Deck - Claude Code Instructions
 
 ## Project Overview
-This project builds an NPM module containing a React component called `UiIterations` that enables rapid design iteration by wrapping variations of UI components with development-mode controls for switching between them. The module will be published to npm for installation in consuming React applications.
+This project builds an NPM module containing React components called `IterationDeck` and `IterationDeckSlide` that enable rapid design iteration by wrapping variations of UI components with development-mode controls for switching between them. The module will be published to npm for installation in consuming React applications.
 
 ## Package Details
-- Package name: `ui-iterations`
-- Main export: `UiIterations` component
+- Package name: `iteration-deck`
+- Main exports: `IterationDeck` and `IterationDeckSlide` components
 - Built as TypeScript library with type definitions
 - Supports both ES modules and CommonJS
 
-## Key Component
-- Main component: `UiIterations` (not `Iteration`)
-- Props interface: `UiIterationsProps`
-- State interface: `UiIterationsState`
-- Context: `UiIterationsContext`
+## Key Components
+- Main component: `IterationDeck`
+- Child wrapper: `IterationDeckSlide`
+- Props interfaces: `IterationDeckProps`, `IterationDeckSlideProps`
+- State interface: `IterationDeckState`
+- Context: `IterationDeckContext`
 - Focuses on simplicity over complex features
 
 ## Development Guidelines
@@ -25,7 +26,7 @@ This project builds an NPM module containing a React component called `UiIterati
 - Bundle size target: < 10kb gzipped
 
 ## Distribution
-- Bundle component for npm distribution using Rollup
+- Bundle components for npm distribution using Rollup
 - Include TypeScript declarations (.d.ts files)
 - Support tree-shaking with separate ESM and CJS builds
 - Export configuration in package.json with proper "exports" field

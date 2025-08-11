@@ -1,72 +1,99 @@
-# React Design Iteration Tool - Technical Specification
+# Iteration Deck - Technical Specification
 
 ## Overview
 
-A simple wrapper component for rapid design iteration in React applications with development-mode controls for switching between variations.
+A simple set of wrapper components for rapid design iteration in React applications with development-mode controls for switching between variations. Uses a slide deck metaphor where each variation is a "slide" in the deck.
 
 ## Component API
 
 ```tsx
-interface UiIterationsProps {
-  /** Unique identifier for this iteration group */
+interface IterationDeckProps {
+  /** Unique identifier for this iteration deck */
   id: string;
-  /** Labels for each variation (optional, falls back to indices) */
-  labels?: string[];
-  children: React.ReactNode[];
+  /** Label for this deck in the toolbar */
+  label?: string;
+  children: React.ReactElement<IterationDeckSlideProps>[];
 }
 
-function UiIterations({ 
+interface IterationDeckSlideProps {
+  /** Label for this slide/variation */
+  label: string;
+  children: React.ReactNode;
+}
+
+function IterationDeck({ 
   id, 
-  labels, 
+  label, 
   children 
-}: UiIterationsProps): JSX.Element
+}: IterationDeckProps): JSX.Element
+
+function IterationDeckSlide({ 
+  label, 
+  children 
+}: IterationDeckSlideProps): JSX.Element
 ```
 
 ### Usage Examples
 
 ```tsx
 // Basic usage
-<UiIterations id="hero-layouts">
-  <HeroLayout1 />
-  <HeroLayout2 />
-  <HeroLayout3 />
-</UiIterations>
+<IterationDeck id="hero-layouts" label="Hero Sections">
+  <IterationDeckSlide label="Centered Layout">
+    <HeroLayout1 />
+  </IterationDeckSlide>
+  <IterationDeckSlide label="Split Layout">
+    <HeroLayout2 />
+  </IterationDeckSlide>
+  <IterationDeckSlide label="Full Width">
+    <HeroLayout3 />
+  </IterationDeckSlide>
+</IterationDeck>
 
-// With custom labels
-<UiIterations 
+// Button variations
+<IterationDeck 
   id="cta-buttons" 
-  labels={["Primary", "Secondary", "Gradient"]}
+  label="Call to Action Buttons"
 >
-  <Button variant="primary">Get Started</Button>
-  <Button variant="secondary">Get Started</Button>
-  <Button variant="gradient">Get Started</Button>
-</UiIterations>
+  <IterationDeckSlide label="Primary">
+    <Button variant="primary">Get Started</Button>
+  </IterationDeckSlide>
+  <IterationDeckSlide label="Secondary">
+    <Button variant="secondary">Get Started</Button>
+  </IterationDeckSlide>
+  <IterationDeckSlide label="Gradient">
+    <Button variant="gradient">Get Started</Button>
+  </IterationDeckSlide>
+</IterationDeck>
 ```
 
 ### State Management
 
 ```tsx
-interface UiIterationsState {
-  [iterationId: string]: {
+interface IterationDeckState {
+  [deckId: string]: {
     activeIndex: number;
-    labels: string[];
+    label?: string;
+    slides: Array<{ label: string }>;
   };
 }
 
-const UiIterationsContext = createContext<{
-  state: UiIterationsState;
+const IterationDeckContext = createContext<{
+  state: IterationDeckState;
   setActiveIndex: (id: string, index: number) => void;
+  registerDeck: (id: string, label?: string) => void;
+  registerSlide: (deckId: string, slideLabel: string) => void;
 }>({});
 ```
 
 ## Development Toolbar
 
 Simple development-only toolbar with:
-- List of all iteration groups
-- Previous/Next navigation for each group
+- List of all iteration decks (with their labels)
+- Previous/Next navigation for each deck
+- Current slide label display
 - Keyboard shortcuts (Ctrl/Cmd + Arrow keys)
 
-The toolbar accesses the `UiIterationsContext` directly and uses `setActiveIndex` for all navigation.
+The toolbar accesses the `IterationDeckContext` directly and uses `setActiveIndex` for all navigation.
 
 ## Production Behavior
 
@@ -74,12 +101,18 @@ In production builds, render only the first child by default:
 
 ```tsx
 // Development: Shows controls and all variations
-// Production: Renders only first child
-<UiIterations id="hero">
-  <HeroV1 />  // Only this renders in production
-  <HeroV2 />  
-  <HeroV3 />  
-</UiIterations>
+// Production: Renders only first slide
+<IterationDeck id="hero" label="Hero Variations">
+  <IterationDeckSlide label="Version 1">
+    <HeroV1 />  {/* Only this renders in production */}
+  </IterationDeckSlide>
+  <IterationDeckSlide label="Version 2">
+    <HeroV2 />  
+  </IterationDeckSlide>
+  <IterationDeckSlide label="Version 3">
+    <HeroV3 />  
+  </IterationDeckSlide>
+</IterationDeck>
 ```
 
 ## Testing
@@ -98,14 +131,15 @@ In production builds, render only the first child by default:
 ## NPM Module Structure
 
 ```
-ui-iterations/
+iteration-deck/
 ├── package.json
 ├── tsconfig.json
 ├── rollup.config.js
 ├── src/
 │   ├── index.ts              # Main export
-│   ├── UiIterations.tsx      # Main component
-│   ├── context.ts            # Iteration context
+│   ├── IterationDeck.tsx     # Main component
+│   ├── IterationDeckSlide.tsx # Slide wrapper component
+│   ├── context.ts            # Iteration deck context
 │   └── toolbar.tsx           # Development toolbar
 ├── dist/                     # Built files for npm
 │   ├── index.js              # CommonJS build
@@ -120,19 +154,25 @@ ui-iterations/
 
 ### Installation
 ```bash
-pnpm add ui-iterations
+pnpm add iteration-deck
 ```
 
 ### Import and Usage
 ```tsx
-import { UiIterations } from 'ui-iterations';
+import { IterationDeck, IterationDeckSlide } from 'iteration-deck';
 
 // Basic usage
-<UiIterations id="hero-layouts">
-  <HeroLayout1 />
-  <HeroLayout2 />
-  <HeroLayout3 />
-</UiIterations>
+<IterationDeck id="hero-layouts" label="Hero Sections">
+  <IterationDeckSlide label="Layout 1">
+    <HeroLayout1 />
+  </IterationDeckSlide>
+  <IterationDeckSlide label="Layout 2">
+    <HeroLayout2 />
+  </IterationDeckSlide>
+  <IterationDeckSlide label="Layout 3">
+    <HeroLayout3 />
+  </IterationDeckSlide>
+</IterationDeck>
 ```
 
 ## Bundle Configuration
@@ -168,8 +208,8 @@ import { UiIterations } from 'ui-iterations';
 #### Initial Project Scaffolding
 Run the following terminal command to scaffold the project:
 ```bash
-npm create vite@latest ui-iterations -- --template react-ts
-cd ui-iterations
+npm create vite@latest iteration-deck -- --template react-ts
+cd iteration-deck
 npm install
 ```
 
@@ -177,20 +217,21 @@ npm install
 Move the generated files from the nested folder to this project root:
 ```bash
 cd ..
-cp -r ui-iterations/* ./
-rm -rf ui-iterations/
+cp -r iteration-deck/* ./
+rm -rf iteration-deck/
 ```
 
 #### Post-Scaffolding Tasks
 - [ ] Review and adjust generated configuration files for npm library distribution
 - [ ] Update package.json with proper npm fields and library-specific scripts
 - [ ] Configure Vite for library bundling instead of app bundling
-- [ ] Install any additional dependencies required for ui-iterations component
+- [ ] Install any additional dependencies required for iteration-deck components
 - [ ] Update tsconfig.json for library builds if needed
 
 ### Phase 2: Core Development (Can run 2 agents concurrently)
-**Agent A:** Core Component  
-- [ ] UiIterations component with context
+**Agent A:** Core Components  
+- [ ] IterationDeck component with context
+- [ ] IterationDeckSlide wrapper component
 - [ ] Development environment detection logic
 - [ ] Component test suite
 
