@@ -59,19 +59,22 @@ src/
 
 ### State Management
 
-Uses React Context pattern:
-- Global state tracks all decks by ID
+Uses React Context pattern with automatic provider creation:
+- Global state tracks all decks by ID with automatic registration/deregistration
 - Each deck maintains active slide index and slide metadata
+- Context tracks `activeDeckId` for multi-deck keyboard navigation
 - Context provides registration and navigation methods
 - Development toolbar consumes context for all interactions
+- **No explicit provider required** - components self-organize via auto-created global context
 
 ### Environment-Specific Behavior
 
 **Development Mode:**
-- Renders navigation toolbar
-- Supports keyboard shortcuts (Ctrl/Cmd + Arrow keys)
+- Renders single global navigation toolbar (singleton pattern)
+- Toolbar includes deck selector when multiple IterationDecks are present
+- Supports keyboard shortcuts (Ctrl/Cmd + Arrow keys) for active deck
 - Shows all slide variations
-- Registers with global context
+- Automatic registration with global context on mount
 
 **Production Mode:**
 - Renders only the first slide by default
@@ -102,6 +105,8 @@ The module will use:
 - Focus on simplicity over complex features
 - Prioritize bundle size optimization
 - Use TypeScript throughout for better DX
-- Component registration happens automatically on mount
-- Keyboard shortcuts should be globally available in dev mode
+- Component registration happens automatically on mount/unmount
+- Keyboard shortcuts operate on the currently active deck in dev mode
 - Production detection should use `process.env.NODE_ENV`
+- **Multi-deck support**: Automatic handling of multiple IterationDeck instances with deck selector UI
+- **Zero-config approach**: No providers or setup required - components work out of the box

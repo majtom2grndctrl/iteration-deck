@@ -64,36 +64,106 @@ function IterationDeckSlide({
     <Button variant="gradient">Get Started</Button>
   </IterationDeckSlide>
 </IterationDeck>
+
+// Multiple decks on same page - automatic multi-deck support
+function DesignSystemPage() {
+  return (
+    <div>
+      <h2>Header Variations</h2>
+      <IterationDeck id="headers" label="Page Headers">
+        <IterationDeckSlide label="Standard">
+          <Header variant="standard" />
+        </IterationDeckSlide>
+        <IterationDeckSlide label="Compact">
+          <Header variant="compact" />
+        </IterationDeckSlide>
+      </IterationDeck>
+
+      <h2>Footer Variations</h2>
+      <IterationDeck id="footers" label="Page Footers">
+        <IterationDeckSlide label="Full">
+          <Footer variant="full" />
+        </IterationDeckSlide>
+        <IterationDeckSlide label="Minimal">
+          <Footer variant="minimal" />
+        </IterationDeckSlide>
+      </IterationDeck>
+      
+      {/* 
+        Toolbar automatically shows deck selector dropdown
+        Keyboard shortcuts work on selected deck
+        Zero configuration required
+      */}
+    </div>
+  );
+}
 ```
 
 ### State Management
 
 ```tsx
 interface IterationDeckState {
-  [deckId: string]: {
-    activeIndex: number;
-    label?: string;
-    slides: Array<{ label: string }>;
+  decks: {
+    [deckId: string]: {
+      activeIndex: number;
+      label?: string;
+      slides: Array<{ label: string }>;
+    };
   };
+  activeDeckId: string | null; // For multi-deck keyboard navigation
 }
 
-const IterationDeckContext = createContext<{
+interface IterationDeckContextType {
   state: IterationDeckState;
   setActiveIndex: (id: string, index: number) => void;
+  setActiveDeck: (id: string) => void;
   registerDeck: (id: string, label?: string) => void;
+  unregisterDeck: (id: string) => void;
   registerSlide: (deckId: string, slideLabel: string) => void;
-}>({});
+}
+
+// Auto-created global context - no explicit provider needed
+const IterationDeckContext = createContext<IterationDeckContextType>(defaultContextValue);
+```
+
+### Auto-Provider Pattern
+
+Components automatically participate in global context without requiring explicit provider setup:
+
+```tsx
+// IterationDeck automatically registers/unregisters itself
+const IterationDeck = ({ id, label, children }: IterationDeckProps) => {
+  const context = useContext(IterationDeckContext);
+  
+  useEffect(() => {
+    context.registerDeck(id, label);
+    return () => context.unregisterDeck(id);
+  }, [id, label]);
+
+  // Component logic...
+};
+
+// Usage requires zero setup - just import and use
+<IterationDeck id="hero" label="Hero Variations">
+  {/* slides */}
+</IterationDeck>
 ```
 
 ## Development Toolbar
 
-Simple development-only toolbar with:
-- List of all iteration decks (with their labels)
-- Previous/Next navigation for each deck
-- Current slide label display
-- Keyboard shortcuts (Ctrl/Cmd + Arrow keys)
+Single global toolbar (singleton pattern) with intelligent multi-deck support:
+- **Deck selector dropdown** (appears when multiple IterationDecks are present)
+- Previous/Next navigation for the currently active deck
+- Current slide label display for active deck
+- Keyboard shortcuts (Ctrl/Cmd + Arrow keys) operate on active deck only
 
-The toolbar accesses the `IterationDeckContext` directly and uses `setActiveIndex` for all navigation.
+### Multi-Deck Behavior
+- Single toolbar instance shared across all IterationDecks
+- Dropdown selector shows deck labels (falls back to deck IDs)
+- Active deck highlighted in selector and responds to keyboard shortcuts
+- Automatic cleanup when decks are unmounted
+
+The toolbar accesses the `IterationDeckContext` directly and uses `setActiveIndex` and `setActiveDeck` for navigation.
 
 ## Production Behavior
 
