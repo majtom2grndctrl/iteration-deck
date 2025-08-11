@@ -63,34 +63,90 @@ pnpm publish
 
 ## Project Architecture
 
-### Multi-Framework Package Structure
+### Implementation-Ready File Structure
 ```
 src/
-├── index.ts                    # Main exports (React by default)
-├── core/                       # Framework-agnostic core logic
-│   ├── state.ts               # State management primitives
-│   ├── url-params.ts          # URL parameter handling
-│   ├── keyboard.ts            # Keyboard event handling
-│   └── types.ts               # TypeScript definitions
-├── react/                     # React implementation (primary)
-│   ├── index.ts               # React exports
-│   ├── IterationDeck.tsx      # Main wrapper component
-│   ├── IterationDeckSlide.tsx # Individual slide wrapper
-│   ├── context.tsx            # React context provider
-│   ├── toolbar.tsx            # Development toolbar
-│   └── hooks.ts               # React hooks
-├── web-components/            # Future: Web components bridge
-│   ├── index.ts               # Web component exports
-│   ├── iteration-deck.ts      # Custom element definitions
-│   └── bridge.ts              # React-to-WebComponent bridge
-├── svelte/                    # Future: Svelte implementation
-│   ├── index.ts               # Svelte exports
-│   ├── IterationDeck.svelte   # Main component
-│   └── stores.ts              # Svelte stores
-└── vue/                       # Future: Vue implementation
-    ├── index.ts               # Vue exports
-    ├── IterationDeck.vue      # Main component
-    └── composables.ts         # Vue composables
+├── index.ts                    # Main exports (re-exports react/index.tsx)
+├── core/                       # Framework-agnostic logic
+│   ├── types.ts               # All TypeScript interfaces
+│   ├── state.ts               # createInitialState, createDeckActions  
+│   └── url-params.ts          # parseURLParams, updateURLParams
+├── react/                     # React implementation  
+│   ├── index.tsx              # Main exports + IterationDeck wrapper
+│   ├── context.tsx            # Global state + subscription system
+│   ├── IterationDeck.tsx      # Base component (registers with context)
+│   ├── IterationDeckSlide.tsx # Wrapper component (metadata only)
+│   ├── toolbar.tsx            # Singleton toolbar + portal management
+│   └── styles.css             # Complete design system CSS
+└── example/                   # Test application
+    ├── index.html             # Basic HTML shell  
+    └── app.tsx                # Demo with IterationDeckProvider wrapper
+```
+
+### Critical Implementation Patterns
+
+#### Auto-Provider Pattern (Avoid This - Use Manual Provider)
+```tsx
+// WRONG: Each IterationDeck creates own provider
+export function IterationDeck(props) {
+  return (
+    <IterationDeckProvider>  {/* Creates isolated state! */}
+      <BaseIterationDeck {...props} />
+      <ToolbarRoot />
+    </IterationDeckProvider>
+  )
+}
+
+// RIGHT: Single provider wraps app, components just connect
+export function IterationDeck(props) {
+  return (
+    <>
+      <BaseIterationDeck {...props} />  {/* Registers with global state */}
+      <ToolbarRoot />                   {/* Singleton toolbar */}
+    </>
+  )
+}
+```
+
+#### Toolbar Singleton Management  
+```tsx
+// src/react/toolbar.tsx - Critical implementation pattern
+let toolbarContainer: HTMLDivElement | null = null
+let toolbarMounted = false
+
+export function ToolbarRoot() {
+  useEffect(() => {
+    if (toolbarMounted) return // Prevent duplicate mounting
+    
+    const container = document.createElement('div')
+    container.id = 'iteration-deck-toolbar-root'
+    document.body.appendChild(container)
+    
+    const root = createRoot(container)
+    root.render(<IterationDeckToolbar />)
+    toolbarMounted = true
+  }, [])
+  
+  return null // Component renders nothing in React tree
+}
+```
+
+#### Global State Access Pattern
+```tsx
+// src/react/toolbar.tsx - Access global state outside React tree
+export function IterationDeckToolbar() {
+  const [, forceRender] = useState({})
+  const context = useGlobalIterationDeck() // Direct global access
+  
+  useEffect(() => {
+    return subscribeToGlobalState(() => {
+      forceRender({}) // Force re-render on state changes
+    })
+  }, [])
+  
+  if (!context?.isDevMode) return null
+  // Render toolbar...
+}
 ```
 
 ### Package Exports Strategy
@@ -134,19 +190,78 @@ src/
 
 ### Component API Design
 
-**IterationDeck** - Main wrapper component:
-- Required `id` prop for unique identification across AI generation sessions
-- Optional `label` for toolbar display (e.g., "AI Card Variations", "Button Explorations")
-- Optional `prompt` to document the original AI prompt used for generation
-- Optional `description` for additional context in stakeholder presentations
-- Children must be `IterationDeckSlide` components
+### Component Implementation Specifications
 
-**IterationDeckSlide** - Individual AI-generated variation wrapper:
-- Required `label` for navigation (e.g., "Modern Minimal", "Bold & Colorful", "Corporate Style")
-- Optional `aiPrompt` to document the specific prompt refinements for this variation
-- Optional `notes` prop for design rationale, AI feedback, or iteration insights
-- Optional `confidence` score from AI generation (for debugging/optimization)
-- Wraps any React content as `children` (typically AI-generated components)
+**IterationDeck** - Main wrapper component:
+- **Required `id` prop**: Unique identification for global state registration
+- **Optional `label`**: Toolbar display name (e.g., "Button Variants", "Card Layouts")
+- **Optional `prompt`**: Document original AI prompt for generation context
+- **Optional `description`**: Additional stakeholder presentation context
+- **Children constraint**: Must contain only `IterationDeckSlide` components
+- **Behavior**: Automatically registers with global state on mount, unregisters on unmount
+- **Rendering**: In dev mode shows active slide, in production shows first slide only
+
+**Key Implementation Details:**
+```tsx
+// Component extracts slide metadata from children
+const slides: SlideMetadata[] = Children.toArray(children)
+  .filter(isValidElement)
+  .map(child => ({
+    label: child.props.label,
+    aiPrompt: child.props.aiPrompt,
+    // ... other metadata
+  }))
+
+// Registers deck with global state
+useEffect(() => {
+  context.registerDeck({ id, label, slides, activeSlideIndex: 0 })
+  return () => context.unregisterDeck(id)
+}, [id])
+```
+
+**IterationDeckSlide** - Metadata wrapper component:
+- **Required `label`**: Navigation display name (e.g., "Modern Minimal", "Dark Mode")
+- **Optional `aiPrompt`**: Document specific prompt refinements for this variation
+- **Optional `notes`**: Design rationale, AI feedback, or iteration insights
+- **Optional `confidence`**: AI generation confidence score (0-1, dev mode only)
+- **Children**: Any React content (typically AI-generated components)
+- **Behavior**: Pure wrapper component - metadata extracted by parent IterationDeck
+
+**Key Implementation Detail:**
+```tsx  
+// Component is purely a wrapper - rendering handled by parent
+export function IterationDeckSlide({ children }) {
+  return <>{children}</>  // Props used only for metadata extraction
+}
+```
+
+### Required Usage Pattern
+
+**❌ Incorrect - Multiple Providers:**
+```tsx
+function App() {
+  return (
+    <div>
+      <IterationDeck id="buttons">...</IterationDeck>  {/* Creates own provider */}
+      <IterationDeck id="cards">...</IterationDeck>    {/* Creates another provider */}
+    </div>
+  )
+}
+```
+
+**✅ Correct - Single Provider:**
+```tsx
+function App() {
+  return (
+    <IterationDeckProvider>  {/* Single provider for entire app */}
+      <div>
+        <IterationDeck id="buttons">...</IterationDeck>  {/* Registers with shared state */}
+        <IterationDeck id="cards">...</IterationDeck>    {/* Registers with shared state */}
+      </div>
+    </IterationDeckProvider>
+  )
+}
+```
 
 ### AI-First Design Features
 - **Prompt documentation**: Track original AI prompts and refinements per slide
@@ -194,29 +309,75 @@ https://myapp.com/page?iteration-deck=cards&slide=modern&ai-session=eyJ2ZXJzaW9u
 - **Export capabilities**: Generate design specs from selected AI variations
 - **Version control integration**: Git-friendly storage of AI iteration sessions
 
-### State Management
+### Global State Management Architecture
 
-Uses React Context pattern with automatic provider creation:
-- Global state tracks all decks by ID with automatic registration/deregistration
-- Each deck maintains active slide index and slide metadata
-- Context tracks `activeDeckId` for multi-deck keyboard navigation
-- Context provides registration and navigation methods
-- Development toolbar consumes context for all interactions
-- **No explicit provider required** - components self-organize via auto-created global context
+**Critical Implementation Detail**: Multiple `IterationDeck` components must share a single global state, but toolbar renders in portal outside React tree.
+
+#### Singleton State Pattern
+```typescript
+// Global singleton state (src/react/context.tsx)
+let globalState: IterationDeckContextValue | null = null
+let subscribers: Set<() => void> = new Set()
+
+// State subscription for cross-component updates
+export function subscribeToGlobalState(callback: () => void) {
+  subscribers.add(callback)
+  return () => subscribers.delete(callback)
+}
+
+// Notify all subscribers when state changes
+function notifySubscribers() {
+  subscribers.forEach(callback => callback())
+}
+```
+
+#### Provider Pattern
+- **Single IterationDeckProvider** wraps entire application
+- **All IterationDeck components** register with same global state
+- **Toolbar accesses global state** via `useGlobalIterationDeck()` hook
+- **State updates trigger** subscriber notifications for toolbar re-render
+
+#### State Shape
+```typescript
+interface GlobalState {
+  decks: Record<string, DeckState>  // All registered decks
+  activeDeckId: string | null       // Currently selected deck
+  isDevMode: boolean               // Environment detection
+}
+
+interface DeckState {
+  id: string
+  label?: string
+  slides: SlideMetadata[]
+  activeSlideIndex: number         // Current slide per deck
+}
+```
 
 ### Environment-Specific Behavior
 
-**Development Mode:**
-- Renders single global navigation toolbar (singleton pattern)
-- Toolbar includes deck selector when multiple IterationDecks are present
-- Supports keyboard shortcuts (Ctrl/Cmd + Arrow keys) for active deck
-- Shows all slide variations
-- Automatic registration with global context on mount
+#### Development Mode
+- **Global toolbar singleton**: One toolbar for entire application (not per deck)
+- **Toolbar portal rendering**: Appends to `document.body` via React portal
+- **Multi-deck support**: Dropdown selector appears when >1 deck registered
+- **Keyboard shortcuts**: Arrow keys navigate when toolbar focused
+- **All slides visible**: IterationDeck renders active slide based on global state
 
-**Production Mode:**
-- Renders only the first slide by default
-- No toolbar or navigation UI
-- Minimal runtime footprint
+#### Production Mode  
+- **First slide only**: IterationDeck renders `Children.toArray(children)[0]`
+- **No toolbar**: Environment detection prevents mounting
+- **Minimal footprint**: Zero overhead in production builds
+
+#### Environment Detection Strategy
+```typescript
+// Primary: Vite/modern bundlers
+const isDevMode = import.meta.env?.MODE !== 'production'
+
+// Fallback: Traditional NODE_ENV (Webpack, etc.)
+const isDevMode = process.env?.NODE_ENV !== 'production'
+
+// Implementation:
+const isDevMode = (import.meta.env?.MODE || process.env?.NODE_ENV) !== 'production'
+```
 
 ### Implementation Phases
 
@@ -270,16 +431,92 @@ The module will use:
 - Framework-specific build targets with shared core bundle
 - Proper `package.json` exports field for all framework variants
 
-## Development Workflow
+## Development Workflow & Debugging Guide
 
-**Current Status:** Project is in specification phase with no source code yet implemented.
+### Implementation Sequence (Learned from Trial)
 
-**Next Steps:**
-1. Scaffold React TypeScript project structure
-2. Implement core components with context
-3. Build development toolbar with keyboard navigation
-4. Configure bundling for npm distribution
-5. Create example/demo application
+**Phase 1: Core Foundation (30 minutes)**
+1. **Scaffold project**: `pnpm init`, package.json exports, tsconfig.json, vite.config.ts
+2. **Core types & utilities**: All interfaces in `src/core/types.ts` first
+3. **State management**: `createInitialState`, `createDeckActions` with subscription system
+4. **URL parameter handling**: `parseURLParams`, `updateURLParams` with error handling
+
+**Phase 2: React Components (45 minutes)**  
+5. **Global context**: Provider with singleton state and subscriber notification
+6. **Base IterationDeck**: Component registration, slide metadata extraction
+7. **IterationDeckSlide**: Simple wrapper (props are metadata only)
+8. **Toolbar singleton**: Portal-based rendering with global state access
+
+**Phase 3: Styling & Polish (30 minutes)**
+9. **CSS design system**: Complete styles.css with all responsive breakpoints
+10. **Example application**: Multi-deck demo with provider wrapper
+11. **Icon fixes**: Use HTML entities (‹ ›) instead of Unicode arrows
+
+### Critical Debugging Techniques
+
+#### Toolbar Not Appearing Checklist
+```bash
+# 1. Check dev mode detection
+console.log('Environment:', import.meta.env?.MODE)
+
+# 2. Verify global state access  
+console.log('Global state:', useGlobalIterationDeck())
+
+# 3. Inspect DOM for container
+document.getElementById('iteration-deck-toolbar-root')
+
+# 4. Check for infinite render loops
+# Look for rapid console.log repetition - indicates subscription issues
+```
+
+#### State Registration Issues
+```tsx
+// Add debug logging to track deck registration
+export function IterationDeck({ id, ...props }) {
+  useEffect(() => {
+    console.log(`Registering deck: ${id}`, { props, slides: extractedSlides })
+  }, [id])
+  
+  // Check if deck appears in global state
+  const context = useIterationDeck()
+  console.log('Current decks:', Object.keys(context.decks))
+}
+```
+
+#### Portal Rendering Problems
+```tsx
+// Verify portal container creation
+useEffect(() => {
+  const container = document.getElementById('iteration-deck-toolbar-root')
+  console.log('Toolbar container:', container, 'Mounted:', toolbarMounted)
+}, [])
+```
+
+### Common Pitfalls & Solutions
+
+❌ **Multiple Providers**: Each IterationDeck creating own provider
+✅ **Single Provider**: Wrap entire app once, all decks register with same state
+
+❌ **Context in Portal**: Trying to useContext across portal boundary  
+✅ **Global State Access**: Use singleton with subscription system
+
+❌ **Unicode Issues**: Arrow characters (←, →) corrupted in file transfer
+✅ **HTML Entities**: Use ‹ and › or SVG components
+
+❌ **Environment Detection**: Using only `process.env.NODE_ENV`
+✅ **Bundler-Agnostic**: Check both `import.meta.env.MODE` and `process.env.NODE_ENV`
+
+### Performance Monitoring
+
+**Bundle Size Targets:**
+- Total: <10kb gzipped  
+- React component: ~8.5kb gzipped
+- CSS: ~1.5kb gzipped
+
+**Runtime Performance:**
+- State updates should not cause full re-renders
+- Toolbar should only re-render on actual state changes
+- URL updates should be debounced/throttled
 
 ## Code Style Guidelines
 
@@ -398,6 +635,8 @@ The module will use:
   --iteration-deck-bg-primary: #ffffff;
   --iteration-deck-bg-secondary: #f5f5f5;
   --iteration-deck-bg-elevated: #ffffff;
+  --iteration-deck-toolbar-bg: #f8f9fa;        /* Light gray toolbar background */
+  --iteration-deck-toolbar-interactive: #ffffff; /* White interactive areas */
   
   /* Text colors */
   --iteration-deck-text-primary: #1a1a1a;
@@ -426,6 +665,8 @@ The module will use:
     --iteration-deck-bg-primary: #1a1a1a;
     --iteration-deck-bg-secondary: #2d2d2d;
     --iteration-deck-bg-elevated: #2d2d2d;
+    --iteration-deck-toolbar-bg: #2d2d2d;        /* Dark gray toolbar background */
+    --iteration-deck-toolbar-interactive: #404040; /* Lighter interactive areas */
     
     /* Text colors */
     --iteration-deck-text-primary: #ffffff;
@@ -451,33 +692,63 @@ The module will use:
 
 ### Interaction Design
 
-#### Button States
+#### Pill-Shaped Toolbar Layout
 ```css
-/* Standard button styling */
-.button {
+/* Main toolbar container */
+.iteration-deck-toolbar {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  
+  /* Pill shape */
+  border-radius: 24px;
+  padding: var(--iteration-deck-space-3);
+  
+  /* Layout */
+  display: flex;
+  align-items: center;
+  gap: var(--iteration-deck-space-4);
+  max-width: 480px;
+  
+  /* Visual styling */
+  background: var(--iteration-deck-toolbar-bg);
+  border: 1px solid var(--iteration-deck-border-light);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(8px);
+  
+  /* Typography */
   font-family: var(--iteration-deck-font-family);
   font-size: var(--iteration-deck-font-size-sm);
-  padding: var(--iteration-deck-button-padding);
-  border: 1px solid var(--iteration-deck-border-medium);
-  background: var(--iteration-deck-bg-primary);
-  color: var(--iteration-deck-text-primary);
+  line-height: var(--iteration-deck-line-height-normal);
+}
+
+/* Interactive elements get white background */
+.iteration-deck-toolbar button,
+.iteration-deck-toolbar select {
+  background: var(--iteration-deck-toolbar-interactive);
+  border: 1px solid var(--iteration-deck-border-light);
+  border-radius: 8px;
+  padding: var(--iteration-deck-space-2) var(--iteration-deck-space-3);
+  font-family: var(--iteration-deck-font-family);
+  font-size: var(--iteration-deck-font-size-sm);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all var(--iteration-deck-timing-fast);
   
-  /* Focus state - always visible for accessibility */
+  /* Focus state */
   &:focus-visible {
     outline: 2px solid var(--iteration-deck-focus-ring);
     outline-offset: 2px;
   }
   
   /* Hover state */
-  &:hover {
+  &:hover:not(:disabled) {
     background: var(--iteration-deck-hover-bg);
     border-color: var(--iteration-deck-accent);
   }
   
   /* Active state */
-  &:active {
+  &:active:not(:disabled) {
     background: var(--iteration-deck-active-bg);
     transform: translateY(1px);
   }
@@ -488,26 +759,57 @@ The module will use:
     color: white;
     border-color: var(--iteration-deck-accent);
   }
+  
+  /* Disabled state */
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 1023px) {
+  .iteration-deck-toolbar {
+    bottom: 24px;
+    right: 24px;
+    gap: var(--iteration-deck-space-3);
+  }
+}
+
+@media (max-width: 767px) {
+  .iteration-deck-toolbar {
+    bottom: 16px;
+    right: 16px;
+    border-radius: 16px;
+    padding: var(--iteration-deck-space-2);
+    gap: var(--iteration-deck-space-2);
+    max-width: 320px;
+  }
 }
 ```
 
 #### Toolbar Behavior & Visual Design
-- **Position**: Fixed to bottom of viewport for easy access during design review
+- **Position**: Fixed to lower-right corner of viewport (not full-width)
+- **Spacing**: 24px from right and bottom edges on tablet+ devices
+- **Shape**: Pill-shaped container with rounded corners (border-radius: 24px)
+- **Background**: Light gray (#f8f9fa) with subtle shadow and backdrop blur
+- **Interactive areas**: White background for buttons, dropdowns, and controls
+- **Visual hierarchy**: Light container background, white interactive elements
 - **Layering**: High z-index (9999) to appear above all content
-- **Visual treatment**: Card-like appearance with subtle shadow and backdrop blur
-- **Clear visual hierarchy**: Deck selector prominent, navigation controls secondary
-- **Slide indicators**: Visual dots/pills showing current position (like presentation software)
-- **Responsive breakpoints**:
-  - Desktop: Full horizontal toolbar with descriptive labels and slide previews
-  - Tablet (≤768px): Compact toolbar with clear icons and abbreviated labels  
-  - Mobile (≤480px): Essential controls only with touch-friendly sizing
+- **Layout**: Horizontal flex layout with gap spacing between control groups
+- **Responsive behavior**:
+  - Desktop (≥1024px): Full pill layout, 24px from edges
+  - Tablet (768px-1023px): Compact pill layout, 24px from edges
+  - Mobile (≤767px): Reduced padding, 16px from edges, smaller border-radius
 
 #### Designer-Friendly Features
+- **Compact pill-shaped toolbar**: Fixed to lower-right corner, not full-width
+- **Visual hierarchy**: Light gray background with white interactive areas
 - **Visual slide indicators**: Dot navigation showing total slides and current position
 - **Slide labels prominently displayed**: Current slide name always visible
 - **Hover previews**: Quick visual preview of slides on hover (when feasible)
 - **Clear visual feedback**: Obvious visual states for all interactive elements
-- **Intuitive iconography**: Standard presentation/slideshow icons (play, pause, arrows)
+- **Intuitive iconography**: Standard presentation/slideshow icons (‹, ›)
 - **No technical jargon**: All UI text uses design/presentation terminology
 
 #### Animation Guidelines
