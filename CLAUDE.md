@@ -4,14 +4,41 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This project builds an NPM module containing React TypeScript components called `IterationDeck` and `IterationDeckSlide` for rapid design iteration. The components wrap UI variations with development-mode controls for switching between them using a slide deck metaphor.
+This project builds an NPM module containing React TypeScript components called `IterationDeck` and `IterationDeckSlide` for **AI-first prototyping workflows**. The components enable rapid design iteration by wrapping AI-generated UI variations with intuitive controls for switching between them using a familiar slide deck metaphor.
+
+### Vision: Designer Tools for the AI Era
+
+**The Problem**: Designers can iterate lightning-fast in Figma by duplicating frames and making non-destructive edits. But in AI-first prototyping workflows, where coding agents generate multiple variations of a component based on specs, there's no equivalent tool for comparing those iterations in-context.
+
+**The Solution**: IterationDeck bridges this gap by providing the "duplicate frame" equivalent for AI-generated code variations. Instead of switching between static mockups, designers can compare live, interactive prototypes directly in the product context.
+
+**Philosophy**: "We've had developer tools for so long. But where are the designer tools? Let's start one!"
+
+### Target Users
+**Primary**: Designers and Product Managers working with AI coding agents
+**Secondary**: Frontend developers building component libraries and design systems  
+**Tertiary**: Design system teams evaluating AI-generated component variations
+
+### AI-First Workflow
+1. **Designer creates spec**: "Make a card component with 5 different visual treatments"
+2. **AI generates variations**: Coding agent creates 5 different implementations
+3. **Designer compares in-context**: IterationDeck lets them toggle between variations on the actual page
+4. **Stakeholder review**: Share interactive prototypes without complex deployment
+5. **Decision & handoff**: Select preferred variation with documented rationale
+
+**Core User Goals:**
+- Compare AI-generated design variations in real product context
+- Present multiple AI-created options to stakeholders interactively
+- Iterate on AI prompts based on side-by-side comparisons
+- Document design decisions from AI exploration sessions
+- Bridge the gap between AI prototyping and production implementation
 
 **Key Details:**
 - Package name: `iteration-deck`
 - Target: < 10kb gzipped bundle size
 - Supports both ESM and CommonJS
 - Production builds render only the first child
-- Development mode includes toolbar with keyboard shortcuts
+- Development mode includes visual toolbar with both mouse and keyboard controls
 
 ## Development Commands
 
@@ -49,13 +76,64 @@ src/
 ### Component API Design
 
 **IterationDeck** - Main wrapper component:
-- Required `id` prop for unique identification
-- Optional `label` for toolbar display  
+- Required `id` prop for unique identification across AI generation sessions
+- Optional `label` for toolbar display (e.g., "AI Card Variations", "Button Explorations")
+- Optional `prompt` to document the original AI prompt used for generation
+- Optional `description` for additional context in stakeholder presentations
 - Children must be `IterationDeckSlide` components
 
-**IterationDeckSlide** - Individual variation wrapper:
-- Required `label` for navigation
-- Wraps any React content as `children`
+**IterationDeckSlide** - Individual AI-generated variation wrapper:
+- Required `label` for navigation (e.g., "Modern Minimal", "Bold & Colorful", "Corporate Style")
+- Optional `aiPrompt` to document the specific prompt refinements for this variation
+- Optional `notes` prop for design rationale, AI feedback, or iteration insights
+- Optional `confidence` score from AI generation (for debugging/optimization)
+- Wraps any React content as `children` (typically AI-generated components)
+
+### AI-First Design Features
+- **Prompt documentation**: Track original AI prompts and refinements per slide
+- **Iteration history**: Optional metadata about the AI generation process
+- **Confidence indicators**: Visual feedback about AI generation quality (dev mode only)
+- **Quick regeneration**: Interface for sending variations back to AI for refinement
+- **Batch operations**: Select multiple variations for combined AI refinement prompts
+
+### URL Sharing & Navigation
+
+**Router-Agnostic URL Parameters:**
+```javascript
+// Single deck sharing
+https://myapp.com/dashboard?iteration-deck=button-variations&slide=hover-state
+
+// Multiple decks (prefixed parameters)
+https://myapp.com/page?iteration-deck-1=buttons:hover-state&iteration-deck-2=cards:minimal
+
+// With AI prompt context
+https://myapp.com/page?iteration-deck=cards&slide=modern&prompt=make-it-more-minimal
+
+// Encoded for complex scenarios
+https://myapp.com/page?iteration-deck=cards&slide=modern&ai-session=eyJ2ZXJzaW9u...
+```
+
+**URL Parameter Schema:**
+- `iteration-deck={deckId}` - Sets active deck
+- `slide={slideLabel}` - Sets active slide (URL-encoded)
+- `prompt={aiPrompt}` - Optional AI prompt context (URL-encoded)
+- `ai-session={base64Data}` - Optional full AI session metadata
+- Multiple decks use prefixed params: `iteration-deck-1`, `iteration-deck-2`, etc.
+
+**Implementation Behavior:**
+- **On mount**: Read URL parameters and set initial deck/slide state
+- **On navigation**: Optionally update URL (configurable via props)
+- **Browser navigation**: Back/forward buttons work naturally
+- **Fallback**: Graceful handling when parameters are missing/invalid
+- **Encoding**: Safe URL encoding for slide labels and prompts
+
+### Design Collaboration Features  
+- **Shareable links**: URLs preserve exact deck/slide state for stakeholder reviews
+- **Presentation mode**: Clean interface hiding AI metadata during client presentations
+- **Bookmarkable sessions**: Designers can bookmark specific AI iteration states
+- **Cross-browser compatibility**: Works with any routing setup or static hosting
+- **Export capabilities**: Generate design specs from selected AI variations
+- **Version control integration**: Git-friendly storage of AI iteration sessions
 
 ### State Management
 
@@ -115,9 +193,10 @@ The module will use:
 - **Arrow keys**: Navigate between slides within active deck
 - **Enter/Space**: Activate buttons and select slides
 - **Escape**: Close deck selector or return focus to content
-- **Keyboard shortcuts**: 
-  - `Ctrl/Cmd + ←/→`: Navigate slides in active deck
-  - `Ctrl/Cmd + ↑/↓`: Switch between decks (when multiple present)
+- **Optional keyboard shortcuts** (for power users):
+  - `←/→`: Navigate slides in active deck (when toolbar focused)
+  - `↑/↓`: Switch between decks when multiple present (when toolbar focused)
+  - **Note**: Shortcuts work only when toolbar has focus to avoid conflicts with page interactions
 
 #### Screen Reader Support
 ```html
@@ -147,11 +226,21 @@ The module will use:
 - **Focus management**: Maintain focus position during slide transitions
 - **Animation duration**: Maximum 0.3s for interface transitions
 
-#### Error Handling & States
-- **Loading states**: Provide clear feedback during async operations  
-- **Error messages**: Descriptive text for screen readers, not just icons
-- **Empty states**: Clear messaging when no slides are available
-- **Graceful degradation**: Core functionality works without JavaScript
+#### Error Handling & Edge Cases (Design-Focused)
+- **Loading states**: "Loading design variations..." with friendly messaging
+- **Error states**: "Unable to load this variation" with suggestion to refresh
+- **Empty states**: "No design variations added yet" with helpful guidance
+- **Malformed content**: Hide broken slides gracefully, don't break entire deck
+- **Graceful degradation**: Show first variation when JavaScript disabled
+- **Too many slides**: Performance warnings in development, pagination suggestions
+- **Missing labels**: Auto-generate friendly names ("Variation 1", "Variation 2")
+
+#### Design Workflow Considerations  
+- **Presentation mode**: Clean URLs for sharing with stakeholders
+- **Design handoff**: Clear slide labels and descriptions for developer handoff
+- **Version control friendly**: Minimal markup changes when slides are reordered
+- **Screenshot/recording friendly**: High contrast toolbar that looks good in recordings
+- **Demo mode**: Option to auto-advance slides for presentations
 
 ### Styling Standards
 - **CSS Modules** for all component styling (`.module.css` files)
@@ -299,14 +388,24 @@ The module will use:
 }
 ```
 
-#### Toolbar Behavior
-- **Position**: Fixed to bottom of viewport (similar to browser dev tools)
+#### Toolbar Behavior & Visual Design
+- **Position**: Fixed to bottom of viewport for easy access during design review
 - **Layering**: High z-index (9999) to appear above all content
-- **Backdrop**: Semi-transparent backdrop-blur for visual separation
+- **Visual treatment**: Card-like appearance with subtle shadow and backdrop blur
+- **Clear visual hierarchy**: Deck selector prominent, navigation controls secondary
+- **Slide indicators**: Visual dots/pills showing current position (like presentation software)
 - **Responsive breakpoints**:
-  - Desktop: Full horizontal toolbar with all controls
-  - Tablet (≤768px): Compact toolbar with abbreviated labels
-  - Mobile (≤480px): Minimal toolbar with icons only
+  - Desktop: Full horizontal toolbar with descriptive labels and slide previews
+  - Tablet (≤768px): Compact toolbar with clear icons and abbreviated labels  
+  - Mobile (≤480px): Essential controls only with touch-friendly sizing
+
+#### Designer-Friendly Features
+- **Visual slide indicators**: Dot navigation showing total slides and current position
+- **Slide labels prominently displayed**: Current slide name always visible
+- **Hover previews**: Quick visual preview of slides on hover (when feasible)
+- **Clear visual feedback**: Obvious visual states for all interactive elements
+- **Intuitive iconography**: Standard presentation/slideshow icons (play, pause, arrows)
+- **No technical jargon**: All UI text uses design/presentation terminology
 
 #### Animation Guidelines
 ```css
