@@ -6,18 +6,6 @@ React TypeScript components for **AI-first prototyping workflows** that enable d
 
 **Core Philosophy:** Provide the "duplicate frame" equivalent for AI-generated code variations, allowing live comparison of interactive prototypes directly in product context.
 
-### AI-First Workflow
-1. **Designer creates spec**: "Make a card component with 5 different visual treatments"
-2. **AI generates variations**: Coding agent creates 5 different implementations
-3. **Designer compares in-context**: IterationDeck lets them toggle between variations
-4. **Stakeholder review**: Share interactive prototypes without complex deployment
-5. **Decision & handoff**: Select preferred variation with documented rationale
-
-### Target Users
-- **Primary**: Designers and Product Managers working with AI coding agents
-- **Secondary**: Frontend developers building component libraries
-- **Tertiary**: Design system teams evaluating AI-generated variations
-
 ## Component API
 
 ```tsx
@@ -142,72 +130,6 @@ function DesignSystemPage() {
 }
 ```
 
-### State Management
-
-**Architecture: Global Singleton with Subscription System**
-
-Uses global state management with subscription pattern (NOT React Context) to avoid portal rendering issues:
-
-```tsx
-interface GlobalState {
-  decks: { [deckId: string]: DeckState };
-  activeDeckId: string | null;
-  isDevMode: boolean;
-}
-
-interface DeckState {
-  id: string;
-  label?: string;
-  prompt?: string;
-  description?: string;
-  slides: SlideMetadata[];
-  activeSlideIndex: number;
-}
-
-interface DeckActions {
-  registerDeck: (deck: DeckState) => void;
-  unregisterDeck: (deckId: string) => void;
-  setActiveSlide: (deckId: string, slideIndex: number) => void;
-  setActiveDeck: (deckId: string) => void;
-  updateDeck: (deckId: string, updates: Partial<DeckState>) => void;
-}
-
-// Global state access functions
-function getGlobalState(): GlobalState;
-function subscribeToGlobalState(callback: () => void): () => void;
-function getGlobalActions(): DeckActions;
-```
-
-### Zero-Config Pattern
-
-Components automatically participate in global state without requiring explicit providers:
-
-```tsx
-// IterationDeck automatically registers/unregisters with global state
-const IterationDeck = ({ id, label, children }: IterationDeckProps) => {
-  const [, forceUpdate] = useReducer(x => x + 1, 0);
-  const { registerDeck, unregisterDeck } = getGlobalActions();
-  
-  // Subscribe to global state changes
-  useEffect(() => {
-    const unsubscribe = subscribeToGlobalState(forceUpdate);
-    return unsubscribe;
-  }, []);
-  
-  useEffect(() => {
-    registerDeck({ id, label, slides: extractedSlides, activeSlideIndex: 0 });
-    return () => unregisterDeck(id);
-  }, [id, label]);
-
-  // Component logic...
-};
-
-// Usage requires zero setup - just import and use
-<IterationDeck id="hero" label="Hero Variations">
-  {/* slides */}
-</IterationDeck>
-```
-
 ## Development Toolbar
 
 Single global toolbar (singleton pattern) with intelligent multi-deck support:
@@ -260,9 +182,6 @@ In production builds, render only the first child by default:
 ## Bundle Configuration
 
 ### Build Targets
-- **Total bundle size**: <10kb gzipped
-- **React components**: ~8.5kb gzipped  
-- **CSS modules**: ~1.5kb gzipped
 - **TypeScript declarations**: Full type safety
 - **Dual builds**: ESM and CommonJS support
 
@@ -270,38 +189,6 @@ In production builds, render only the first child by default:
 - **Vite**: Library mode with multiple entry points
 - **TypeScript**: Strict mode compilation
 - **CSS Modules**: Component-scoped styling
-- **Tree-shaking**: Optimal bundle size per import
-
-## NPM Module Structure
-
-```
-iteration-deck/
-├── package.json
-├── tsconfig.json
-├── vite.config.ts            # Vite library build configuration
-├── src/
-│   ├── index.ts              # Main export
-│   ├── core/                 # Core functionality
-│   │   ├── types.ts          # TypeScript interfaces
-│   │   ├── state.ts          # Global state management
-│   │   └── url-params.ts     # URL parameter handling
-│   └── react/                # React implementation
-│       ├── index.tsx         # React exports
-│       ├── IterationDeck.tsx + iterationDeck.module.css
-│       ├── IterationDeckSlide.tsx + iterationDeckSlide.module.css
-│       ├── toolbar.tsx + toolbar.module.css
-│       ├── global-context.ts # Global state access
-│       └── css-modules.d.ts  # TypeScript declarations
-├── dist/                     # Built files for npm
-│   ├── react/index.js        # React components build
-│   ├── core/index.js         # Core utilities build
-│   └── style.css             # Compiled CSS
-└── example/                  # Demo application
-    ├── index.html
-    ├── app.tsx
-    ├── demo.module.css
-    └── package.json
-```
 
 ## Installation & Usage
 
@@ -333,49 +220,12 @@ import { IterationDeck, IterationDeckSlide } from 'iteration-deck';
 ### Build Requirements
 - TypeScript compilation with declaration files
 - Rollup bundling for optimal tree-shaking
-- Separate ESM and CJS builds
 - Development vs production behavior detection
-- Minimal bundle size (< 10kb gzipped)
-
-### Package.json Fields
-```json
-{
-  "name": "iteration-deck",
-  "version": "1.0.0",
-  "description": "AI-first prototyping components for rapid design iteration",
-  "type": "module",
-  "main": "dist/react/index.js",
-  "types": "dist/react/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/react/index.d.ts",
-      "import": "./dist/react/index.js",
-      "require": "./dist/react/index.cjs"
-    },
-    "./react": {
-      "types": "./dist/react/index.d.ts",
-      "import": "./dist/react/index.js",
-      "require": "./dist/react/index.cjs"
-    },
-    "./core": {
-      "types": "./dist/core/index.d.ts",
-      "import": "./dist/core/index.js",
-      "require": "./dist/core/index.cjs"
-    }
-  },
-  "files": ["dist"],
-  "peerDependencies": {
-    "react": ">=16.8.0",
-    "react-dom": ">=16.8.0"
-  }
-}
-```
 
 ## Environment-Specific Behavior
 
 ### Development Mode
 - **Global toolbar**: Single toolbar for all IterationDeck instances
-- **Portal rendering**: Toolbar renders outside React tree via portal
 - **Multi-deck support**: Dropdown selector when multiple decks present
 - **Keyboard shortcuts**: Ctrl/Cmd + Arrow keys for navigation
 - **All slides visible**: Shows active slide based on state
@@ -385,17 +235,7 @@ import { IterationDeck, IterationDeckSlide } from 'iteration-deck';
 - **No toolbar**: Environment detection prevents mounting
 - **Zero overhead**: Minimal runtime footprint
 
-### Environment Detection
-```tsx
-const isDevMode = (import.meta.env?.MODE || process.env?.NODE_ENV) !== 'production'
-```
-
 ## AI-First Features
-
-### Prompt Tracking
-- Track original AI prompts per deck and slide
-- Document prompt refinements and iterations
-- Optional confidence scores for AI-generated variations
 
 ### Design Collaboration
 - **Shareable URLs**: Preserve exact deck/slide state for stakeholder reviews
@@ -419,7 +259,6 @@ https://myapp.com/page?iteration-deck=cards&slide=modern&prompt=make-it-more-min
 3. **Global state**: Cross-component state synchronization
 4. **URL synchronization**: State persists across page reloads
 5. **Keyboard shortcuts**: Navigation works on active deck only
-6. **Portal rendering**: Toolbar renders outside React tree correctly
 
 ## Implementation Plan
 
