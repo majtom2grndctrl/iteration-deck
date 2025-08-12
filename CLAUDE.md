@@ -31,44 +31,13 @@ pnpm lint         # Lint TypeScript code
 ## Implementation Guidelines
 
 ### Architecture Principles
-- **Global state management**: Use subscription pattern (NOT React Context for portals)
+- **Global state management**: Use Zustand for a framework agnostic state library that works well with React
 - **CSS Modules**: Individual `.module.css` file per component
-- **Environment detection**: Support both Vite and Webpack patterns
-- **Zero-config**: Components work out of the box, no providers required
-
-### Critical Patterns (Battle-Tested)
-
-**State Management:**
-```tsx
-// Global singleton with subscriptions (required for portal rendering)
-const globalState = getGlobalState()
-const unsubscribe = subscribeToGlobalState(callback)
-const { registerDeck, setActiveSlide } = getGlobalActions()
-```
-
-**Environment Detection:**
-```tsx
-// Support both bundler types
-const isDevMode = (import.meta.env?.MODE || process.env?.NODE_ENV) !== 'production'
-```
-
-**Toolbar Singleton:**
-```tsx
-// Only one toolbar globally, portal-based rendering
-let toolbarMounted = false // Prevent duplicates
-```
 
 ### Code Quality Standards
-- **Accessibility**: WCAG 2.1 AA compliance, proper ARIA attributes
-- **Performance**: <10kb gzipped bundle target
+- **Accessibility**: WCAG 2.2 AA compliance, proper ARIA attributes
 - **TypeScript**: Strict mode throughout
 - **Testing**: Unit + integration tests for critical paths
-
-### Common Pitfalls (Learned from Implementation)
-- ❌ **Multiple providers**: Each IterationDeck creating own provider  
-- ❌ **Context in portals**: Trying to useContext across portal boundary
-- ❌ **Unicode issues**: Arrow characters (←, →) corrupted in file transfer
-- ❌ **Environment detection**: Using only `process.env.NODE_ENV`
 
 ### Visual Design Principles
 - **Designer-friendly**: Clean, neutral palette that doesn't compete with user designs
