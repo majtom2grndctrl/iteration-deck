@@ -128,6 +128,16 @@ function DesignSystemPage() {
 }
 ```
 
+## 🤖 **For AI Coding Agents**
+
+**Looking to integrate Iteration Deck with AI coding assistants?** Check out our comprehensive [AI Agent Usage Guide](./AI_AGENT_USAGE.md) for:
+
+- 🎯 When and how to use Iteration Deck
+- 📋 Common patterns and examples  
+- 🔧 Integration with AI workflows
+- ✅ Best practices and naming conventions
+- 🚀 TypeScript utilities and helper functions
+
 ## 📖 **API Reference**
 
 ### `IterationDeck`

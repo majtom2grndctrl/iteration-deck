@@ -7,3 +7,17 @@ export type {
   IterationDeckProps, 
   IterationDeckSlideProps 
 } from './core/types'
+
+// Export utility types and helpers for AI agents
+export type {
+  ComponentVariation,
+  LayoutVariation, 
+  StateVariation
+} from './core/utilities'
+
+export {
+  createSlideFromVariation,
+  COMMON_VARIATION_PATTERNS,
+  generateVariationLabel,
+  AI_PRESETS
+} from './core/utilities'
