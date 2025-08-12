@@ -428,9 +428,9 @@ https://myapp.com/page?iteration-deck=cards&slide=modern&prompt=make-it-more-min
 #### Initial Project Scaffolding
 Run the following terminal command to scaffold the project:
 ```bash
-npm create vite@latest iteration-deck -- --template react-ts
+pnpm create vite@latest iteration-deck -- --template react-ts
 cd iteration-deck
-npm install
+pnpm install
 ```
 
 #### Copy Scaffolded Files to Project Root
@@ -443,7 +443,7 @@ rm -rf iteration-deck/
 
 #### Post-Scaffolding Tasks
 - [ ] Review and adjust generated configuration files for npm library distribution
-- [ ] Update package.json with proper npm fields and library-specific scripts
+- [ ] Update package.json with proper package fields and library-specific scripts
 - [ ] Configure Vite for library bundling instead of app bundling
 - [ ] Install any additional dependencies required for iteration-deck components
 - [ ] Update tsconfig.json for library builds if needed
@@ -467,6 +467,6 @@ rm -rf iteration-deck/
 - [ ] NPM publishing workflow
 
 **Agent B:** Example Application
-- [ ] Demo app consuming the npm package
+- [ ] Demo app consuming the pnpm package
 - [ ] Usage documentation and README
 - [ ] Installation testing
