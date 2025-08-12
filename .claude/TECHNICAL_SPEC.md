@@ -264,22 +264,6 @@ https://myapp.com/page?iteration-deck=cards&slide=modern&prompt=make-it-more-min
 
 ### Phase 1: NPM Module Setup
 
-#### Initial Project Scaffolding
-Run the following terminal command to scaffold the project:
-```bash
-pnpm create vite@latest iteration-deck -- --template react-ts
-cd iteration-deck
-pnpm install
-```
-
-#### Copy Scaffolded Files to Project Root
-Move the generated files from the nested folder to this project root:
-```bash
-cd ..
-cp -r iteration-deck/* ./
-rm -rf iteration-deck/
-```
-
 #### Post-Scaffolding Tasks
 - [ ] Review and adjust generated configuration files for npm library distribution
 - [ ] Update package.json with proper package fields and library-specific scripts
