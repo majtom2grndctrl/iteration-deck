@@ -76,6 +76,12 @@ let toolbarMounted = false // Prevent duplicates
 - **Visual hierarchy**: Light gray background, white interactive areas
 - **Auto theming**: `prefers-color-scheme` support for light/dark modes
 
+### UI Design System Requirements
+- **Spacing**: 8px base grid system (4px, 8px, 12px, 16px, 24px, 32px progression)
+- **Colors**: Neutral gray scale with semantic variants (50, 100, 200, 300, 400, 500, 600, 700, 800, 900)
+- **Touch targets**: 44px minimum for interactive elements
+- **Typography**: System font stack matching OS/browser dev tools aesthetic
+
 ### File Organization
 ```
 src/
