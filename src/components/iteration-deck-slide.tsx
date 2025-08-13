@@ -1,5 +1,5 @@
 import { Component, Prop, Element, Event, EventEmitter, Watch, h, Host } from '@stencil/core';
-import { isDevelopment } from '../core/store';
+import { isDevelopment } from '../core/environment';
 
 @Component({
   tag: 'iteration-deck-slide',
@@ -48,7 +48,7 @@ export class IterationDeckSlide {
     
     return (
       <Host class={isDev ? 'dev-mode' : ''}>
-        <div class="slide-content">
+        <div class="slideContent">
           <slot></slot>
         </div>
       </Host>

@@ -5,7 +5,14 @@ node_modules/
 # Build outputs
 dist/
 build/
+www/
 *.tsbuildinfo
+
+# Stencil auto-generated files
+src/generated/
+src/components.d.ts
+.stencil/
+hydrate/
 
 # Environment variables
 .env
@@ -82,13 +89,20 @@ jspm_packages/
 
 # Nuxt.js build / generate output
 .nuxt
-dist
 
-# Vite build tool
+# Vite build tool (legacy)
 .vite
+
+# Stencil cache and outputs  
+.stencil/
+loader/
 
 # Rollup cache
 .rollup.cache
+
+# Auto-generated documentation (Stencil generates these)
+docs/
+readme.md
 
 # Storybook build outputs
 .out

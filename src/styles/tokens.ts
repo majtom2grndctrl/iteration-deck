@@ -1,10 +1,7 @@
 /**
  * Design Tokens for Iteration Deck Components
- * Following 8px base grid system and neutral color palette
- * 
- * NOTE: These tokens are used for reference and exported for consumers.
- * The actual CSS custom properties are generated in src/styles/theme-tokens.css
- * based on this structured data.
+ * Structured TypeScript object that will be converted to CSS custom properties
+ * via vanilla-extract's createGlobalTheme
  */
 
 // Spacing tokens (8px base grid)
@@ -19,7 +16,7 @@ export const spacing = {
   '4xl': '48px',
   '5xl': '56px',
   '6xl': '64px'
-} as const
+} as const;
 
 // Color tokens (neutral gray scale with semantic variants)
 export const colors = {
@@ -59,7 +56,7 @@ export const colors = {
     hoverDark: 'rgba(255, 255, 255, 0.1)',
     disabled: '0.4'
   }
-} as const
+} as const;
 
 // Typography tokens
 export const typography = {
@@ -80,7 +77,7 @@ export const typography = {
     normal: '1.5',
     relaxed: '1.6'
   }
-} as const
+} as const;
 
 // Component-specific tokens
 export const components = {
@@ -103,7 +100,7 @@ export const components = {
     width: '1px',
     height: '24px'
   }
-} as const
+} as const;
 
 // Animation tokens
 export const animation = {
@@ -118,7 +115,7 @@ export const animation = {
     easeOut: 'ease-out',
     easeInOut: 'ease-in-out'
   }
-} as const
+} as const;
 
 // Z-index scale
 export const zIndex = {
@@ -131,7 +128,7 @@ export const zIndex = {
   tooltip: '1060',
   toast: '1070',
   toolbar: '10000'
-} as const
+} as const;
 
 // Breakpoints for responsive design
 export const breakpoints = {
@@ -139,4 +136,20 @@ export const breakpoints = {
   md: '768px',
   lg: '1024px',
   xl: '1280px'
-} as const
+} as const;
+
+/**
+ * Combined design tokens object for vanilla-extract theme generation
+ * This structure will be converted to CSS custom properties
+ */
+export const tokens = {
+  spacing,
+  colors,
+  typography,
+  components,
+  animation,
+  zIndex,
+  breakpoints
+} as const;
+
+export type Tokens = typeof tokens;

@@ -112,7 +112,7 @@ class IterationDeckStore {
     return this.activeDeckId;
   }
 
-  getActiveDeck() {
+  getActiveDeck(): DeckData | null {
     return this.activeDeckId ? this.decks.get(this.activeDeckId) || null : null;
   }
 
@@ -139,37 +139,3 @@ export function getIterationDeckStore(): IterationDeckStore {
   return storeInstance;
 }
 
-// Utility function to check if we're in development mode
-export function isDevelopment(): boolean {
-  // Check if we're in a test environment first
-  if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test') {
-    return true; // Default to development mode in tests
-  }
-  
-  // Check process.env.NODE_ENV if available
-  if (typeof process !== 'undefined' && process.env.NODE_ENV) {
-    return process.env.NODE_ENV === 'development';
-  }
-  
-  // Check global process if available
-  if (typeof globalThis !== 'undefined' && (globalThis as any).process?.env?.NODE_ENV) {
-    return (globalThis as any).process.env.NODE_ENV === 'development';
-  }
-  
-  try {
-    // Fall back to import.meta.env.DEV
-    if (typeof import.meta !== 'undefined' && (import.meta as any).env && typeof (import.meta as any).env.DEV === 'boolean') {
-      return (import.meta as any).env.DEV;
-    }
-  } catch (e) {
-    // import.meta not supported in this environment (e.g., Jest)
-  }
-  
-  // Check global mock set up in tests
-  if (typeof globalThis !== 'undefined' && (globalThis as any)['import.meta']?.env?.DEV !== undefined) {
-    return (globalThis as any)['import.meta'].env.DEV;
-  }
-  
-  // Default to false (production)
-  return false;
-}

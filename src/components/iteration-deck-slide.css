@@ -2,20 +2,14 @@
   display: block;
 }
 
-:host([active]) {
-  /* Slide is currently active */
-}
-
-.slide-content {
+.slideContent {
   width: 100%;
 }
 
-/* Production mode - only show if this is the first slide */
 :host(:not([active])) {
   display: none;
 }
 
-/* Development mode - handle visibility through parent */
 :host(.dev-mode:not([active])) {
   opacity: 0;
   pointer-events: none;
@@ -23,10 +17,12 @@
   top: 0;
   left: 0;
   width: 100%;
+  display: block;
 }
 
 :host(.dev-mode[active]) {
   opacity: 1;
   pointer-events: auto;
   position: relative;
+  display: block;
 }

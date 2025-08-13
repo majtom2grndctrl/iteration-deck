@@ -2,16 +2,13 @@ import { newSpecPage } from '@stencil/core/testing';
 import { IterationDeck } from './iteration-deck';
 import { IterationDeckSlide } from './iteration-deck-slide';
 import { IterationDeckToolbar } from './iteration-deck-toolbar';
-import { getIterationDeckStore, isDevelopment } from '../core/store';
+import { getIterationDeckStore } from '../core/store';
+import { isDevelopment } from '../core/environment';
 
 // Mock isDevelopment function
-jest.mock('../core/store', () => {
-  const originalModule = jest.requireActual('../core/store');
-  return {
-    ...originalModule,
-    isDevelopment: jest.fn(() => true),
-  };
-});
+jest.mock('../core/environment', () => ({
+  isDevelopment: jest.fn(() => true),
+}));
 
 // Mock global toolbar functions
 jest.mock('./global', () => ({

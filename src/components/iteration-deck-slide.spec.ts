@@ -1,15 +1,11 @@
 import { newSpecPage } from '@stencil/core/testing';
 import { IterationDeckSlide } from './iteration-deck-slide';
-import { isDevelopment } from '../core/store';
+import { isDevelopment } from '../core/environment';
 
 // Mock isDevelopment function
-jest.mock('../core/store', () => {
-  const originalModule = jest.requireActual('../core/store');
-  return {
-    ...originalModule,
-    isDevelopment: jest.fn(() => true),
-  };
-});
+jest.mock('../core/environment', () => ({
+  isDevelopment: jest.fn(() => true),
+}));
 
 describe('iteration-deck-slide', () => {
   beforeEach(() => {

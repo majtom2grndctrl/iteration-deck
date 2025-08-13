@@ -1,9 +1,10 @@
 import { Component, Prop, h, State, Listen, Method, Element } from '@stencil/core';
-import { getIterationDeckStore, isDevelopment, type SlideData } from '../core/store';
-import * as styles from './iteration-deck.css';
+import { getIterationDeckStore, type SlideData } from '../core/store';
+import { isDevelopment } from '../core/environment';
 
 @Component({
   tag: 'iteration-deck',
+  styleUrl: 'iteration-deck.css',
   shadow: true,
 })
 export class IterationDeck {
@@ -110,7 +111,7 @@ export class IterationDeck {
     if (!isDev) {
       // Production: render only the first slide
       return (
-        <div class={`${styles.iterationDeck} ${styles.productionMode}`}>
+        <div class="iterationDeck">
           <slot></slot>
         </div>
       );
@@ -118,8 +119,8 @@ export class IterationDeck {
 
     // Development: render all slides with visibility control
     return (
-      <div class={styles.iterationDeck}>
-        <div class={`${styles.slidesContainer} ${styles.slidesContainerDevMode}`}>
+      <div class="iterationDeck">
+        <div class="slidesContainer dev-mode">
           <slot></slot>
         </div>
       </div>

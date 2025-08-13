@@ -4,19 +4,515 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Iteration Deck - Stencil Components</title>
+    <title>Iteration Deck - AI-First Prototyping Components</title>
     <script type="module" src="/build/iteration-deck.esm.js"></script>
     <script nomodule src="/build/iteration-deck.js"></script>
+    <link rel="stylesheet" href="/build/iteration-deck.css" />
+    <style>
+      /* Page styling for compelling demo */
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        margin: 0;
+        padding: 40px 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        color: #333;
+      }
+
+      .demo-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 16px;
+        padding: 40px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      }
+
+      .demo-header {
+        text-align: center;
+        margin-bottom: 60px;
+      }
+
+      .demo-header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 16px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .demo-header p {
+        font-size: 1.2rem;
+        color: #666;
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.6;
+      }
+
+      .section {
+        margin: 60px 0;
+      }
+
+      .section-header {
+        margin-bottom: 32px;
+      }
+
+      .section-title {
+        font-size: 1.75rem;
+        margin-bottom: 8px;
+        color: #333;
+      }
+
+      .section-description {
+        color: #666;
+        font-size: 1rem;
+        margin-bottom: 24px;
+      }
+
+      /* Hero section variations */
+      .hero-variation {
+        padding: 60px 40px;
+        border-radius: 12px;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .hero-1 {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+
+      .hero-2 {
+        background: #f8f9fa;
+        border: 2px solid #e9ecef;
+        color: #333;
+      }
+
+      .hero-3 {
+        background: #343a40;
+        color: white;
+      }
+
+      .hero-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 16px;
+      }
+
+      .hero-subtitle {
+        font-size: 1.25rem;
+        opacity: 0.9;
+        margin-bottom: 32px;
+      }
+
+      .cta-button {
+        padding: 12px 32px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+      }
+
+      .cta-button:hover {
+        transform: translateY(-2px);
+      }
+
+      .cta-primary {
+        background: #007bff;
+        color: white;
+      }
+
+      .cta-outline {
+        background: transparent;
+        color: #007bff;
+        border: 2px solid #007bff;
+      }
+
+      .cta-gradient {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        color: white;
+      }
+
+      /* Card variations */
+      .card {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+
+      .card-minimal {
+        border: 1px solid #e9ecef;
+        box-shadow: none;
+      }
+
+      .card-elevated {
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+      }
+
+      .card-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 12px;
+        color: #333;
+      }
+
+      .card-content {
+        color: #666;
+        line-height: 1.6;
+      }
+
+      /* Navigation variations */
+      .nav {
+        padding: 16px 0;
+        margin-bottom: 20px;
+      }
+
+      .nav-standard {
+        background: #fff;
+        border-bottom: 1px solid #e9ecef;
+      }
+
+      .nav-minimal {
+        background: transparent;
+      }
+
+      .nav-dark {
+        background: #343a40;
+        color: white;
+      }
+
+      .nav-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+
+      .nav-logo {
+        font-size: 1.25rem;
+        font-weight: 700;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 32px;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .nav-link {
+        color: inherit;
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      /* Development mode indicator */
+      .dev-mode-indicator {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #28a745;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        z-index: 1000;
+      }
+
+      /* Keyboard shortcuts hint */
+      .shortcuts-hint {
+        background: #f8f9fa;
+        border-left: 4px solid #667eea;
+        padding: 16px;
+        margin: 20px 0;
+        border-radius: 4px;
+      }
+
+      .shortcuts-hint h4 {
+        margin: 0 0 8px 0;
+        color: #333;
+      }
+
+      .shortcuts-hint p {
+        margin: 0;
+        color: #666;
+        font-size: 0.9rem;
+      }
+    </style>
   </head>
   <body>
-    <div id="root">
-      <h1>Iteration Deck - Stencil Web Components</h1>
-      <p>Testing Stencil setup...</p>
-      
-      <!-- Test component to verify Stencil is working -->
-      <iteration-deck-test message="Stencil setup test"></iteration-deck-test>
-      
-      <!-- Future: Real iteration deck components will go here -->
+    <div class="dev-mode-indicator">
+      🔧 Development Mode
     </div>
+
+    <!-- Global toolbar singleton - automatically appears when decks are present -->
+    <iteration-deck-toolbar></iteration-deck-toolbar>
+
+    <div class="demo-container">
+      <div class="demo-header">
+        <h1>Iteration Deck</h1>
+        <p>AI-First Prototyping Components for Designers and Product Managers. Compare live, interactive UI variations directly in product context using the slide deck metaphor.</p>
+      </div>
+
+      <div class="shortcuts-hint">
+        <h4>🎮 Keyboard Shortcuts</h4>
+        <p><strong>Ctrl/Cmd + ←/→</strong> Navigate slides • <strong>Dropdown</strong> Switch between decks • All controls work in development mode</p>
+      </div>
+
+      <!-- Hero Section Variations -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">Hero Section Variations</h2>
+          <p class="section-description">Three different approaches to landing page hero sections. Each variation targets different brand personalities and user experiences.</p>
+        </div>
+
+        <iteration-deck deck-id="hero-sections" label="Hero Layouts" prompt="Create engaging hero sections with different visual approaches">
+          <iteration-deck-slide 
+            label="Gradient Bold" 
+            ai-prompt="Create a bold gradient hero with strong visual impact"
+            confidence="0.95"
+            notes="Designer preferred for tech companies">
+            <div class="hero-variation hero-1">
+              <h2 class="hero-title">Build The Future</h2>
+              <p class="hero-subtitle">Revolutionary AI-powered tools for modern development teams</p>
+              <button class="cta-button cta-primary">Get Started Free</button>
+            </div>
+          </iteration-deck-slide>
+
+          <iteration-deck-slide 
+            label="Clean Minimal" 
+            ai-prompt="Minimal, clean design focusing on typography and whitespace"
+            confidence="0.88"
+            notes="Better for enterprise or professional services">
+            <div class="hero-variation hero-2">
+              <h2 class="hero-title">Simple. Powerful. Effective.</h2>
+              <p class="hero-subtitle">The productivity platform that grows with your team</p>
+              <button class="cta-button cta-outline">Learn More</button>
+            </div>
+          </iteration-deck-slide>
+
+          <iteration-deck-slide 
+            label="Dark & Modern" 
+            ai-prompt="Modern dark theme with sleek professional appearance"
+            confidence="0.92"
+            notes="Appeals to developer/technical audiences">
+            <div class="hero-variation hero-3">
+              <h2 class="hero-title">Code. Deploy. Scale.</h2>
+              <p class="hero-subtitle">Infrastructure that adapts to your ambitious projects</p>
+              <button class="cta-button cta-gradient">Start Building</button>
+            </div>
+          </iteration-deck-slide>
+        </iteration-deck>
+      </section>
+
+      <!-- Call-to-Action Button Variations -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">CTA Button Variations</h2>
+          <p class="section-description">Different button styles for various contexts and conversion optimization. Test which performs best for your audience.</p>
+        </div>
+
+        <iteration-deck deck-id="cta-buttons" label="CTA Buttons" prompt="Design effective call-to-action buttons with different styles">
+          <iteration-deck-slide 
+            label="Primary Solid" 
+            ai-prompt="Bold, attention-grabbing solid button"
+            confidence="0.94">
+            <div style="text-align: center; padding: 40px;">
+              <button class="cta-button cta-primary">Get Started Today</button>
+            </div>
+          </iteration-deck-slide>
+
+          <iteration-deck-slide 
+            label="Outline Style" 
+            ai-prompt="Subtle outline button for secondary actions"
+            confidence="0.89">
+            <div style="text-align: center; padding: 40px;">
+              <button class="cta-button cta-outline">Learn More</button>
+            </div>
+          </iteration-deck-slide>
+
+          <iteration-deck-slide 
+            label="Gradient Eye-Catcher" 
+            ai-prompt="Vibrant gradient button to maximize attention"
+            confidence="0.87"
+            notes="A/B test showed 15% higher click-through rate">
+            <div style="text-align: center; padding: 40px;">
+              <button class="cta-button cta-gradient">Start Free Trial</button>
+            </div>
+          </iteration-deck-slide>
+        </iteration-deck>
+      </section>
+
+      <!-- Card Component Variations -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">Card Component Variations</h2>
+          <p class="section-description">Product or feature cards with different visual treatments. Optimized for different content types and page layouts.</p>
+        </div>
+
+        <iteration-deck deck-id="product-cards" label="Product Cards" prompt="Create product showcase cards with varying visual emphasis">
+          <iteration-deck-slide 
+            label="Standard Card" 
+            ai-prompt="Balanced card design with subtle shadow">
+            <div class="card">
+              <h3 class="card-title">Pro Features</h3>
+              <p class="card-content">Advanced analytics, custom integrations, and priority support for growing teams.</p>
+            </div>
+          </iteration-deck-slide>
+
+          <iteration-deck-slide 
+            label="Minimal Border" 
+            ai-prompt="Clean minimal card with just a border"
+            confidence="0.85">
+            <div class="card card-minimal">
+              <h3 class="card-title">Pro Features</h3>
+              <p class="card-content">Advanced analytics, custom integrations, and priority support for growing teams.</p>
+            </div>
+          </iteration-deck-slide>
+
+          <iteration-deck-slide 
+            label="Elevated Shadow" 
+            ai-prompt="High-impact card with pronounced shadow"
+            confidence="0.91">
+            <div class="card card-elevated">
+              <h3 class="card-title">Pro Features</h3>
+              <p class="card-content">Advanced analytics, custom integrations, and priority support for growing teams.</p>
+            </div>
+          </iteration-deck-slide>
+        </iteration-deck>
+      </section>
+
+      <!-- Navigation Variations -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">Navigation Variations</h2>
+          <p class="section-description">Different navigation styles for various brand personalities and user interface requirements.</p>
+        </div>
+
+        <iteration-deck deck-id="navigation" label="Site Navigation" prompt="Design navigation bars suitable for different brand styles">
+          <iteration-deck-slide 
+            label="Standard Light" 
+            ai-prompt="Clean, professional light navigation">
+            <div class="nav nav-standard">
+              <div class="nav-content">
+                <div class="nav-logo">YourBrand</div>
+                <ul class="nav-links">
+                  <li><a href="#" class="nav-link">Products</a></li>
+                  <li><a href="#" class="nav-link">Solutions</a></li>
+                  <li><a href="#" class="nav-link">Company</a></li>
+                  <li><a href="#" class="nav-link">Contact</a></li>
+                </ul>
+              </div>
+            </div>
+          </iteration-deck-slide>
+
+          <iteration-deck-slide 
+            label="Minimal Transparent" 
+            ai-prompt="Ultra-minimal navigation with no background"
+            confidence="0.82">
+            <div class="nav nav-minimal">
+              <div class="nav-content">
+                <div class="nav-logo">YourBrand</div>
+                <ul class="nav-links">
+                  <li><a href="#" class="nav-link">Products</a></li>
+                  <li><a href="#" class="nav-link">Solutions</a></li>
+                  <li><a href="#" class="nav-link">Company</a></li>
+                  <li><a href="#" class="nav-link">Contact</a></li>
+                </ul>
+              </div>
+            </div>
+          </iteration-deck-slide>
+
+          <iteration-deck-slide 
+            label="Dark Theme" 
+            ai-prompt="Professional dark navigation for modern apps"
+            confidence="0.93">
+            <div class="nav nav-dark">
+              <div class="nav-content">
+                <div class="nav-logo">YourBrand</div>
+                <ul class="nav-links">
+                  <li><a href="#" class="nav-link">Products</a></li>
+                  <li><a href="#" class="nav-link">Solutions</a></li>
+                  <li><a href="#" class="nav-link">Company</a></li>
+                  <li><a href="#" class="nav-link">Contact</a></li>
+                </ul>
+              </div>
+            </div>
+          </iteration-deck-slide>
+        </iteration-deck>
+      </section>
+
+      <!-- Multi-deck Demo Instructions -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">🎯 Multi-Deck Demo Features</h2>
+          <p class="section-description">This page demonstrates the complete Iteration Deck feature set:</p>
+        </div>
+
+        <div style="background: #f8f9fa; padding: 24px; border-radius: 8px; margin-bottom: 32px;">
+          <ul style="margin: 0; padding-left: 20px; color: #555;">
+            <li><strong>Single Global Toolbar:</strong> One toolbar controls all iteration decks on the page</li>
+            <li><strong>Deck Selector Dropdown:</strong> Switch between "Hero Layouts", "CTA Buttons", "Product Cards", and "Site Navigation"</li>
+            <li><strong>Keyboard Navigation:</strong> Use Ctrl/Cmd + Arrow keys to navigate slides in the active deck</li>
+            <li><strong>Development Mode:</strong> All features active (toolbar, navigation, multiple slides visible)</li>
+            <li><strong>Production Behavior:</strong> In production, only the first slide of each deck would be visible</li>
+            <li><strong>AI Metadata:</strong> Each slide can track AI prompts, confidence scores, and design notes</li>
+          </ul>
+        </div>
+
+        <div style="background: #fff3cd; padding: 16px; border-radius: 4px; border-left: 4px solid #ffc107;">
+          <strong>Try it:</strong> Use the toolbar at the bottom to switch between decks and navigate slides. The keyboard shortcuts work on whichever deck is currently selected in the dropdown.
+        </div>
+      </section>
+    </div>
+
+    <script>
+      // Add some interactive enhancements
+      document.addEventListener('DOMContentLoaded', function() {
+        console.log('🚀 Iteration Deck Demo loaded');
+        console.log('📊 Found', document.querySelectorAll('iteration-deck').length, 'iteration decks');
+        console.log('🔧 Found', document.querySelectorAll('iteration-deck-toolbar').length, 'toolbars');
+        console.log('🎯 Development mode active - all features enabled');
+        
+        // Log slide changes for demo purposes
+        window.addEventListener('iteration-deck:slide-changed', function(event) {
+          console.log('🔄 Slide changed:', event.detail);
+        });
+        
+        window.addEventListener('iteration-deck:active-deck-changed', function(event) {
+          console.log('🎛️ Active deck changed:', event.detail);
+        });
+        
+        // Debug component registration
+        setTimeout(() => {
+          const toolbar = document.querySelector('iteration-deck-toolbar');
+          if (toolbar) {
+            console.log('✅ Toolbar element found:', toolbar);
+            const styles = window.getComputedStyle(toolbar);
+            console.log('📐 Toolbar position:', styles.position, 'bottom:', styles.bottom, 'left:', styles.left);
+            console.log('📐 Toolbar display:', styles.display, 'visibility:', styles.visibility);
+            console.log('📐 Toolbar background:', styles.background);
+          } else {
+            console.log('❌ Toolbar element not found');
+          }
+          
+          const decks = document.querySelectorAll('iteration-deck');
+          decks.forEach((deck, i) => {
+            console.log(`🃏 Deck ${i}:`, deck, 'deck-id:', deck.getAttribute('deck-id'));
+            const slides = deck.querySelectorAll('iteration-deck-slide');
+            console.log(`  📄 ${slides.length} slides in deck ${i}`);
+          });
+        }, 2000);
+      });
+    </script>
   </body>
 </html>

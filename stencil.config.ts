@@ -1,9 +1,10 @@
 import { Config } from '@stencil/core';
 import { reactOutputTarget } from '@stencil/react-output-target';
+import { vanillaExtractPlugin } from '@vanilla-extract/rollup-plugin';
 
 export const config: Config = {
   namespace: 'iteration-deck',
-  srcDir: 'src/components',
+  srcDir: 'src',
   globalStyle: 'src/styles/global.css',
   buildEs5: 'prod',
   extras: {
@@ -20,7 +21,7 @@ export const config: Config = {
       esmLoaderPath: '../loader',
       copy: [
         {
-          src: '../styles/global.css',
+          src: 'styles/global.css',
           dest: 'iteration-deck/global.css'
         }
       ]
@@ -55,12 +56,8 @@ export const config: Config = {
       serviceWorker: null,
       copy: [
         {
-          src: '../../index.html',
+          src: '../index.html',
           dest: 'index.html'
-        },
-        {
-          src: '../../public/**/*',
-          dest: '.'
         }
       ]
     }
@@ -100,11 +97,30 @@ export const config: Config = {
     ]
   },
   
-  // Enable source maps for development
+  // Enhanced development server configuration
   devServer: {
     reloadStrategy: 'hmr',
     openBrowser: false,
-    port: 3333
+    port: 3333,
+    host: '0.0.0.0', // Allow external connections for development
+    historyApiFallback: true, // Enable SPA routing support
+    logRequests: true, // Log HTTP requests for debugging
+    root: 'www', // Serve files from www directory
+    watchGlob: '**/*.{ts,tsx,css,html}', // Watch additional file types
+    initialLoadTimeout: 5000, // Timeout for initial page load
+    websocket: true, // Enable WebSocket for hot reload
+    gzip: true, // Enable gzip compression for development
+    
+    // Enhanced error handling and logging
+    errorReporting: true, // Show build errors in browser
+    logLevel: 'info', // Enable detailed logging: 'error', 'warn', 'info', 'debug'
+    
+    // Custom headers for development
+    responseHeaders: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    }
   },
   
   // TypeScript configuration for Stencil
@@ -119,9 +135,11 @@ export const config: Config = {
   // Plugins configuration
   plugins: [],
   
-  // Bundle configuration
+  // Bundle configuration - temporarily disable vanilla-extract to fix loading issues
   rollupPlugins: {
-    before: [],
+    before: [
+      // vanillaExtractPlugin() // Disabled temporarily to fix CSS loading issues
+    ],
     after: []
   }
 };

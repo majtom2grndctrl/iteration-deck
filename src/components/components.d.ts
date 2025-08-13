@@ -20,12 +20,6 @@ export namespace Components {
         "label": string;
         "notes"?: string;
     }
-    interface IterationDeckTest {
-        /**
-          * @default 'Hello from Stencil!'
-         */
-        "message": string;
-    }
     interface IterationDeckToolbar {
     }
 }
@@ -62,12 +56,6 @@ declare global {
         prototype: HTMLIterationDeckSlideElement;
         new (): HTMLIterationDeckSlideElement;
     };
-    interface HTMLIterationDeckTestElement extends Components.IterationDeckTest, HTMLStencilElement {
-    }
-    var HTMLIterationDeckTestElement: {
-        prototype: HTMLIterationDeckTestElement;
-        new (): HTMLIterationDeckTestElement;
-    };
     interface HTMLIterationDeckToolbarElement extends Components.IterationDeckToolbar, HTMLStencilElement {
     }
     var HTMLIterationDeckToolbarElement: {
@@ -77,7 +65,6 @@ declare global {
     interface HTMLElementTagNameMap {
         "iteration-deck": HTMLIterationDeckElement;
         "iteration-deck-slide": HTMLIterationDeckSlideElement;
-        "iteration-deck-test": HTMLIterationDeckTestElement;
         "iteration-deck-toolbar": HTMLIterationDeckToolbarElement;
     }
 }
@@ -100,18 +87,11 @@ declare namespace LocalJSX {
     confidence?: number;
   }>) => void;
     }
-    interface IterationDeckTest {
-        /**
-          * @default 'Hello from Stencil!'
-         */
-        "message"?: string;
-    }
     interface IterationDeckToolbar {
     }
     interface IntrinsicElements {
         "iteration-deck": IterationDeck;
         "iteration-deck-slide": IterationDeckSlide;
-        "iteration-deck-test": IterationDeckTest;
         "iteration-deck-toolbar": IterationDeckToolbar;
     }
 }
@@ -121,7 +101,6 @@ declare module "@stencil/core" {
         interface IntrinsicElements {
             "iteration-deck": LocalJSX.IterationDeck & JSXBase.HTMLAttributes<HTMLIterationDeckElement>;
             "iteration-deck-slide": LocalJSX.IterationDeckSlide & JSXBase.HTMLAttributes<HTMLIterationDeckSlideElement>;
-            "iteration-deck-test": LocalJSX.IterationDeckTest & JSXBase.HTMLAttributes<HTMLIterationDeckTestElement>;
             "iteration-deck-toolbar": LocalJSX.IterationDeckToolbar & JSXBase.HTMLAttributes<HTMLIterationDeckToolbarElement>;
         }
     }

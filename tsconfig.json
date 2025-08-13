@@ -27,18 +27,23 @@
     "useDefineForClassFields": false
   },
   "include": [
+    "src",
+    "src/components",
     "src/components/**/*",
+    "src/core/**/*",
     "src/test/**/*"
   ],
   "exclude": [
     "node_modules",
     "dist",
     "www",
+    "src/main.tsx",
+    "src/App.tsx",
+    "src/vite-env.d.ts",
     "src/react/**/*",
     "src/web-components/**/*",
     "src/examples/**/*",
     "src/styles/**/*",
-    "src/core/**/*",
     "src/**/__tests__/**/*",
     "src/**/test/**/*",
     "**/*.vitest.ts",

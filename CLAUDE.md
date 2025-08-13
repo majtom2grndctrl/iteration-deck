@@ -36,7 +36,7 @@ pnpm lint         # Lint TypeScript code
 - **Auto-Generated Framework Bindings**: Stencil automatically generates React, Vue, Angular wrappers
 - **Vanilla State Management**: Custom event-based state system for framework-agnostic reactivity
 - **Universal Compatibility**: Works with React, Astro, Vue, Angular, vanilla HTML, and any framework
-- **Zero-Runtime CSS**: @vanilla-extract/css generates static CSS at build time
+- **vanilla-extract for CSS**: Use vanilla-extract for styling, with design tokens that exist as a JSON object in a .ts file.
 
 ### Code Quality Standards
 - **Accessibility**: WCAG 2.2 AA compliance, proper ARIA attributes
@@ -49,28 +49,25 @@ pnpm lint         # Lint TypeScript code
 - **Pill-shaped toolbar**: Fixed lower-center position with rounded corners (64px border-radius)
 - **Visual hierarchy**: Light gray background, white interactive areas
 - **Auto theming**: `prefers-color-scheme` support for light/dark modes
-- **Type-safe CSS**: @vanilla-extract/css with TypeScript integration for styling
+- **Scoped CSS**: CSS with Stencil's shadow DOM encapsulation and development-time optimization
 
 ### UI Design System Requirements
-Use Design Tokens integrated with @vanilla-extract/css theme system for type-safe, zero-runtime styling.
 - **Spacing**: 8px base grid system (4px, 8px, 12px, 16px, 24px, 32px, 40px, 48px, 56px, 64px progression)
-- **Colors**: Neutral gray scale with semantic variants (50, 100, 200, 300, 400, 500, 600, 700, 800, 900)
+- **Colors**: Neutral gray scale with semantic variants (gray.50, gray.100, gray.200, gray.300, gray.400, gray.500, gray.600, gray.700, gray.800, gray.900) using string keys in TypeScript object to enable clean dot notation access
 - **Touch targets**: 44px minimum for interactive elements
 - **Typography**: System font stack matching OS/browser dev tools aesthetic
 - **Backdrop effects**: Modern blur and transparency effects for toolbar
-- **Theme Variables**: vanilla-extract contract for consistent theming across components
 
 ### File Organization
 ```
 src/
 ├── core/          # Framework-agnostic types and utilities
 ├── components/    # Stencil web components (foundation)
-├── styles/        # @vanilla-extract/css theme and styling
+├── styles/        # CSS files and theme management utilities
 ├── generated/     # Auto-generated framework bindings (React, Vue, Angular)
 └── example/       # Demo application
 ```
 
 **Implementation details:** @.claude/TECHNICAL_SPEC.md  
 **Stencil components:** @src/components/*.tsx  
-**Styling system:** @src/styles/*.css.ts  
 **Generated bindings:** @src/generated/react/, @src/generated/vue/, etc.
