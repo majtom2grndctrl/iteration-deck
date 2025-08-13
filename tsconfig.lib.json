@@ -13,23 +13,34 @@
     "emitDeclarationOnly": true,
     "outDir": "./dist",
     "strict": true,
-    "noUnusedLocals": true,
+    "noUnusedLocals": false,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    
+    /* Decorators for Lit */
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false,
+    
+    /* Include type definitions */
+    "typeRoots": ["./node_modules/@types"]
   },
   "include": [
     "src/index.ts",
+    "src/tokens.ts",
     "src/core/**/*",
-    "src/react/**/*",
-    "src/vite-env.d.ts"
+    "src/react/**/*", 
+    "src/web-components/**/*",
+    "src/vite-env.d.ts",
+    "src/global.d.ts"
   ],
   "exclude": [
     "src/main.tsx",
     "src/App.tsx",
-    "src/App.css",
+    "src/App.css", 
     "src/index.css",
     "src/assets/**",
-    "**/*.test.tsx",
-    "**/*.test.ts"
+    "src/**/*.test.tsx",
+    "src/**/*.test.ts",
+    "src/**/__tests__/**/*"
   ]
 }

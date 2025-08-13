@@ -1,14 +1,37 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach } from '@jest/globals'
 
-// We need to unmock the environment module for these tests
-vi.unmock('../environment')
+// Unmock the environment module for these specific tests
+jest.unmock('../environment')
+
+// We need to explicitly import the environment module after clearing mocks
 import { isDevelopment, isProduction } from '../environment'
 
-// Skip this test suite due to complex mocking issues with import.meta
-describe.skip('Environment Detection', () => {
+describe('Environment Detection', () => {
+  let originalImportMeta: any
+  let originalProcess: any
+
   beforeEach(() => {
+    // Store original values
+    originalImportMeta = (global as any)['import.meta']
+    originalProcess = global.process
+    
     // Clear any existing mocks
-    vi.clearAllMocks()
+    jest.clearAllMocks()
+  })
+
+  afterEach(() => {
+    // Restore original values
+    if (originalImportMeta !== undefined) {
+      (global as any)['import.meta'] = originalImportMeta
+    } else {
+      delete (global as any)['import.meta']
+    }
+    
+    if (originalProcess !== undefined) {
+      global.process = originalProcess
+    } else {
+      delete (global as any).process
+    }
   })
 
   describe('isDevelopment', () => {
@@ -18,48 +41,46 @@ describe.skip('Environment Detection', () => {
       }
       
       // Mock import.meta
-      vi.stubGlobal('import.meta', mockMeta)
+      ;(global as any)['import.meta'] = mockMeta
       
       expect(isDevelopment()).toBe(true)
-      
-      vi.unstubAllGlobals()
     })
 
     it('should return false when import.meta.env.DEV is false', () => {
+      // Remove process env to force import.meta path
+      delete (global as any).process
+      
       const mockMeta = {
         env: { DEV: false }
       }
       
-      vi.stubGlobal('import.meta', mockMeta)
+      ;(global as any)['import.meta'] = mockMeta
       
       expect(isDevelopment()).toBe(false)
-      
-      vi.unstubAllGlobals()
     })
 
     it('should fallback to process.env.NODE_ENV', () => {
-      // Mock globalThis.process
+      // Mock process.env
       const mockProcess = {
         env: { NODE_ENV: 'development' }
       }
       
-      vi.stubGlobal('globalThis', { process: mockProcess })
+      global.process = mockProcess as any
       // Remove import.meta
-      vi.stubGlobal('import.meta', undefined)
+      delete (global as any)['import.meta']
       
       expect(isDevelopment()).toBe(true)
-      
-      vi.unstubAllGlobals()
     })
 
     it('should return false by default', () => {
       // Remove both import.meta and process
-      vi.stubGlobal('import.meta', undefined)
-      vi.stubGlobal('globalThis', {})
+      delete (global as any)['import.meta']
+      delete (global as any).process
+      
+      // Clear jest mock if set
+      jest.clearAllMocks()
       
       expect(isDevelopment()).toBe(false)
-      
-      vi.unstubAllGlobals()
     })
   })
 
@@ -69,11 +90,9 @@ describe.skip('Environment Detection', () => {
         env: { DEV: true }
       }
       
-      vi.stubGlobal('import.meta', mockMeta)
+      ;(global as any)['import.meta'] = mockMeta
       
       expect(isProduction()).toBe(false)
-      
-      vi.unstubAllGlobals()
     })
   })
 })

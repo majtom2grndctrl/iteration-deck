@@ -23,7 +23,11 @@
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+    
+    /* Decorators for Lit */
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false
   },
   "include": ["src"]
 }

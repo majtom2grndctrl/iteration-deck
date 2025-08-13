@@ -1,97 +1,175 @@
-import { create } from 'zustand'
-import { IterationDeckStore, DeckState } from './types'
+/**
+ * Vanilla JavaScript state management for Iteration Deck
+ * Uses native custom events for reactivity across web components
+ */
 
-export const useIterationDeckStore = create<IterationDeckStore>((set, get) => ({
-  decks: new Map(),
-  activeDeckId: null,
-  globalToolbarVisible: false,
+export interface DeckData {
+  id: string;
+  label?: string;
+  prompt?: string;
+  description?: string;
+  slides: SlideData[];
+  activeSlideIndex: number;
+  element?: Element;
+}
 
-  registerDeck: (deck: DeckState) => {
-    set((state) => {
-      const newDecks = new Map(state.decks)
-      newDecks.set(deck.id, deck)
-      
-      // If this is the first deck, make it active
-      const activeDeckId = state.activeDeckId || deck.id
-      
-      // Show toolbar if we have at least one deck and we're in development
-      const globalToolbarVisible = newDecks.size > 0
+export interface SlideData {
+  label: string;
+  aiPrompt?: string;
+  notes?: string;
+  confidence?: number;
+}
 
-      return {
-        decks: newDecks,
-        activeDeckId,
-        globalToolbarVisible
-      }
-    })
-  },
+class IterationDeckStore {
+  private decks = new Map<string, DeckData>();
+  private activeDeckId: string | null = null;
+  private globalToolbarVisible = false;
 
-  unregisterDeck: (id: string) => {
-    set((state) => {
-      const newDecks = new Map(state.decks)
-      newDecks.delete(id)
-      
-      // If the active deck was removed, select the first remaining deck
-      let activeDeckId = state.activeDeckId
-      if (activeDeckId === id) {
-        const remainingDecks = Array.from(newDecks.keys())
-        activeDeckId = remainingDecks.length > 0 ? remainingDecks[0] : null
-      }
-      
-      // Hide toolbar if no decks remain
-      const globalToolbarVisible = newDecks.size > 0
-
-      return {
-        decks: newDecks,
-        activeDeckId,
-        globalToolbarVisible
-      }
-    })
-  },
-
-  setActiveSlideIndex: (deckId: string, index: number) => {
-    set((state) => {
-      const newDecks = new Map(state.decks)
-      const deck = newDecks.get(deckId)
-      
-      if (deck) {
-        // Clamp index to valid range
-        const clampedIndex = Math.max(0, Math.min(index, deck.slides.length - 1))
-        newDecks.set(deckId, { ...deck, activeSlideIndex: clampedIndex })
-      }
-      
-      return { decks: newDecks }
-    })
-  },
-
-  setActiveDeck: (deckId: string | null) => {
-    set({ activeDeckId: deckId })
-  },
-
-  nextSlide: () => {
-    const { activeDeckId, decks, setActiveSlideIndex } = get()
-    if (!activeDeckId) return
+  registerDeck(deck: DeckData) {
+    this.decks.set(deck.id, deck);
     
-    const deck = decks.get(activeDeckId)
-    if (!deck) return
+    // Set as active if first deck or no active deck
+    if (!this.activeDeckId || this.decks.size === 1) {
+      this.activeDeckId = deck.id;
+    }
     
-    const nextIndex = (deck.activeSlideIndex + 1) % deck.slides.length
-    setActiveSlideIndex(activeDeckId, nextIndex)
-  },
+    this.globalToolbarVisible = this.decks.size > 0;
+    
+    this.dispatch('deck-registered', { 
+      deck, 
+      activeDeckId: this.activeDeckId,
+      globalToolbarVisible: this.globalToolbarVisible 
+    });
+  }
 
-  previousSlide: () => {
-    const { activeDeckId, decks, setActiveSlideIndex } = get()
-    if (!activeDeckId) return
+  unregisterDeck(deckId: string) {
+    this.decks.delete(deckId);
     
-    const deck = decks.get(activeDeckId)
-    if (!deck) return
+    // Update active deck if it was removed
+    if (this.activeDeckId === deckId) {
+      const remainingDecks = Array.from(this.decks.keys());
+      this.activeDeckId = remainingDecks.length > 0 ? remainingDecks[0] : null;
+    }
+    
+    this.globalToolbarVisible = this.decks.size > 0;
+    
+    this.dispatch('deck-unregistered', { 
+      deckId, 
+      activeDeckId: this.activeDeckId,
+      globalToolbarVisible: this.globalToolbarVisible 
+    });
+  }
+
+  setActiveSlideIndex(deckId: string, index: number) {
+    const deck = this.decks.get(deckId);
+    if (!deck) return;
+    
+    const clampedIndex = Math.max(0, Math.min(index, deck.slides.length - 1));
+    deck.activeSlideIndex = clampedIndex;
+    
+    this.dispatch('slide-changed', { deckId, slideIndex: clampedIndex });
+  }
+
+  setActiveDeck(deckId: string | null) {
+    if (deckId && !this.decks.has(deckId)) return;
+    
+    this.activeDeckId = deckId;
+    this.dispatch('active-deck-changed', { activeDeckId: deckId });
+  }
+
+  nextSlide() {
+    if (!this.activeDeckId) return;
+    
+    const deck = this.decks.get(this.activeDeckId);
+    if (!deck) return;
+    
+    const nextIndex = (deck.activeSlideIndex + 1) % deck.slides.length;
+    this.setActiveSlideIndex(this.activeDeckId, nextIndex);
+  }
+
+  previousSlide() {
+    if (!this.activeDeckId) return;
+    
+    const deck = this.decks.get(this.activeDeckId);
+    if (!deck) return;
     
     const prevIndex = deck.activeSlideIndex === 0 
       ? deck.slides.length - 1 
-      : deck.activeSlideIndex - 1
-    setActiveSlideIndex(activeDeckId, prevIndex)
-  },
-
-  setGlobalToolbarVisible: (visible: boolean) => {
-    set({ globalToolbarVisible: visible })
+      : deck.activeSlideIndex - 1;
+    this.setActiveSlideIndex(this.activeDeckId, prevIndex);
   }
-}))
+
+  // Getters
+  getDeck(deckId: string): DeckData | undefined {
+    return this.decks.get(deckId);
+  }
+
+  getAllDecks(): DeckData[] {
+    return Array.from(this.decks.values());
+  }
+
+  getActiveDeckId(): string | null {
+    return this.activeDeckId;
+  }
+
+  getActiveDeck() {
+    return this.activeDeckId ? this.decks.get(this.activeDeckId) || null : null;
+  }
+
+  isGlobalToolbarVisible(): boolean {
+    return this.globalToolbarVisible;
+  }
+
+  private dispatch(eventName: string, data: any) {
+    window.dispatchEvent(
+      new CustomEvent(`iteration-deck:${eventName}`, { 
+        detail: data 
+      })
+    );
+  }
+}
+
+// Global singleton store
+let storeInstance: IterationDeckStore | null = null;
+
+export function getIterationDeckStore(): IterationDeckStore {
+  if (!storeInstance) {
+    storeInstance = new IterationDeckStore();
+  }
+  return storeInstance;
+}
+
+// Utility function to check if we're in development mode
+export function isDevelopment(): boolean {
+  // Check if we're in a test environment first
+  if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test') {
+    return true; // Default to development mode in tests
+  }
+  
+  // Check process.env.NODE_ENV if available
+  if (typeof process !== 'undefined' && process.env.NODE_ENV) {
+    return process.env.NODE_ENV === 'development';
+  }
+  
+  // Check global process if available
+  if (typeof globalThis !== 'undefined' && (globalThis as any).process?.env?.NODE_ENV) {
+    return (globalThis as any).process.env.NODE_ENV === 'development';
+  }
+  
+  try {
+    // Fall back to import.meta.env.DEV
+    if (typeof import.meta !== 'undefined' && (import.meta as any).env && typeof (import.meta as any).env.DEV === 'boolean') {
+      return (import.meta as any).env.DEV;
+    }
+  } catch (e) {
+    // import.meta not supported in this environment (e.g., Jest)
+  }
+  
+  // Check global mock set up in tests
+  if (typeof globalThis !== 'undefined' && (globalThis as any)['import.meta']?.env?.DEV !== undefined) {
+    return (globalThis as any)['import.meta'].env.DEV;
+  }
+  
+  // Default to false (production)
+  return false;
+}

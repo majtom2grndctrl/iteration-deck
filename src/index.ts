@@ -21,3 +21,14 @@ export {
   generateVariationLabel,
   AI_PRESETS
 } from './core/utilities'
+
+// Export design tokens for external use
+export {
+  spacing,
+  colors, 
+  typography,
+  components,
+  animation,
+  zIndex,
+  breakpoints
+} from './tokens'
