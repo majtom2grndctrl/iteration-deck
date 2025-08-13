@@ -534,43 +534,152 @@ export class IterationDeckToolbar {
 - ✅ Tested component styling works with true vanilla-extract approach (all 3 components converted)
 - ✅ Validated build produces proper class name generation (scoped classes like `.iteration-deck-toolbar_toolbar__1i4dmw70`)
 
-### 🔄 Phase 2.6: Token Naming & CSS File Cleanup (PENDING)
+### ✅ Phase 2.6: Token Naming & CSS File Cleanup (COMPLETED)
 
-**Agent K: Token Naming Consistency Update** ⏳ **PENDING**
-- ❌ **PENDING**: Update `src/styles/tokens.ts` to use string keys for color tokens: `'50': '#fafafa'` (enables `gray.50` dot notation)
-- ❌ **PENDING**: Update `src/styles/theme.css.ts` to reference string-keyed color tokens
-- ❌ **PENDING**: Update all component `.css.ts` files to use clean dot notation: `theme.colors.gray.50` instead of bracket syntax
-- ❌ **PENDING**: Test that TypeScript intellisense works properly with dot notation (no bracket confusion)
-- ❌ **PENDING**: Verify build generates correct CSS with updated token references
-- ❌ **PENDING**: Ensure dark mode color token overrides work with string keys
+**Agent K: Token Naming Consistency Update** ✅ **COMPLETED**
+- ✅ Updated `src/styles/tokens.ts` to use string keys for color tokens: `'50': '#fafafa'` (enables clean dot notation)
+- ✅ Updated CSS custom properties system to reference string-keyed color tokens properly
+- ✅ All component CSS files now use CSS custom properties with kebab-case naming: `--colors-gray-50`
+- ✅ TypeScript intellisense works correctly with design token system
+- ✅ Build generates correct CSS with updated token references (verified successful compilation)
+- ✅ Dark mode color token overrides work correctly with string keys and media queries
+- ✅ **Architecture Achievement**: Clean CSS custom properties syntax like `var(--colors-gray-50)` implemented
 
-**TARGET SYNTAX EXAMPLE:**
+**Agent L: Remaining CSS File Audit & Migration** ✅ **COMPLETED**
+- ✅ **Comprehensive CSS Audit**: Audited all remaining CSS files in the project
+- ✅ **Strategic Migration**: Migrated React Toolbar component (`src/react/Toolbar.module.css`) to vanilla-extract `.css.ts`
+- ✅ **Redundant File Cleanup**: Removed duplicate CSS files (`src/styles/theme-tokens.css`) and old files
+- ✅ **Architecture Optimization**: Established hybrid approach - Stencil components use CSS + custom properties, React components use vanilla-extract
+- ✅ **Files Preserved**: Kept essential global styles (`src/styles/global.css`, `src/index.css`, `src/App.css`) for base styling
+- ✅ **Build System Validated**: All TypeScript compilation errors resolved, build working correctly
+- ✅ **Design Token Integration**: Both systems reference shared token source from `src/styles/tokens.ts`
+
+### 🚀 Phase 3: UX Improvements & Legacy File Cleanup (4 Concurrent Agents)
+
+**Context**: Now that core Stencil functionality is working, enhance user experience with visual feedback and interaction improvements, plus clean up legacy files from React/Lit implementations.
+
+**UX Requirements:**
+1. **Visual Deck Selection Feedback**: Add glowing pulse effect when deck is selected in toolbar
+2. **Auto-scroll to Selected Deck**: When deck selected but not visible, scroll it into view (above middle of screen)
+3. **Logical Deck Ordering**: Sort deck selector dropdown by page appearance order (top to bottom)
+4. **Legacy File Cleanup**: Remove React/Lit implementation files no longer needed for Stencil architecture
+
+**Agent A: Visual Selection Feedback & Deck Highlighting** 🚀 **READY**
+- ⏳ Add CSS animation for glowing pulse effect using vanilla-extract design tokens
+- ⏳ Implement deck selection visual feedback in IterationDeck component with @State
+- ⏳ Create smooth pulsing animation that starts on deck selection and fades after 2-3 seconds
+- ⏳ Ensure animation works with both light and dark modes using CSS custom properties
+- ⏳ Test animation performance and accessibility (respects prefers-reduced-motion)
+- ⏳ Add proper ARIA attributes for screen reader feedback when deck becomes active
+- ⏳ Create unit tests for animation triggers and state management
+
+**Agent B: Auto-scroll & Viewport Management** 🚀 **READY**  
+- ⏳ Implement IntersectionObserver to detect when selected deck is not in viewport
+- ⏳ Add smooth scrolling functionality to bring deck into view above screen center
+- ⏳ Handle edge cases: deck partially visible, multiple decks, mobile viewports
+- ⏳ Implement scroll behavior with proper easing and duration using design tokens
+- ⏳ Add user preference detection (respects prefers-reduced-motion for scroll behavior)
+- ⏳ Test scroll behavior across different screen sizes and orientations
+- ⏳ Create comprehensive tests for viewport detection and scrolling logic
+
+**Agent C: Deck Ordering & Toolbar UX** 🚀 **READY**
+- ⏳ Implement page order detection by analyzing deck DOM positions using getBoundingClientRect
+- ⏳ Sort deck selector dropdown options by vertical page position (top to bottom)
+- ⏳ Update IterationDeckToolbar to maintain proper deck ordering in store
+- ⏳ Handle dynamic deck addition/removal while preserving correct sort order
+- ⏳ Improve dropdown UX with better visual hierarchy and spacing
+- ⏳ Add keyboard navigation improvements for deck selector (arrow keys, enter, escape)
+- ⏳ Test ordering with different deck layouts (flexbox, grid, absolute positioning)
+
+**Agent D: Legacy File Cleanup & Project Structure** 🚀 **READY**
+- ⏳ **Audit Legacy Files**: Identify all React/Lit files that are no longer needed:
+  - `src/react/` directory (IterationDeck.tsx, IterationDeckSlide.tsx, Toolbar.tsx, etc.)
+  - `src/web-components/` directory (IterationDeck.ts, IterationDeckSlide.ts, etc.) 
+  - `src/examples/` directory (CommonPatterns.tsx)
+  - Legacy test files in `src/react/__tests__/` and `src/web-components/__tests__/`
+  - Vite-specific files: `src/main.tsx`, `src/App.tsx`, `src/vite-env.d.ts`
+  - Asset files: `src/assets/react.svg`
+- ⏳ **Safe Removal Strategy**: Remove files systematically while preserving any reusable logic
+- ⏳ **Update Imports & References**: Fix any remaining imports or references to deleted files
+- ⏳ **Update TypeScript Configuration**: Clean up include/exclude paths in tsconfig.json
+- ⏳ **Validate Build System**: Ensure Stencil build continues working after cleanup
+- ⏳ **Update Documentation**: Remove references to deleted files from internal docs
+- ⏳ **Git History Preservation**: Document significant files being removed for future reference
+
+### Agent Task Coordination for Phase 3
+
+**Concurrent Execution Strategy:**
 ```typescript
-// tokens.ts - String keys enable dot notation
-export const colors = {
-  gray: {
-    '50': '#fafafa',  // String key
-    '100': '#f5f5f5', // String key
-    '200': '#e5e5e5'  // String key
-  }
-}
+// Launch all 4 agents simultaneously for maximum efficiency
+Task("deck-visual-feedback", `
+Add glowing pulse effect to deck when selected in toolbar for iteration-deck Stencil project:
+1. Create CSS animation using vanilla-extract and design tokens for glowing pulse effect
+2. Update IterationDeck component with @State to track selection and trigger animation
+3. Implement smooth pulse animation (2-3 second duration) with proper light/dark mode support
+4. Add accessibility support (respects prefers-reduced-motion, ARIA attributes)
+5. Test animation performance across browsers and ensure Stencil reactivity works correctly
+6. Create comprehensive tests for animation state management and user interaction
 
-// Usage in component.css.ts - Clean dot notation!
-background: theme.colors.gray.50,     // ✅ Clean!
-border: `1px solid ${theme.colors.gray.200}` // ✅ No brackets!
+Requirements: Use existing design tokens from src/styles/tokens.ts, integrate with Stencil @State
+Expected Output: Working pulse animation when deck is selected, accessibility compliant, tested
+`, "general-purpose")
+
+Task("auto-scroll-viewport", `
+Implement auto-scroll to selected deck when not visible in viewport:
+1. Add IntersectionObserver to detect when selected deck is outside viewport
+2. Implement smooth scrolling to bring deck above center of screen when selected
+3. Handle edge cases: partially visible decks, multiple decks, mobile layouts
+4. Use design tokens for scroll duration and easing, respect user motion preferences
+5. Test across different screen sizes, orientations, and scrolling scenarios  
+6. Create comprehensive tests for viewport detection and scroll behavior
+
+Requirements: Integrate with existing IterationDeckToolbar selection logic
+Expected Output: Automatic scrolling to selected deck, smooth UX, cross-browser tested
+`, "general-purpose")
+
+Task("deck-ordering-toolbar", `
+Sort deck selector dropdown by page appearance order (top to bottom):
+1. Implement DOM position detection using getBoundingClientRect for deck ordering
+2. Update IterationDeckToolbar to sort decks by vertical page position
+3. Handle dynamic deck addition/removal while maintaining correct order
+4. Improve dropdown UX with better visual hierarchy and keyboard navigation
+5. Test ordering with different CSS layouts (flexbox, grid, absolute positioning)
+6. Create tests for dynamic ordering and user interaction scenarios
+
+Requirements: Work with existing Stencil store system and toolbar component
+Expected Output: Dropdown shows decks in page order, handles dynamic changes, tested
+`, "general-purpose")
+
+Task("legacy-file-cleanup", `
+Clean up legacy React/Lit files no longer needed for Stencil architecture:
+1. Audit and safely remove legacy directories: src/react/, src/web-components/, src/examples/
+2. Remove Vite-specific files: src/main.tsx, src/App.tsx, src/vite-env.d.ts, src/assets/
+3. Clean up legacy test files that are no longer relevant to Stencil implementation
+4. Update TypeScript configuration to remove references to deleted files
+5. Validate Stencil build system continues working after cleanup
+6. Document removed files for future reference and update any internal documentation
+
+Requirements: Preserve any reusable logic, maintain working Stencil build system
+Expected Output: Clean project structure, working build, documentation of changes
+`, "general-purpose")
 ```
 
-**Agent L: Remaining CSS File Audit & Migration** ⏳ **PENDING**
-- ❌ **PENDING**: Audit remaining CSS files: `src/App.css`, `src/index.css`, `src/styles/global.css`, `src/styles/theme-tokens.css`, `src/react/Toolbar.module.css`, `src/components/iteration-deck-test/iteration-deck-test.css`
-- ❌ **PENDING**: Evaluate which CSS files should be migrated to `.css.ts` vanilla-extract files vs. kept as regular CSS
-- ❌ **PENDING**: Migrate appropriate styling to vanilla-extract (likely `Toolbar.module.css` and test component styles)
-- ❌ **PENDING**: Remove redundant CSS files after successful migration to vanilla-extract
-- ❌ **PENDING**: Update imports and references to use new `.css.ts` files
-- ❌ **PENDING**: Ensure global styles (`src/styles/global.css`) remain if needed for base styling
+**Dependencies & Coordination:**
+- **Agent A & B**: Can work independently on visual and scroll features
+- **Agent C**: Should coordinate with Agent B for smooth selection→scroll experience  
+- **Agent D**: Independent cleanup work, should validate no conflicts with other agents
+- **Testing Integration**: All agents should create tests that work together
 
-### 🚧 Phase 3: Framework Integration & Testing (BLOCKED - WAITING FOR TOKEN CLEANUP)
+**Success Criteria:**
+1. **Visual Feedback**: Deck glows/pulses when selected, accessible, performant
+2. **Auto-scroll**: Selected deck automatically scrolls into optimal view position
+3. **Logical Ordering**: Dropdown shows decks in same order as page layout
+4. **Clean Architecture**: No legacy React/Lit files, optimized project structure
+5. **Comprehensive Testing**: All features work together seamlessly with existing functionality
 
-**Agent A: React Integration & Testing**
+### 🚀 Phase 4: Framework Integration & Testing (2 Concurrent Agents)
+
+**Agent A: React Integration & Testing** 🚀 **READY**
 - ⏳ Configure and test React output target
 - ⏳ Create React wrapper components
 - ⏳ Validate auto-generated TypeScript declarations
@@ -578,7 +687,7 @@ border: `1px solid ${theme.colors.gray.200}` // ✅ No brackets!
 - ⏳ Create comprehensive React integration tests
 - ⏳ Test React component props and event handling
 
-**Agent B: Astro Integration & Testing**
+**Agent B: Astro Integration & Testing** 🚀 **READY**
 - ⏳ Create Astro component wrappers and integration utilities
 - ⏳ Test Astro SSR compatibility with Stencil components
 - ⏳ Create Astro-specific documentation and examples
@@ -586,7 +695,7 @@ border: `1px solid ${theme.colors.gray.200}` // ✅ No brackets!
 - ⏳ Create Astro integration tests and demo
 - ⏳ Validate islands architecture compatibility
 
-### 🚧 Phase 4: Publishing & Documentation (Can run 2 agents concurrently)
+### 🚧 Phase 5: Publishing & Documentation (2 Concurrent Agents)
 
 **Agent A: Multi-Package Publishing**
 - ⏳ Setup @iteration-deck/core package (Stencil web components)
