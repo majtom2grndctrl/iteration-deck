@@ -1,5 +1,100 @@
 /* Global styles for Iteration Deck components */
-/* Vanilla Extract theme system handles design tokens automatically */
+/* CSS custom properties based on design tokens */
+
+:root {
+  /* Spacing tokens (8px base grid) */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 24px;
+  --spacing-2xl: 32px;
+  --spacing-3xl: 40px;
+  --spacing-4xl: 48px;
+  --spacing-5xl: 56px;
+  --spacing-6xl: 64px;
+
+  /* Color tokens (neutral gray scale with semantic variants) */
+  --colors-gray-50: #fafafa;
+  --colors-gray-100: #f5f5f5;
+  --colors-gray-200: #e5e5e5;
+  --colors-gray-300: #d4d4d4;
+  --colors-gray-400: #a3a3a3;
+  --colors-gray-500: #737373;
+  --colors-gray-600: #525252;
+  --colors-gray-700: #404040;
+  --colors-gray-800: #262626;
+  --colors-gray-900: #171717;
+
+  /* Semantic color mappings */
+  --colors-background-primary: #fafafa;
+  --colors-background-secondary: #f5f5f5;
+  --colors-background-overlay: rgba(255, 255, 255, 0.95);
+  --colors-background-overlay-dark: rgba(28, 28, 30, 0.95);
+  --colors-border-light: rgba(0, 0, 0, 0.1);
+  --colors-border-medium: rgba(0, 0, 0, 0.2);
+  --colors-border-dark: rgba(255, 255, 255, 0.2);
+  --colors-border-dark-medium: rgba(255, 255, 255, 0.3);
+  --colors-text-primary: #171717;
+  --colors-text-secondary: #525252;
+  --colors-text-disabled: #a3a3a3;
+  --colors-text-inverse: #ffffff;
+  --colors-interactive-hover: rgba(0, 0, 0, 0.05);
+  --colors-interactive-hover-dark: rgba(255, 255, 255, 0.1);
+  --colors-interactive-disabled: 0.4;
+
+  /* Typography tokens */
+  --typography-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --typography-font-size-xs: 12px;
+  --typography-font-size-sm: 14px;
+  --typography-font-size-md: 16px;
+  --typography-font-size-lg: 18px;
+  --typography-font-weight-normal: 400;
+  --typography-font-weight-medium: 500;
+  --typography-font-weight-semibold: 600;
+  --typography-line-height-tight: 1.2;
+  --typography-line-height-normal: 1.5;
+  --typography-line-height-relaxed: 1.6;
+
+  /* Component-specific tokens */
+  --components-toolbar-border-radius: 64px;
+  --components-toolbar-min-height: 44px;
+  --components-toolbar-backdrop-filter: blur(8px);
+  --components-toolbar-box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+  --components-toolbar-z-index: 10000;
+  --components-button-border-radius: 16px;
+  --components-button-min-touch-target: 44px;
+  --components-button-size-sm: 32px;
+  --components-button-size-md: 44px;
+  --components-divider-width: 1px;
+  --components-divider-height: 24px;
+
+  /* Animation tokens */
+  --animation-duration-fast: 0.2s;
+  --animation-duration-normal: 0.3s;
+  --animation-duration-slow: 0.5s;
+  --animation-easing-ease: ease;
+  --animation-easing-ease-in: ease-in;
+  --animation-easing-ease-out: ease-out;
+  --animation-easing-ease-in-out: ease-in-out;
+
+  /* Z-index scale */
+  --z-index-base: 1;
+  --z-index-dropdown: 1000;
+  --z-index-sticky: 1020;
+  --z-index-fixed: 1030;
+  --z-index-modal: 1040;
+  --z-index-popover: 1050;
+  --z-index-tooltip: 1060;
+  --z-index-toast: 1070;
+  --z-index-toolbar: 10000;
+
+  /* Breakpoints for responsive design */
+  --breakpoints-sm: 640px;
+  --breakpoints-md: 768px;
+  --breakpoints-lg: 1024px;
+  --breakpoints-xl: 1280px;
+}
 
 /* Reset and base styles */
 iteration-deck *,

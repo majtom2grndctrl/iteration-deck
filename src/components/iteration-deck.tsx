@@ -120,7 +120,7 @@ export class IterationDeck {
     // Development: render all slides with visibility control
     return (
       <div class="iterationDeck">
-        <div class="slidesContainer dev-mode">
+        <div class="slidesContainer slidesContainerDevMode">
           <slot></slot>
         </div>
       </div>

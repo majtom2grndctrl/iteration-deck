@@ -135,10 +135,10 @@ export const config: Config = {
   // Plugins configuration
   plugins: [],
   
-  // Bundle configuration - temporarily disable vanilla-extract to fix loading issues
+  // Bundle configuration with vanilla-extract enabled
   rollupPlugins: {
     before: [
-      // vanillaExtractPlugin() // Disabled temporarily to fix CSS loading issues
+      vanillaExtractPlugin()
     ],
     after: []
   }

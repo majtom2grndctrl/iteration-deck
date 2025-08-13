@@ -1,104 +1,104 @@
 /* Toolbar positioned at bottom-center, pill-shaped design */
 :host {
   position: fixed;
-  bottom: 24px;
+  bottom: var(--spacing-xl);
   left: 50%;
   transform: translateX(-50%);
-  z-index: 10000;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-  font-size: 14px;
+  z-index: var(--z-index-toolbar);
+  font-family: var(--typography-font-family);
+  font-size: var(--typography-font-size-sm);
 }
 
 .toolbar {
   display: flex;
   align-items: center;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 64px;
-  padding: 8px 16px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
-  min-height: 44px;
+  gap: var(--spacing-sm);
+  background: var(--colors-background-overlay);
+  backdrop-filter: var(--components-toolbar-backdrop-filter);
+  border: 1px solid var(--colors-border-light);
+  border-radius: var(--components-toolbar-border-radius);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  box-shadow: var(--components-toolbar-box-shadow);
+  min-height: var(--components-toolbar-min-height);
   user-select: none;
 }
 
 @media (prefers-color-scheme: dark) {
   .toolbar {
-    background: rgba(28, 28, 30, 0.95);
-    border-color: rgba(255, 255, 255, 0.1);
-    color: #f5f5f5;
+    background: var(--colors-background-overlay-dark);
+    border-color: var(--colors-border-dark);
+    color: var(--colors-gray-100);
   }
 }
 
-.deckSelectorContainer {
+.deck-selector-container {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--spacing-sm);
 }
 
-.deckSelector {
+.deck-selector {
   background: none;
   border: none;
-  padding: 4px 12px;
-  border-radius: 16px;
-  font-size: 14px;
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--components-button-border-radius);
+  font-size: var(--typography-font-size-sm);
   font-family: inherit;
   cursor: pointer;
   min-width: 120px;
   color: inherit;
 }
 
-.deckSelector:hover {
-  background: rgba(0, 0, 0, 0.05);
+.deck-selector:hover {
+  background: var(--colors-interactive-hover);
 }
 
 @media (prefers-color-scheme: dark) {
-  .deckSelector {
-    color: #f5f5f5;
+  .deck-selector {
+    color: var(--colors-gray-100);
   }
   
-  .deckSelector:hover {
-    background: rgba(255, 255, 255, 0.1);
+  .deck-selector:hover {
+    background: var(--colors-interactive-hover-dark);
   }
 }
 
-.navButton {
+.nav-button {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: var(--components-button-size-sm);
+  height: var(--components-button-size-sm);
   border: none;
-  border-radius: 16px;
+  border-radius: var(--components-button-border-radius);
   background: none;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color var(--animation-duration-fast);
   color: inherit;
 }
 
-.navButton:hover:not(:disabled) {
-  background: rgba(0, 0, 0, 0.05);
+.nav-button:hover:not(:disabled) {
+  background: var(--colors-interactive-hover);
 }
 
-.navButton:disabled {
-  opacity: 0.4;
+.nav-button:disabled {
+  opacity: var(--colors-interactive-disabled);
   cursor: not-allowed;
 }
 
 @media (prefers-color-scheme: dark) {
-  .navButton:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.1);
+  .nav-button:hover:not(:disabled) {
+    background: var(--colors-interactive-hover-dark);
   }
 }
 
-.navButton svg {
+.nav-button svg {
   width: 16px;
   height: 16px;
   fill: currentColor;
 }
 
-.slideInfo {
+.slide-info {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -106,35 +106,35 @@
   gap: 2px;
 }
 
-.slideLabel {
-  font-weight: 500;
+.slide-label {
+  font-weight: var(--typography-font-weight-medium);
   max-width: 150px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.slideCounter {
-  font-size: 12px;
-  color: #666;
-  font-weight: 400;
+.slide-counter {
+  font-size: var(--typography-font-size-xs);
+  color: var(--colors-gray-600);
+  font-weight: var(--typography-font-weight-normal);
 }
 
 @media (prefers-color-scheme: dark) {
-  .slideCounter {
-    color: #999;
+  .slide-counter {
+    color: var(--colors-gray-400);
   }
 }
 
 .divider {
-  width: 1px;
-  height: 24px;
-  background: rgba(0, 0, 0, 0.1);
+  width: var(--components-divider-width);
+  height: var(--components-divider-height);
+  background: var(--colors-border-light);
   border-radius: 1px;
 }
 
 @media (prefers-color-scheme: dark) {
   .divider {
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--colors-border-dark);
   }
 }

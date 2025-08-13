@@ -4,6 +4,17 @@
 
 import { ReactNode } from 'react'
 
+// TypeScript declarations for vanilla-extract CSS modules
+declare module '*.css' {
+  const styles: { [className: string]: string };
+  export = styles;
+}
+
+declare module '*.css.ts' {
+  const styles: { [className: string]: string };
+  export = styles;
+}
+
 declare global {
   namespace JSX {
     interface IntrinsicElements {

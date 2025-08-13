@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { IterationDeck } from './react/IterationDeck'
 import { IterationDeckSlide } from './react/IterationDeckSlide'
 import './App.css'
-import './react/Toolbar.module.css'
 
 // Demo components for different button variations
 function PrimaryButton({ children, onClick }: { children: React.ReactNode, onClick?: () => void }) {

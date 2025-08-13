@@ -1,17 +1,17 @@
 import { useEffect } from 'react'
 import { useIterationDeckStore } from '../core/store'
 import { isDevelopment } from '../core/environment'
-import styles from './Toolbar.module.css'
+import * as styles from './Toolbar.module.css'
 
 // SVG icons for navigation
 const ChevronLeftIcon = () => (
-  <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg className={styles.navButtonIcon} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path fillRule="evenodd" clipRule="evenodd" d="M10.7071 2.29289C11.0976 2.68342 11.0976 3.31658 10.7071 3.70711L6.41421 8L10.7071 12.2929C11.0976 12.6834 11.0976 13.3166 10.7071 13.7071C10.3166 14.0976 9.68342 14.0976 9.29289 13.7071L4.29289 8.70711C3.90237 8.31658 3.90237 7.68342 4.29289 7.29289L9.29289 2.29289C9.68342 1.90237 10.3166 1.90237 10.7071 2.29289Z" fill="currentColor"/>
   </svg>
 )
 
 const ChevronRightIcon = () => (
-  <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg className={styles.navButtonIcon} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path fillRule="evenodd" clipRule="evenodd" d="M5.29289 2.29289C5.68342 1.90237 6.31658 1.90237 6.70711 2.29289L11.7071 7.29289C12.0976 7.68342 12.0976 8.31658 11.7071 8.70711L6.70711 13.7071C6.31658 14.0976 5.68342 14.0976 5.29289 13.7071C4.90237 13.3166 4.90237 12.6834 5.29289 12.2929L9.58579 8L5.29289 3.70711C4.90237 3.31658 4.90237 2.68342 5.29289 2.29289Z" fill="currentColor"/>
   </svg>
 )
