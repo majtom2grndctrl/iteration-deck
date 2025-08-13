@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(touch:*)",
+      "Bash(pnpm typecheck:*)",
+      "Bash(pnpm add:*)",
+      "Bash(pnpm dev:*)",
+      "Bash(pnpm build:*)",
+      "Bash(pnpm test:*)",
+      "Bash(rm:*)",
+      "Bash(pnpm typecheck:*)",
+      "Bash(pnpm install:*)",
+      "WebFetch(domain:docs.anthropic.com)",
+      "Bash(grep:*)",
+      "Bash(pnpm list:*)",
+      "Bash(pnpm lint:*)",
+      "Bash(npx tsc:*)",
+      "Bash(vite build:*)",
+      "Bash(pnpm tsc:*)",
+      "Bash(pnpm vite build:*)",
+      "Bash(pnpm start:*)",
+      "Bash(pnpm run:*)",
+      "Bash(pnpm stencil test:*)",
+      "Bash(mv:*)",
+      "Bash(pnpm vitest run:*)",
+      "Bash(find:*)"
+    ],
+    "deny": []
+  }
+}
