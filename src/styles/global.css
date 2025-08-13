@@ -27,9 +27,9 @@
   --colors-gray-900: #171717;
 
   /* Semantic color mappings */
-  --colors-background-primary: #fafafa;
+  --colors-background-primary: var(--colors-gray-50);
   --colors-background-secondary: #f5f5f5;
-  --colors-background-overlay: rgba(255, 255, 255, 0.95);
+  --colors-background-overlay: rgba(236, 236, 236, 0.621);
   --colors-background-overlay-dark: rgba(28, 28, 30, 0.95);
   --colors-border-light: rgba(0, 0, 0, 0.1);
   --colors-border-medium: rgba(0, 0, 0, 0.2);
@@ -60,7 +60,7 @@
   --components-toolbar-border-radius: 64px;
   --components-toolbar-min-height: 44px;
   --components-toolbar-backdrop-filter: blur(8px);
-  --components-toolbar-box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+  --components-toolbar-box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
   --components-toolbar-z-index: 10000;
   --components-button-border-radius: 16px;
   --components-button-min-touch-target: 44px;
