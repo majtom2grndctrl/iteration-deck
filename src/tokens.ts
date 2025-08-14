@@ -17,42 +17,46 @@ export const spacing = {
   '6xl': '64px'
 } as const
 
-// Color tokens (neutral gray scale with semantic variants)
+// Color primitives (internal use only - not exported)
+const colorPrimitives = {
+  gray50: '#fafafa',
+  gray100: '#f5f5f5',
+  gray200: '#e5e5e5',
+  gray300: '#d4d4d4',
+  gray400: '#a3a3a3',
+  gray500: '#737373',
+  gray600: '#525252',
+  gray700: '#404040',
+  gray800: '#262626',
+  gray900: '#171717',
+  white: '#ffffff',
+  black: '#000000',
+  darkOverlay: '#1c1c1e'
+} as const
+
+// Semantic color mappings (references primitives)
 export const colors = {
-  gray: {
-    50: '#fafafa',
-    100: '#f5f5f5',
-    200: '#e5e5e5',
-    300: '#d4d4d4',
-    400: '#a3a3a3',
-    500: '#737373',
-    600: '#525252',
-    700: '#404040',
-    800: '#262626',
-    900: '#171717'
-  },
-  // Semantic color mappings
   background: {
-    primary: '#fafafa',
-    secondary: '#f5f5f5',
-    overlay: 'rgba(255, 255, 255, 0.95)',
-    overlayDark: 'rgba(28, 28, 30, 0.95)'
+    primary: colorPrimitives.gray50,
+    secondary: colorPrimitives.gray100,
+    overlay: `${colorPrimitives.white}f2`, // 95% opacity
+    overlayDark: `${colorPrimitives.darkOverlay}f2` // 95% opacity
   },
   border: {
-    light: 'rgba(0, 0, 0, 0.1)',
-    medium: 'rgba(0, 0, 0, 0.2)',
-    dark: 'rgba(255, 255, 255, 0.2)',
-    darkMedium: 'rgba(255, 255, 255, 0.3)'
+    light: `${colorPrimitives.black}1a`, // 10% opacity
+    medium: `${colorPrimitives.black}33`, // 20% opacity
+    dark: `${colorPrimitives.white}33`, // 20% opacity
+    darkMedium: `${colorPrimitives.white}4d` // 30% opacity
   },
   text: {
-    primary: '#171717',
-    secondary: '#525252',
-    disabled: '#a3a3a3',
-    inverse: '#ffffff'
+    primary: colorPrimitives.gray900,
+    secondary: colorPrimitives.gray600,
+    disabled: colorPrimitives.gray400,
+    inverse: colorPrimitives.white
   },
   interactive: {
-    hover: 'rgba(0, 0, 0, 0.05)',
-    hoverDark: 'rgba(255, 255, 255, 0.1)',
+    hover: `${colorPrimitives.black}0d`, // 5% opacity
+    hoverDark: `${colorPrimitives.white}1a`, // 10% opacity
     disabled: '0.4'
   }
 } as const
