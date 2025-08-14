@@ -30,6 +30,13 @@ global.IntersectionObserver = jest.fn().mockImplementation(() => ({
   disconnect: jest.fn(),
 }));
 
+// Mock MutationObserver
+global.MutationObserver = jest.fn().mockImplementation((callback) => ({
+  observe: jest.fn(),
+  disconnect: jest.fn(),
+  takeRecords: jest.fn(() => []),
+}));
+
 // Setup for accessibility testing
 expect.extend({
   toBeAccessible: () => {

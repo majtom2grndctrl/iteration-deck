@@ -5,15 +5,29 @@ import { detectEnvironment, isDevMode } from '../../utils/environment';
 
 // Toolbar singleton management
 let toolbarCreated = false;
+let toolbarElement: HTMLElement | null = null;
 
 function ensureToolbarExists() {
-  if (!toolbarCreated && isDevMode()) {
-    // Check if toolbar already exists in DOM
-    const existingToolbar = document.querySelector('iteration-deck-toolbar');
-    if (!existingToolbar) {
-      const toolbar = document.createElement('iteration-deck-toolbar');
-      document.body.appendChild(toolbar);
-    }
+  if (!isDevMode()) return;
+  
+  // Check if we already have a reference to a toolbar
+  if (toolbarElement && document.body.contains(toolbarElement)) {
+    return; // Toolbar already exists and is in DOM
+  }
+  
+  // Check if toolbar already exists in DOM (from other instances)
+  const existingToolbar = document.querySelector('iteration-deck-toolbar');
+  if (existingToolbar) {
+    toolbarElement = existingToolbar as HTMLElement;
+    toolbarCreated = true;
+    return;
+  }
+  
+  // Create new toolbar only if none exists
+  if (!toolbarCreated) {
+    const toolbar = document.createElement('iteration-deck-toolbar');
+    document.body.appendChild(toolbar);
+    toolbarElement = toolbar;
     toolbarCreated = true;
   }
 }

@@ -23,7 +23,6 @@ let toolbarInstance: IterationDeckToolbar | null = null;
 export class IterationDeckToolbar {
   @Element() el!: HTMLElement;
   
-  @State() isDropdownOpen = false;
   @State() storeState = useIterationDeckStore.getState();
   
   private unsubscribe?: () => void;
@@ -32,7 +31,9 @@ export class IterationDeckToolbar {
     // Singleton pattern - only allow one toolbar instance
     if (toolbarInstance && toolbarInstance !== this) {
       // Remove existing toolbar from DOM
-      toolbarInstance.el?.remove();
+      if (toolbarInstance.el && document.body.contains(toolbarInstance.el)) {
+        toolbarInstance.el.remove();
+      }
     }
     toolbarInstance = this;
     
@@ -102,11 +103,6 @@ export class IterationDeckToolbar {
   
   private handleDeckSelect = (deckId: string) => {
     useIterationDeckStore.getState().setActiveDeck(deckId);
-    this.isDropdownOpen = false;
-  }
-  
-  private toggleDropdown = () => {
-    this.isDropdownOpen = !this.isDropdownOpen;
   }
   
   private renderDeckSelector() {
@@ -118,64 +114,40 @@ export class IterationDeckToolbar {
       return null;
     }
     
-    const activeDeck = activeDeckId ? decks.get(activeDeckId) : null;
-    const activeLabel = activeDeck?.label || activeDeck?.id || 'Select Deck';
-    
     return (
-      <div style={{ position: 'relative' }}>
-        <button
-          class="deck-selector"
-          style={{
-            background: 'transparent',
-            border: '1px solid #d1d5db',
-            borderRadius: '16px',
-            padding: '6px 12px',
-            cursor: 'pointer',
-            fontSize: '13px',
-            color: '#374151'
-          }}
-          onClick={this.toggleDropdown}
-          aria-expanded={this.isDropdownOpen.toString()}
-          aria-haspopup="true"
-        >
-          {activeLabel} ▼
-        </button>
-        
-        {this.isDropdownOpen && (
-          <div class="dropdown-menu" style={{
-            position: 'absolute',
-            top: '100%',
-            left: '0',
-            marginTop: '4px',
-            background: 'white',
-            border: '1px solid #d1d5db',
-            borderRadius: '8px',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-            minWidth: '150px',
-            overflow: 'hidden'
-          }}>
-            {deckArray.map(deck => (
-              <button
-                key={deck.id}
-                class={`dropdown-item ${deck.id === activeDeckId ? 'dropdown-item-active' : ''}`}
-                style={{
-                  background: deck.id === activeDeckId ? '#f3f4f6' : 'transparent',
-                  border: 'none',
-                  padding: '8px 12px',
-                  width: '100%',
-                  textAlign: 'left',
-                  cursor: 'pointer',
-                  fontSize: '13px',
-                  color: '#374151'
-                }}
-                onClick={() => this.handleDeckSelect(deck.id)}
-              >
-                {deck.label || deck.id}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+      <select
+        class="deck-selector"
+        style={{
+          background: 'white',
+          border: '1px solid #d1d5db',
+          borderRadius: '16px',
+          padding: '6px 12px',
+          cursor: 'pointer',
+          fontSize: '13px',
+          color: '#374151',
+          outline: 'none',
+          appearance: 'none',
+          backgroundImage: 'url("data:image/svg+xml;charset=US-ASCII,<svg viewBox=\'0 0 4 5\' xmlns=\'http://www.w3.org/2000/svg\'><path d=\'M2 0L0 2h4zm0 5L0 3h4z\' fill=\'%23374151\'/></svg>")',
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'right 8px center',
+          backgroundSize: '8px',
+          paddingRight: '24px',
+          minWidth: '120px'
+        }}
+        onInput={(event) => {
+          const target = event.target as HTMLSelectElement;
+          if (target.value) {
+            this.handleDeckSelect(target.value);
+          }
+        }}
+        aria-label="Select deck"
+      >
+        {deckArray.map(deck => (
+          <option key={deck.id} value={deck.id} selected={deck.id === activeDeckId}>
+            {deck.label || deck.id}
+          </option>
+        ))}
+      </select>
     );
   }
   
@@ -208,6 +180,11 @@ export class IterationDeckToolbar {
   render() {
     // Only render in development mode
     if (!isDevMode()) {
+      return null;
+    }
+    
+    // Additional safety check - only render if this is the singleton instance
+    if (toolbarInstance !== this) {
       return null;
     }
     
