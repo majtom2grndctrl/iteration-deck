@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multi-Deck Page Layout - Iteration Deck</title>
+  <script type="module" src="../../dist/iterationdeck/iterationdeck.esm.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+      background: #f8fafc;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    .section {
+      margin: 2rem 0;
+      padding: 2rem;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      text-align: center;
+      padding: 3rem 2rem;
+      margin: -2rem -2rem 2rem -2rem;
+      border-radius: 12px 12px 0 0;
+    }
+    
+    .nav {
+      background: #1f2937;
+      padding: 1rem 2rem;
+      margin: -2rem -2rem 2rem -2rem;
+      border-radius: 12px 12px 0 0;
+    }
+    
+    .nav-horizontal {
+      display: flex;
+      gap: 2rem;
+    }
+    
+    .nav-vertical {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .nav-minimal {
+      display: flex;
+      gap: 1rem;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 1rem;
+    }
+    
+    .nav-link {
+      color: white;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+    
+    .nav-link:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .nav-minimal .nav-link {
+      color: #374151;
+      padding: 0.5rem 0;
+      border-radius: 0;
+    }
+    
+    .nav-minimal .nav-link:hover {
+      background: none;
+      color: #3b82f6;
+      border-bottom: 2px solid #3b82f6;
+    }
+    
+    .content {
+      padding: 2rem;
+      background: #f9fafb;
+      border-radius: 8px;
+      margin: 1rem 0;
+    }
+    
+    .sidebar {
+      background: #f3f4f6;
+      padding: 1.5rem;
+      border-radius: 8px;
+      width: 250px;
+    }
+    
+    .sidebar-modern {
+      background: white;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .sidebar-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    
+    .footer-simple {
+      background: #f3f4f6;
+      padding: 2rem;
+      text-align: center;
+      border-radius: 8px;
+      margin-top: 2rem;
+    }
+    
+    .footer-rich {
+      background: #1f2937;
+      color: white;
+      padding: 3rem 2rem;
+      border-radius: 8px;
+      margin-top: 2rem;
+    }
+    
+    .footer-columns {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+    
+    .keyboard-shortcuts {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.9);
+      color: white;
+      padding: 1rem;
+      border-radius: 8px;
+      font-size: 12px;
+      max-width: 250px;
+      z-index: 1000;
+    }
+    
+    .shortcut {
+      display: flex;
+      justify-content: space-between;
+      margin: 0.25rem 0;
+    }
+    
+    kbd {
+      background: #374151;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="keyboard-shortcuts">
+    <div style="font-weight: bold; margin-bottom: 0.5rem;">⌨️ Keyboard Shortcuts</div>
+    <div class="shortcut">
+      <span>Next slide:</span>
+      <kbd>Ctrl/Cmd + →</kbd>
+    </div>
+    <div class="shortcut">
+      <span>Previous slide:</span>
+      <kbd>Ctrl/Cmd + ←</kbd>
+    </div>
+    <div style="font-size: 10px; margin-top: 0.5rem; opacity: 0.8;">
+      Use dropdown to switch between decks
+    </div>
+  </div>
+
+  <div class="container">
+    <h1>🎛️ Multi-Deck Page Layout</h1>
+    <p>This example demonstrates multiple Iteration Decks on a single page, simulating a complete page design review workflow.</p>
+
+    <!-- Header Section -->
+    <div class="section">
+      <h2>Page Header Variations</h2>
+      
+      <iteration-deck 
+        id="page-headers" 
+        label="Page Headers"
+        prompt="Design 3 header styles: hero, gradient, and minimal">
+        
+        <iteration-deck-slide 
+          label="Hero Style" 
+          ai-prompt="Bold hero header with call-to-action"
+          confidence="0.94">
+          <div class="header">
+            <h1 style="margin: 0 0 1rem 0; font-size: 2.5rem;">Welcome to Our Platform</h1>
+            <p style="margin: 0 0 2rem 0; font-size: 1.25rem; opacity: 0.9;">
+              The complete solution for modern teams
+            </p>
+            <button style="background: white; color: #667eea; padding: 12px 24px; border: none; border-radius: 6px; font-weight: 600;">
+              Get Started Free
+            </button>
+          </div>
+        </iteration-deck-slide>
+        
+        <iteration-deck-slide 
+          label="Gradient" 
+          ai-prompt="Subtle gradient with clean typography"
+          confidence="0.87">
+          <div style="background: linear-gradient(90deg, #f3f4f6 0%, #e5e7eb 100%); padding: 3rem 2rem; text-align: center; border-radius: 12px 12px 0 0; margin: -2rem -2rem 2rem -2rem;">
+            <h1 style="margin: 0 0 1rem 0; color: #1f2937;">Platform Overview</h1>
+            <p style="margin: 0; color: #6b7280; font-size: 1.125rem;">
+              Streamlined workflows for better results
+            </p>
+          </div>
+        </iteration-deck-slide>
+        
+        <iteration-deck-slide 
+          label="Minimal" 
+          ai-prompt="Clean minimal header, content-focused"
+          confidence="0.91"
+          notes="Best for content-heavy pages">
+          <div style="padding: 2rem; text-align: center; border-bottom: 1px solid #e5e7eb; margin: -2rem -2rem 2rem -2rem;">
+            <h1 style="margin: 0 0 0.5rem 0; color: #1f2937; font-weight: 500;">Documentation</h1>
+            <p style="margin: 0; color: #6b7280;">Everything you need to get started</p>
+          </div>
+        </iteration-deck-slide>
+      </iteration-deck>
+    </div>
+
+    <!-- Navigation Section -->
+    <div class="section">
+      <h2>Navigation Styles</h2>
+      
+      <iteration-deck 
+        id="navigation" 
+        label="Navigation Menus"
+        prompt="Create 3 navigation styles: horizontal, vertical, minimal">
+        
+        <iteration-deck-slide 
+          label="Horizontal" 
+          ai-prompt="Traditional horizontal navigation bar"
+          confidence="0.96">
+          <div class="nav">
+            <nav class="nav-horizontal">
+              <a href="#" class="nav-link">Home</a>
+              <a href="#" class="nav-link">Products</a>
+              <a href="#" class="nav-link">Solutions</a>
+              <a href="#" class="nav-link">Pricing</a>
+              <a href="#" class="nav-link">About</a>
+              <a href="#" class="nav-link">Contact</a>
+            </nav>
+          </div>
+        </iteration-deck-slide>
+        
+        <iteration-deck-slide 
+          label="Vertical" 
+          ai-prompt="Sidebar-style vertical navigation"
+          confidence="0.83">
+          <div style="display: flex; gap: 2rem;">
+            <div class="nav" style="width: 200px; margin: 0;">
+              <nav class="nav-vertical">
+                <a href="#" class="nav-link">Dashboard</a>
+                <a href="#" class="nav-link">Analytics</a>
+                <a href="#" class="nav-link">Projects</a>
+                <a href="#" class="nav-link">Team</a>
+                <a href="#" class="nav-link">Settings</a>
+              </nav>
+            </div>
+            <div class="content" style="flex: 1; margin: 0;">
+              <h3>Main Content Area</h3>
+              <p>Content flows alongside the vertical navigation</p>
+            </div>
+          </div>
+        </iteration-deck-slide>
+        
+        <iteration-deck-slide 
+          label="Minimal" 
+          ai-prompt="Clean minimal navigation with underline effects"
+          confidence="0.89">
+          <div style="background: white; padding: 1rem 2rem; margin: -2rem -2rem 2rem -2rem; border-radius: 12px 12px 0 0;">
+            <nav class="nav-minimal">
+              <a href="#" class="nav-link">Home</a>
+              <a href="#" class="nav-link">Products</a>
+              <a href="#" class="nav-link">About</a>
+              <a href="#" class="nav-link">Contact</a>
+            </nav>
+          </div>
+        </iteration-deck-slide>
+      </iteration-deck>
+    </div>
+
+    <!-- Sidebar Section -->
+    <div class="section">
+      <h2>Sidebar Components</h2>
+      
+      <iteration-deck 
+        id="sidebars" 
+        label="Sidebar Layouts"
+        description="Different sidebar approaches for dashboard layouts">
+        
+        <iteration-deck-slide 
+          label="Traditional" 
+          confidence="0.92">
+          <div style="display: flex; gap: 2rem;">
+            <div class="sidebar">
+              <h4 style="margin: 0 0 1rem 0;">Quick Links</h4>
+              <ul style="list-style: none; padding: 0; margin: 0;">
+                <li style="margin: 0.5rem 0;"><a href="#" style="color: #374151; text-decoration: none;">Dashboard</a></li>
+                <li style="margin: 0.5rem 0;"><a href="#" style="color: #374151; text-decoration: none;">Reports</a></li>
+                <li style="margin: 0.5rem 0;"><a href="#" style="color: #374151; text-decoration: none;">Settings</a></li>
+              </ul>
+            </div>
+            <div class="content" style="flex: 1; margin: 0;">
+              <h3>Main Content</h3>
+              <p>Traditional sidebar with simple styling</p>
+            </div>
+          </div>
+        </iteration-deck-slide>
+        
+        <iteration-deck-slide 
+          label="Modern Card" 
+          confidence="0.88">
+          <div style="display: flex; gap: 2rem;">
+            <div class="sidebar sidebar-modern">
+              <h4 style="margin: 0 0 1rem 0;">Navigation</h4>
+              <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                <button style="background: #3b82f6; color: white; border: none; padding: 0.75rem; border-radius: 6px; text-align: left;">📊 Dashboard</button>
+                <button style="background: #f3f4f6; color: #374151; border: none; padding: 0.75rem; border-radius: 6px; text-align: left;">📈 Analytics</button>
+                <button style="background: #f3f4f6; color: #374151; border: none; padding: 0.75rem; border-radius: 6px; text-align: left;">⚙️ Settings</button>
+              </div>
+            </div>
+            <div class="content" style="flex: 1; margin: 0;">
+              <h3>Main Content</h3>
+              <p>Modern card-style sidebar with button navigation</p>
+            </div>
+          </div>
+        </iteration-deck-slide>
+        
+        <iteration-deck-slide 
+          label="Gradient" 
+          confidence="0.85"
+          notes="Eye-catching but use sparingly">
+          <div style="display: flex; gap: 2rem;">
+            <div class="sidebar sidebar-card">
+              <h4 style="margin: 0 0 1rem 0; color: white;">Menu</h4>
+              <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                <a href="#" style="color: white; text-decoration: none; padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.2);">Home</a>
+                <a href="#" style="color: white; text-decoration: none; padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.2);">Projects</a>
+                <a href="#" style="color: white; text-decoration: none; padding: 0.5rem 0;">Profile</a>
+              </div>
+            </div>
+            <div class="content" style="flex: 1; margin: 0;">
+              <h3>Main Content</h3>
+              <p>Gradient sidebar for visually striking layouts</p>
+            </div>
+          </div>
+        </iteration-deck-slide>
+      </iteration-deck>
+    </div>
+
+    <!-- Footer Section -->
+    <div class="section">
+      <h2>Footer Variations</h2>
+      
+      <iteration-deck 
+        id="footers" 
+        label="Page Footers"
+        prompt="Design 3 footer styles: simple, rich content, minimal">
+        
+        <iteration-deck-slide 
+          label="Simple" 
+          ai-prompt="Clean simple footer with basic links"
+          confidence="0.93">
+          <div class="footer-simple">
+            <p style="margin: 0 0 1rem 0; color: #6b7280;">© 2024 Your Company. All rights reserved.</p>
+            <div style="display: flex; justify-content: center; gap: 2rem;">
+              <a href="#" style="color: #6b7280; text-decoration: none;">Privacy</a>
+              <a href="#" style="color: #6b7280; text-decoration: none;">Terms</a>
+              <a href="#" style="color: #6b7280; text-decoration: none;">Contact</a>
+            </div>
+          </div>
+        </iteration-deck-slide>
+        
+        <iteration-deck-slide 
+          label="Rich Content" 
+          ai-prompt="Comprehensive footer with multiple sections"
+          confidence="0.87">
+          <div class="footer-rich">
+            <div class="footer-columns">
+              <div>
+                <h4 style="margin: 0 0 1rem 0;">Product</h4>
+                <ul style="list-style: none; padding: 0; margin: 0;">
+                  <li style="margin: 0.5rem 0;"><a href="#" style="color: #d1d5db; text-decoration: none;">Features</a></li>
+                  <li style="margin: 0.5rem 0;"><a href="#" style="color: #d1d5db; text-decoration: none;">Pricing</a></li>
+                  <li style="margin: 0.5rem 0;"><a href="#" style="color: #d1d5db; text-decoration: none;">API</a></li>
+                </ul>
+              </div>
+              <div>
+                <h4 style="margin: 0 0 1rem 0;">Company</h4>
+                <ul style="list-style: none; padding: 0; margin: 0;">
+                  <li style="margin: 0.5rem 0;"><a href="#" style="color: #d1d5db; text-decoration: none;">About</a></li>
+                  <li style="margin: 0.5rem 0;"><a href="#" style="color: #d1d5db; text-decoration: none;">Blog</a></li>
+                  <li style="margin: 0.5rem 0;"><a href="#" style="color: #d1d5db; text-decoration: none;">Careers</a></li>
+                </ul>
+              </div>
+              <div>
+                <h4 style="margin: 0 0 1rem 0;">Support</h4>
+                <ul style="list-style: none; padding: 0; margin: 0;">
+                  <li style="margin: 0.5rem 0;"><a href="#" style="color: #d1d5db; text-decoration: none;">Help Center</a></li>
+                  <li style="margin: 0.5rem 0;"><a href="#" style="color: #d1d5db; text-decoration: none;">Contact</a></li>
+                  <li style="margin: 0.5rem 0;"><a href="#" style="color: #d1d5db; text-decoration: none;">Status</a></li>
+                </ul>
+              </div>
+            </div>
+            <div style="border-top: 1px solid #374151; padding-top: 2rem; text-align: center; color: #9ca3af;">
+              © 2024 Your Company. All rights reserved.
+            </div>
+          </div>
+        </iteration-deck-slide>
+        
+        <iteration-deck-slide 
+          label="Minimal" 
+          ai-prompt="Ultra-minimal footer, content-focused"
+          confidence="0.91">
+          <div style="text-align: center; padding: 1rem; color: #9ca3af; font-size: 14px;">
+            © 2024 Your Company
+          </div>
+        </iteration-deck-slide>
+      </iteration-deck>
+    </div>
+
+    <div class="section">
+      <h2>💡 Multi-Deck Workflow Benefits</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 1rem;">
+        <div style="padding: 1.5rem; background: #f0f9ff; border: 1px solid #0ea5e9; border-radius: 8px;">
+          <h4 style="margin: 0 0 0.5rem 0; color: #0369a1;">🎯 Systematic Review</h4>
+          <p style="margin: 0; color: #075985; font-size: 14px;">
+            Compare multiple page components simultaneously. Use the toolbar dropdown to switch between different sections and keyboard shortcuts to navigate within each section.
+          </p>
+        </div>
+        
+        <div style="padding: 1.5rem; background: #f0fdf4; border: 1px solid #22c55e; border-radius: 8px;">
+          <h4 style="margin: 0 0 0.5rem 0; color: #166534;">🚀 AI Iteration</h4>
+          <p style="margin: 0; color: #15803d; font-size: 14px;">
+            Each deck tracks AI prompts and confidence scores. Iterate on individual components while maintaining context about what generated each variation.
+          </p>
+        </div>
+        
+        <div style="padding: 1.5rem; background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px;">
+          <h4 style="margin: 0 0 0.5rem 0; color: #92400e;">👥 Stakeholder Review</h4>
+          <p style="margin: 0; color: #92400e; font-size: 14px;">
+            Present complete page experiences to stakeholders. They can navigate between variations using simple keyboard shortcuts or the visual toolbar.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Enhanced interaction tracking for multi-deck scenarios
+    document.addEventListener('DOMContentLoaded', () => {
+      const decks = document.querySelectorAll('iteration-deck');
+      console.log(`🎛️ Multi-deck page loaded with ${decks.length} iteration decks`);
+      
+      // Track which decks are present
+      decks.forEach((deck, index) => {
+        console.log(`Deck ${index + 1}: "${deck.id}" - "${deck.getAttribute('label')}"`);
+      });
+      
+      // Example: Custom analytics or integration hooks
+      // In a real application, you might send this data to your analytics service
+      const trackDeckInteraction = (deckId, slideIndex) => {
+        console.log(`📊 Analytics: Deck "${deckId}" → Slide ${slideIndex}`);
+      };
+      
+      // Example: Auto-scroll behavior when decks receive focus
+      // This demonstrates how you might enhance the user experience
+      const enhanceScrollBehavior = () => {
+        decks.forEach(deck => {
+          deck.addEventListener('focus', () => {
+            deck.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'center' 
+            });
+          });
+        });
+      };
+      
+      enhanceScrollBehavior();
+    });
+  </script>
+</body>
+</html>

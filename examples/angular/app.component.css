@@ -1,0 +1,226 @@
+.angular-example {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: #f8fafc;
+}
+
+.integration-tip {
+  background: #f1f5f9;
+  padding: 1rem;
+  border-radius: 6px;
+  margin: 1rem 0;
+  font-size: 14px;
+  border-left: 4px solid #3b82f6;
+}
+
+.integration-tip ul {
+  margin: 0.5rem 0 0 0;
+  padding-left: 1.25rem;
+}
+
+.example-section {
+  margin: 3rem 0;
+  padding: 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.button-demo {
+  padding: 2rem;
+  text-align: center;
+}
+
+.button-description {
+  margin-top: 1rem;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.click-counter {
+  margin-top: 0.5rem;
+  font-size: 12px;
+  color: #3b82f6;
+  font-weight: 600;
+}
+
+.button-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.reset-button {
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background 0.2s ease;
+}
+
+.reset-button:hover {
+  background: #e5e7eb;
+}
+
+.form-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 6px;
+}
+
+.form-controls label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.form-controls select {
+  margin-left: 0.5rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #d1d5db;
+}
+
+.form-stats {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.best-practices-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.practice-card {
+  padding: 1.5rem;
+  border-radius: 8px;
+}
+
+.practice-card--setup {
+  background: #f0f9ff;
+  border: 1px solid #0ea5e9;
+}
+
+.practice-card--setup h4 {
+  color: #0369a1;
+  margin: 0 0 0.5rem 0;
+}
+
+.practice-card--setup ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: #075985;
+}
+
+.practice-card--services {
+  background: #f0fdf4;
+  border: 1px solid #22c55e;
+}
+
+.practice-card--services h4 {
+  color: #166534;
+  margin: 0 0 0.5rem 0;
+}
+
+.practice-card--services ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: #15803d;
+}
+
+.practice-card--workflow {
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+}
+
+.practice-card--workflow h4 {
+  color: #92400e;
+  margin: 0 0 0.5rem 0;
+}
+
+.practice-card--workflow ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: #92400e;
+}
+
+.environment-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.env-card {
+  padding: 1.5rem;
+  border-radius: 8px;
+}
+
+.env-card--dev {
+  background: #f0f9ff;
+  border: 1px solid #0ea5e9;
+}
+
+.env-card--dev h4 {
+  margin: 0 0 0.5rem 0;
+  color: #0369a1;
+}
+
+.env-card--dev ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: #075985;
+}
+
+.env-card--prod {
+  background: #f0fdf4;
+  border: 1px solid #22c55e;
+}
+
+.env-card--prod h4 {
+  margin: 0 0 0.5rem 0;
+  color: #166534;
+}
+
+.env-card--prod ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: #15803d;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .angular-example {
+    padding: 1rem;
+  }
+  
+  .environment-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .best-practices-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-controls,
+  .button-stats {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+}

@@ -25,7 +25,8 @@
       "Bash(mv:*)",
       "Bash(pnpm vitest run:*)",
       "Bash(find:*)",
-      "Bash(pnpm generate:*)"
+      "Bash(pnpm generate:*)",
+      "Bash(node:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits"

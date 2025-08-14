@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Manager AI Workflow - Iteration Deck</title>
+  <script type="module" src="../../dist/iterationdeck/iterationdeck.esm.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+      background: #f8fafc;
+      color: #1f2937;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    .hero-section {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 3rem 2rem;
+      border-radius: 16px;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    
+    .scenario-section {
+      margin: 2rem 0;
+      padding: 2rem;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      border-left: 4px solid #10b981;
+    }
+    
+    .pm-context {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+    
+    .context-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      border-top: 3px solid #3b82f6;
+    }
+    
+    .context-header {
+      font-weight: 600;
+      color: #3b82f6;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .metrics-dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    
+    .metric-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      border-bottom: 3px solid #10b981;
+    }
+    
+    .metric-value {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #10b981;
+      margin-bottom: 0.5rem;
+    }
+    
+    .metric-label {
+      color: #6b7280;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+    
+    .requirement-card {
+      background: #f0f9ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 1rem 0;
+    }
+    
+    .requirement-header {
+      font-weight: 600;
+      color: #1e40af;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .priority-high { border-left: 4px solid #ef4444; }
+    .priority-medium { border-left: 4px solid #f59e0b; }
+    .priority-low { border-left: 4px solid #10b981; }
+    
+    .user-story {
+      background: #fffbeb;
+      border: 1px solid #fbbf24;
+      border-radius: 8px;
+      padding: 1rem;
+      margin: 1rem 0;
+      font-style: italic;
+    }
+    
+    .acceptance-criteria {
+      background: #f0fdf4;
+      border: 1px solid #22c55e;
+      border-radius: 8px;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+    
+    .acceptance-criteria ul {
+      margin: 0.5rem 0;
+      padding-left: 1.5rem;
+    }
+    
+    .ai-generation-log {
+      background: #f9fafb;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 1rem;
+      font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+      font-size: 0.875rem;
+      margin: 1rem 0;
+      white-space: pre-wrap;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    
+    .decision-matrix {
+      display: grid;
+      grid-template-columns: 1fr repeat(4, auto);
+      gap: 0.5rem;
+      align-items: center;
+      margin: 1rem 0;
+      font-size: 0.875rem;
+    }
+    
+    .matrix-header {
+      font-weight: 600;
+      background: #f3f4f6;
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      text-align: center;
+    }
+    
+    .matrix-cell {
+      padding: 0.5rem 1rem;
+      text-align: center;
+      border-radius: 4px;
+    }
+    
+    .score-excellent { background: #dcfce7; color: #166534; }
+    .score-good { background: #fef3c7; color: #92400e; }
+    .score-poor { background: #fee2e2; color: #991b1b; }
+    
+    .roadmap-timeline {
+      position: relative;
+      padding-left: 2rem;
+      margin: 2rem 0;
+    }
+    
+    .roadmap-timeline::before {
+      content: '';
+      position: absolute;
+      left: 0.75rem;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, #3b82f6, #10b981);
+    }
+    
+    .timeline-item {
+      position: relative;
+      margin-bottom: 2rem;
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      border-left: 4px solid #3b82f6;
+    }
+    
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -2rem;
+      top: 1.5rem;
+      width: 12px;
+      height: 12px;
+      background: #3b82f6;
+      border-radius: 50%;
+      border: 3px solid white;
+      box-shadow: 0 0 0 3px #3b82f6;
+    }
+    
+    .timeline-item.completed::before {
+      background: #10b981;
+      box-shadow: 0 0 0 3px #10b981;
+    }
+    
+    .feature-comparison {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+    
+    .comparison-card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      border-top: 4px solid #3b82f6;
+    }
+    
+    .comparison-header {
+      background: #f8fafc;
+      padding: 1.5rem;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .comparison-content {
+      padding: 1.5rem;
+    }
+    
+    .data-insight {
+      background: #fef7ff;
+      border: 1px solid #e879f9;
+      border-radius: 8px;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+    
+    .workflow-nav {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 1rem;
+      font-size: 0.875rem;
+      max-width: 200px;
+      z-index: 1001;
+    }
+    
+    .workflow-nav h4 {
+      margin: 0 0 0.5rem 0;
+      color: #374151;
+    }
+    
+    .workflow-nav ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .workflow-nav li {
+      margin: 0.25rem 0;
+    }
+    
+    .workflow-nav a {
+      color: #6b7280;
+      text-decoration: none;
+      display: block;
+      padding: 0.25rem 0;
+    }
+    
+    .workflow-nav a:hover {
+      color: #3b82f6;
+    }
+  </style>
+</head>
+<body>
+  <div class="workflow-nav">
+    <h4>📋 Workflow Steps</h4>
+    <ul>
+      <li><a href="#context">Product Context</a></li>
+      <li><a href="#requirements">Requirements</a></li>
+      <li><a href="#generation">AI Generation</a></li>
+      <li><a href="#evaluation">Evaluation</a></li>
+      <li><a href="#validation">User Validation</a></li>
+      <li><a href="#roadmap">Roadmap</a></li>
+    </ul>
+  </div>
+
+  <div class="container">
+    <div class="hero-section">
+      <h1>📊 Product Manager AI Workflow</h1>
+      <p>Complete product development cycle using AI-assisted design iteration</p>
+      <p style="opacity: 0.9; font-size: 1rem; margin-top: 1rem;">
+        Real-world scenario: A Product Manager at a B2B SaaS company uses AI to rapidly prototype 
+        and validate dashboard improvements, reducing design cycle time by 70% while maintaining 
+        high user experience standards.
+      </p>
+    </div>
+
+    <div class="metrics-dashboard">
+      <div class="metric-card">
+        <div class="metric-value">70%</div>
+        <div class="metric-label">Faster Design Cycles</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value">12</div>
+        <div class="metric-label">Iterations in 1 Week</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value">94%</div>
+        <div class="metric-label">Stakeholder Approval</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value">3.2x</div>
+        <div class="metric-label">User Engagement</div>
+      </div>
+    </div>
+
+    <!-- Product Context -->
+    <div class="scenario-section" id="context">
+      <h2>🎯 Product Context & Challenge</h2>
+      <p><strong>Scenario:</strong> Sarah, PM at CloudAnalytics, needs to redesign the main dashboard to improve user engagement and reduce churn. Current dashboard has 23% bounce rate and low feature adoption.</p>
+      
+      <div class="pm-context">
+        <div class="context-card">
+          <div class="context-header">📈 Business Metrics</div>
+          <ul style="margin: 0.5rem 0; padding-left: 1.25rem; font-size: 0.875rem;">
+            <li>Dashboard bounce rate: 23%</li>
+            <li>Feature adoption: 34%</li>
+            <li>Time to value: 8.3 days</li>
+            <li>Monthly churn: 12%</li>
+            <li>Support tickets: 45/week</li>
+          </ul>
+        </div>
+        
+        <div class="context-card">
+          <div class="context-header">👥 User Research</div>
+          <ul style="margin: 0.5rem 0; padding-left: 1.25rem; font-size: 0.875rem;">
+            <li>"Dashboard feels overwhelming"</li>
+            <li>"Can't find key metrics quickly"</li>
+            <li>"Too many clicks to get insights"</li>
+            <li>"Mobile experience is poor"</li>
+            <li>"Want customizable views"</li>
+          </ul>
+        </div>
+        
+        <div class="context-card">
+          <div class="context-header">🎯 Business Goals</div>
+          <ul style="margin: 0.5rem 0; padding-left: 1.25rem; font-size: 0.875rem;">
+            <li>Reduce bounce rate to <15%</li>
+            <li>Increase feature adoption to 60%</li>
+            <li>Decrease time to value to 3 days</li>
+            <li>Improve mobile engagement +40%</li>
+            <li>Reduce support load by 25%</li>
+          </ul>
+        </div>
+        
+        <div class="context-card">
+          <div class="context-header">⚡ Technical Constraints</div>
+          <ul style="margin: 0.5rem 0; padding-left: 1.25rem; font-size: 0.875rem;">
+            <li>React + TypeScript codebase</li>
+            <li>Design system compliance</li>
+            <li>Mobile-responsive required</li>
+            <li>A11y WCAG AA standards</li>
+            <li>2 week dev timeline</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Requirements Gathering -->
+    <div class="scenario-section" id="requirements">
+      <h2>📝 Requirements & User Stories</h2>
+      <p>Converting user research and business goals into structured requirements for AI generation.</p>
+      
+      <div class="user-story">
+        <strong>Primary User Story:</strong><br>
+        "As a data analyst, I want to see my most important metrics at a glance when I log in, 
+        so that I can quickly assess business performance without navigating through multiple screens."
+      </div>
+      
+      <div class="requirement-card priority-high">
+        <div class="requirement-header">🔴 High Priority Requirements</div>
+        <div class="acceptance-criteria">
+          <strong>Acceptance Criteria:</strong>
+          <ul>
+            <li>Dashboard loads key metrics in under 2 seconds</li>
+            <li>Most important 6-8 KPIs visible without scrolling</li>
+            <li>One-click drill-down for detailed views</li>
+            <li>Mobile-responsive with same functionality</li>
+            <li>Customizable metric cards (show/hide, reorder)</li>
+            <li>Real-time data updates every 30 seconds</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="requirement-card priority-medium">
+        <div class="requirement-header">🟡 Medium Priority Requirements</div>
+        <div class="acceptance-criteria">
+          <strong>Nice-to-Have Features:</strong>
+          <ul>
+            <li>Dark mode toggle for extended use</li>
+            <li>Export functionality for key charts</li>
+            <li>Keyboard shortcuts for power users</li>
+            <li>Integration with Slack/Teams notifications</li>
+            <li>Historical comparison views</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Generation Process -->
+    <div class="scenario-section" id="generation">
+      <h2>🤖 AI-Assisted Design Generation</h2>
+      <p>Using AI to rapidly generate and iterate on dashboard layouts based on requirements.</p>
+      
+      <div class="ai-generation-log">[AI Generation Log - Session: dashboard-redesign-2024-08]
+[09:15] Initializing GPT-4 with design system context
+[09:16] Processing user requirements and constraints
+[09:17] Generating layout option 1: Card-based grid system
+[09:18] Generating layout option 2: Sidebar navigation with main content
+[09:19] Generating layout option 3: Tabbed interface with customization
+[09:20] Applying accessibility guidelines (WCAG AA)
+[09:21] Optimizing for mobile breakpoints
+[09:22] Adding interaction patterns and micro-animations
+[09:23] ✅ Generated 3 high-fidelity dashboard variations</div>
+      
+      <iteration-deck 
+        id="dashboard-layouts" 
+        label="AI Dashboard Layouts"
+        prompt="Generate dashboard layouts optimized for data analyst workflows with mobile-first design"
+        description="AI-generated dashboard concepts addressing user research findings and business requirements">
+        
+        <iteration-deck-slide 
+          label="Card Grid System" 
+          ai-prompt="Design a card-based dashboard with customizable grid layout, emphasizing key metrics visibility"
+          confidence="0.91"
+          notes="AI prioritized scannable layout with visual hierarchy based on metric importance">
+          <div style="padding: 2rem; background: #f8fafc; border-radius: 12px;">
+            <!-- Mock dashboard with card grid -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+              <!-- Key Metrics Row -->
+              <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-left: 4px solid #10b981;">
+                <h4 style="margin: 0 0 0.5rem 0; color: #6b7280; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em;">Monthly Revenue</h4>
+                <div style="font-size: 2.5rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem;">$47,832</div>
+                <div style="color: #10b981; font-size: 0.875rem;">↗ +12.3% vs last month</div>
+              </div>
+              
+              <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-left: 4px solid #3b82f6;">
+                <h4 style="margin: 0 0 0.5rem 0; color: #6b7280; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em;">Active Users</h4>
+                <div style="font-size: 2.5rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem;">1,247</div>
+                <div style="color: #3b82f6; font-size: 0.875rem;">↗ +8.1% vs last week</div>
+              </div>
+              
+              <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-left: 4px solid #f59e0b;">
+                <h4 style="margin: 0 0 0.5rem 0; color: #6b7280; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em;">Conversion Rate</h4>
+                <div style="font-size: 2.5rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem;">3.4%</div>
+                <div style="color: #f59e0b; font-size: 0.875rem;">→ +0.1% vs last month</div>
+              </div>
+              
+              <!-- Charts Section -->
+              <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); grid-column: span 2;">
+                <h4 style="margin: 0 0 1rem 0; color: #1f2937;">Revenue Trend (Last 30 Days)</h4>
+                <div style="height: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.125rem;">
+                  📈 Interactive Chart Component
+                </div>
+              </div>
+              
+              <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <h4 style="margin: 0 0 1rem 0; color: #1f2937;">Top Features</h4>
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>Analytics Dashboard</span>
+                    <span style="color: #10b981; font-weight: 600;">78%</span>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>Report Builder</span>
+                    <span style="color: #3b82f6; font-weight: 600;">65%</span>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>API Access</span>
+                    <span style="color: #f59e0b; font-weight: 600;">42%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="data-insight">
+              <strong>🎯 AI Design Rationale:</strong> Card-based layout allows for easy scanning and customization. Visual hierarchy uses color coding for metric status. Mobile-friendly grid system collapses gracefully.
+            </div>
+          </div>
+        </iteration-deck-slide>
+        
+        <iteration-deck-slide 
+          label="Sidebar + Main Content" 
+          ai-prompt="Create dashboard with persistent navigation sidebar and focused main content area"
+          confidence="0.87"
+          notes="AI suggested this pattern for power users who need quick navigation between views">
+          <div style="padding: 2rem; background: #f8fafc; border-radius: 12px;">
+            <div style="display: flex; gap: 1.5rem; min-height: 400px;">
+              <!-- Sidebar -->
+              <div style="width: 240px; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 1.5rem;">
+                <h4 style="margin: 0 0 1rem 0; color: #1f2937; font-size: 1rem;">Dashboard Views</h4>
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                  <button style="background: #3b82f6; color: white; border: none; padding: 0.75rem 1rem; border-radius: 6px; text-align: left; font-weight: 500;">📊 Overview</button>
+                  <button style="background: #f3f4f6; color: #374151; border: none; padding: 0.75rem 1rem; border-radius: 6px; text-align: left; font-weight: 500;">💰 Revenue</button>
+                  <button style="background: #f3f4f6; color: #374151; border: none; padding: 0.75rem 1rem; border-radius: 6px; text-align: left; font-weight: 500;">👥 Users</button>
+                  <button style="background: #f3f4f6; color: #374151; border: none; padding: 0.75rem 1rem; border-radius: 6px; text-align: left; font-weight: 500;">⚡ Performance</button>
+                </div>
+                
+                <hr style="margin: 1.5rem 0; border: none; height: 1px; background: #e5e7eb;">
+                
+                <h5 style="margin: 0 0 0.5rem 0; color: #6b7280; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em;">Quick Actions</h5>
+                <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                  <a href="#" style="color: #6b7280; text-decoration: none; padding: 0.5rem 0; font-size: 0.875rem;">📈 Create Report</a>
+                  <a href="#" style="color: #6b7280; text-decoration: none; padding: 0.5rem 0; font-size: 0.875rem;">📤 Export Data</a>
+                  <a href="#" style="color: #6b7280; text-decoration: none; padding: 0.5rem 0; font-size: 0.875rem;">⚙️ Settings</a>
+                </div>
+              </div>
+              
+              <!-- Main Content -->
+              <div style="flex: 1; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                  <h3 style="margin: 0; color: #1f2937;">Overview Dashboard</h3>
+                  <div style="display: flex; gap: 0.5rem;">
+                    <select style="padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; background: white;">
+                      <option>Last 30 days</option>
+                      <option>Last 7 days</option>
+                      <option>Last quarter</option>
+                    </select>
+                    <button style="background: #f3f4f6; border: none; padding: 0.5rem 1rem; border-radius: 6px; color: #374151;">🔄 Refresh</button>
+                  </div>
+                </div>
+                
+                <!-- Key Metrics in Main Area -->
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;">
+                  <div style="text-align: center; padding: 1rem; background: #f8fafc; border-radius: 6px;">
+                    <div style="font-size: 2rem; font-weight: 700; color: #10b981; margin-bottom: 0.25rem;">$47,832</div>
+                    <div style="color: #6b7280; font-size: 0.875rem;">Monthly Revenue</div>
+                  </div>
+                  <div style="text-align: center; padding: 1rem; background: #f8fafc; border-radius: 6px;">
+                    <div style="font-size: 2rem; font-weight: 700; color: #3b82f6; margin-bottom: 0.25rem;">1,247</div>
+                    <div style="color: #6b7280; font-size: 0.875rem;">Active Users</div>
+                  </div>
+                  <div style="text-align: center; padding: 1rem; background: #f8fafc; border-radius: 6px;">
+                    <div style="font-size: 2rem; font-weight: 700; color: #f59e0b; margin-bottom: 0.25rem;">3.4%</div>
+                    <div style="color: #6b7280; font-size: 0.875rem;">Conversion Rate</div>
+                  </div>
+                </div>
+                
+                <!-- Chart Area -->
+                <div style="height: 200px; background: linear-gradient(45deg, #667eea, #764ba2); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.125rem;">
+                  📊 Main Chart Component
+                </div>
+              </div>
+            </div>
+            
+            <div class="data-insight">
+              <strong>🎯 AI Design Rationale:</strong> Sidebar pattern optimizes for power users with frequent navigation needs. Persistent menu reduces clicks to access different views. Main content area has more space for detailed visualization.
+            </div>
+          </div>
+        </iteration-deck-slide>
+        
+        <iteration-deck-slide 
+          label="Tabbed Interface" 
+          ai-prompt="Design tabbed dashboard interface with customizable tab order and content"
+          confidence="0.84"
+          notes="AI emphasized customization features but flagged potential mobile navigation challenges">
+          <div style="padding: 2rem; background: #f8fafc; border-radius: 12px;">
+            <!-- Tab Navigation -->
+            <div style="background: white; border-radius: 8px 8px 0 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+              <div style="display: flex; border-bottom: 1px solid #e5e7eb;">
+                <button style="background: white; color: #3b82f6; border: none; padding: 1rem 1.5rem; border-bottom: 2px solid #3b82f6; font-weight: 600;">📊 Overview</button>
+                <button style="background: #f8fafc; color: #6b7280; border: none; padding: 1rem 1.5rem; font-weight: 500;">💰 Revenue</button>
+                <button style="background: #f8fafc; color: #6b7280; border: none; padding: 1rem 1.5rem; font-weight: 500;">👥 Users</button>
+                <button style="background: #f8fafc; color: #6b7280; border: none; padding: 1rem 1.5rem; font-weight: 500;">📈 Growth</button>
+                <div style="margin-left: auto; padding: 1rem 1.5rem;">
+                  <button style="background: #f3f4f6; border: none; padding: 0.5rem; border-radius: 4px; color: #6b7280;">⚙️</button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Tab Content -->
+            <div style="background: white; border-radius: 0 0 8px 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 2rem; min-height: 300px;">
+              <!-- Customization Panel -->
+              <div style="background: #fffbeb; border: 1px solid #fbbf24; border-radius: 6px; padding: 1rem; margin-bottom: 1.5rem;">
+                <strong>🎛️ Customization Mode Active</strong><br>
+                <span style="font-size: 0.875rem; color: #92400e;">Drag and drop widgets to customize your dashboard. Changes save automatically.</span>
+              </div>
+              
+              <!-- Widget Grid -->
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                <!-- Draggable Widgets -->
+                <div style="background: #f0f9ff; border: 2px dashed #3b82f6; border-radius: 8px; padding: 1.5rem; text-align: center; cursor: move;">
+                  <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">📊</div>
+                  <div style="font-weight: 600; color: #3b82f6;">Revenue Chart</div>
+                  <div style="font-size: 0.875rem; color: #6b7280; margin-top: 0.5rem;">Drag to reorder</div>
+                </div>
+                
+                <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1.5rem;">
+                  <h4 style="margin: 0 0 1rem 0; color: #1f2937;">Key Metrics</h4>
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span>MRR</span>
+                    <span style="font-weight: 600; color: #10b981;">$47,832</span>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span>Users</span>
+                    <span style="font-weight: 600; color: #3b82f6;">1,247</span>
+                  </div>
+                  <div style="display: flex; justify-content: space-between;">
+                    <span>CVR</span>
+                    <span style="font-weight: 600; color: #f59e0b;">3.4%</span>
+                  </div>
+                </div>
+                
+                <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1.5rem;">
+                  <h4 style="margin: 0 0 1rem 0; color: #1f2937;">Recent Activity</h4>
+                  <div style="font-size: 0.875rem; color: #6b7280;">
+                    <div style="margin-bottom: 0.5rem;">• New user signup: john@example.com</div>
+                    <div style="margin-bottom: 0.5rem;">• Plan upgraded: Premium → Enterprise</div>
+                    <div style="margin-bottom: 0.5rem;">• API usage spike: +45% today</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="data-insight">
+              <strong>🎯 AI Design Rationale:</strong> Tabbed interface provides clear information architecture. Customization features address user need for personalization. However, mobile navigation may require hamburger menu or bottom tabs.
+              
+              <div style="margin-top: 0.5rem; padding: 0.5rem; background: #fef3c7; border-radius: 4px; color: #92400e;">
+                ⚠️ AI Concern: Tab overflow on mobile devices. Recommend collapsible navigation for smaller screens.
+              </div>
+            </div>
+          </div>
+        </iteration-deck-slide>
+      </iteration-deck>
+    </div>
+
+    <!-- Evaluation & Decision Matrix -->
+    <div class="scenario-section" id="evaluation">
+      <h2>⚖️ Evaluation & Decision Matrix</h2>
+      <p>Systematic evaluation of AI-generated options against product requirements and success criteria.</p>
+      
+      <div class="decision-matrix">
+        <div class="matrix-header">Layout Option</div>
+        <div class="matrix-header">User Experience</div>
+        <div class="matrix-header">Mobile Responsive</div>
+        <div class="matrix-header">Development Effort</div>
+        <div class="matrix-header">Overall Score</div>
+        
+        <div class="matrix-cell" style="font-weight: 600;">Card Grid System</div>
+        <div class="matrix-cell score-excellent">Excellent</div>
+        <div class="matrix-cell score-excellent">Excellent</div>
+        <div class="matrix-cell score-good">Medium</div>
+        <div class="matrix-cell score-excellent" style="font-weight: 600;">9.2/10</div>
+        
+        <div class="matrix-cell" style="font-weight: 600;">Sidebar + Main</div>
+        <div class="matrix-cell score-good">Good</div>
+        <div class="matrix-cell score-good">Good</div>
+        <div class="matrix-cell score-excellent">Low</div>
+        <div class="matrix-cell score-good" style="font-weight: 600;">8.1/10</div>
+        
+        <div class="matrix-cell" style="font-weight: 600;">Tabbed Interface</div>
+        <div class="matrix-cell score-good">Good</div>
+        <div class="matrix-cell score-poor">Needs Work</div>
+        <div class="matrix-cell score-good">Medium</div>
+        <div class="matrix-cell score-good" style="font-weight: 600;">7.3/10</div>
+      </div>
+      
+      <div style="background: #f0fdf4; border: 1px solid #22c55e; border-radius: 8px; padding: 1.5rem; margin-top: 2rem;">
+        <h4 style="margin: 0 0 1rem 0; color: #166534;">🏆 Winning Solution: Card Grid System</h4>
+        <div style="color: #166534;">
+          <strong>Key Advantages:</strong>
+          <ul style="margin: 0.5rem 0; padding-left: 1.5rem;">
+            <li>Best mobile experience with responsive grid</li>
+            <li>Highly customizable for different user needs</li>
+            <li>Clear visual hierarchy for metric scanning</li>
+            <li>Matches user mental model from research</li>
+            <li>Scalable for future feature additions</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- User Validation -->
+    <div class="scenario-section" id="validation">
+      <h2>👥 User Validation & Testing</h2>
+      <p>Rapid prototype testing with real users to validate AI design decisions.</p>
+      
+      <div class="feature-comparison">
+        <div class="comparison-card">
+          <div class="comparison-header">
+            <h4 style="margin: 0; color: #1f2937;">🧪 A/B Test Results</h4>
+            <div style="font-size: 0.875rem; color: #6b7280;">Card Grid vs. Current Dashboard</div>
+          </div>
+          <div class="comparison-content">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; text-align: center;">
+              <div>
+                <div style="font-size: 2rem; font-weight: 700; color: #10b981;">-67%</div>
+                <div style="font-size: 0.875rem; color: #6b7280;">Bounce Rate</div>
+              </div>
+              <div>
+                <div style="font-size: 2rem; font-weight: 700; color: #3b82f6;">+89%</div>
+                <div style="font-size: 0.875rem; color: #6b7280;">Feature Usage</div>
+              </div>
+            </div>
+            <div style="margin-top: 1rem; padding: 0.75rem; background: #f0fdf4; border-radius: 6px; font-size: 0.875rem; color: #166534;">
+              ✅ Statistical significance reached after 5 days (95% confidence)
+            </div>
+          </div>
+        </div>
+        
+        <div class="comparison-card">
+          <div class="comparison-header">
+            <h4 style="margin: 0; color: #1f2937;">📱 Mobile Usability</h4>
+            <div style="font-size: 0.875rem; color: #6b7280;">iOS & Android Testing</div>
+          </div>
+          <div class="comparison-content">
+            <div style="margin-bottom: 1rem;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span>Task Completion Rate</span>
+                <span style="font-weight: 600; color: #10b981;">92%</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span>Average Task Time</span>
+                <span style="font-weight: 600; color: #3b82f6;">1.3 min</span>
+              </div>
+              <div style="display: flex; justify-content: space-between;">
+                <span>User Satisfaction</span>
+                <span style="font-weight: 600; color: #10b981;">4.6/5</span>
+              </div>
+            </div>
+            <div style="padding: 0.75rem; background: #fef3c7; border-radius: 6px; font-size: 0.875rem; color: #92400e;">
+              📝 Note: Minor scrolling needed on phones <375px width
+            </div>
+          </div>
+        </div>
+        
+        <div class="comparison-card">
+          <div class="comparison-header">
+            <h4 style="margin: 0; color: #1f2937;">💬 User Feedback</h4>
+            <div style="font-size: 0.875rem; color: #6b7280;">12 User Interviews</div>
+          </div>
+          <div class="comparison-content">
+            <div style="font-size: 0.875rem; line-height: 1.6;">
+              <div style="margin-bottom: 0.75rem;">
+                <strong style="color: #10b981;">"Much easier to find what I need"</strong><br>
+                <span style="color: #6b7280;">- Data Analyst, 3+ years experience</span>
+              </div>
+              <div style="margin-bottom: 0.75rem;">
+                <strong style="color: #10b981;">"Love the mobile version finally!"</strong><br>
+                <span style="color: #6b7280;">- Sales Manager, frequent mobile user</span>
+              </div>
+              <div style="margin-bottom: 0.75rem;">
+                <strong style="color: #f59e0b;">"Could use more customization options"</strong><br>
+                <span style="color: #6b7280;">- Power user, advanced analytics</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Implementation Roadmap -->
+    <div class="scenario-section" id="roadmap">
+      <h2>🗓️ Implementation Roadmap</h2>
+      <p>Phased rollout plan based on validated design and user feedback.</p>
+      
+      <div class="roadmap-timeline">
+        <div class="timeline-item completed">
+          <h4 style="margin: 0 0 0.5rem 0; color: #1f2937;">Phase 1: Core Layout (Week 1-2)</h4>
+          <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">✅ Completed August 14, 2024</div>
+          <ul style="margin: 0; padding-left: 1.5rem; font-size: 0.875rem;">
+            <li>Implement responsive card grid system</li>
+            <li>Basic metric cards with real-time data</li>
+            <li>Mobile-first CSS framework setup</li>
+            <li>Accessibility compliance (WCAG AA)</li>
+          </ul>
+        </div>
+        
+        <div class="timeline-item">
+          <h4 style="margin: 0 0 0.5rem 0; color: #1f2937;">Phase 2: Enhanced Features (Week 3-4)</h4>
+          <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">🚧 In Progress</div>
+          <ul style="margin: 0; padding-left: 1.5rem; font-size: 0.875rem;">
+            <li>Drag-and-drop card reordering</li>
+            <li>Show/hide customization options</li>
+            <li>Interactive chart components</li>
+            <li>Export functionality</li>
+          </ul>
+        </div>
+        
+        <div class="timeline-item">
+          <h4 style="margin: 0 0 0.5rem 0; color: #1f2937;">Phase 3: Advanced Personalization (Week 5-6)</h4>
+          <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">📅 Planned</div>
+          <ul style="margin: 0; padding-left: 1.5rem; font-size: 0.875rem;">
+            <li>User preference persistence</li>
+            <li>Role-based default layouts</li>
+            <li>Dark mode implementation</li>
+            <li>Keyboard shortcuts</li>
+          </ul>
+        </div>
+        
+        <div class="timeline-item">
+          <h4 style="margin: 0 0 0.5rem 0; color: #1f2937;">Phase 4: Analytics & Optimization (Week 7-8)</h4>
+          <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">📅 Planned</div>
+          <ul style="margin: 0; padding-left: 1.5rem; font-size: 0.875rem;">
+            <li>Usage analytics implementation</li>
+            <li>Performance optimization</li>
+            <li>A/B test additional variations</li>
+            <li>User behavior analysis</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROI & Impact Summary -->
+    <div class="scenario-section">
+      <h2>📈 Business Impact & ROI</h2>
+      <p>Measurable outcomes from the AI-assisted design process and product improvements.</p>
+      
+      <div class="metrics-dashboard">
+        <div class="metric-card">
+          <div class="metric-value">$180K</div>
+          <div class="metric-label">Estimated Annual Revenue Impact</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">2.1 weeks</div>
+          <div class="metric-label">Time to Market Reduction</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">67%</div>
+          <div class="metric-label">Design Iteration Speed</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">94%</div>
+          <div class="metric-label">Stakeholder Satisfaction</div>
+        </div>
+      </div>
+      
+      <div style="background: #f0f9ff; border: 1px solid #3b82f6; border-radius: 8px; padding: 2rem; margin-top: 2rem;">
+        <h4 style="margin: 0 0 1rem 0; color: #1e40af;">🎯 Key Success Factors</h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; color: #1e40af;">
+          <div>
+            <strong>AI Integration:</strong><br>
+            <span style="font-size: 0.875rem;">Reduced design time from 3 weeks to 5 days while maintaining quality</span>
+          </div>
+          <div>
+            <strong>User-Centered Process:</strong><br>
+            <span style="font-size: 0.875rem;">Direct user feedback integration led to 89% feature adoption increase</span>
+          </div>
+          <div>
+            <strong>Data-Driven Decisions:</strong><br>
+            <span style="font-size: 0.875rem;">A/B testing validated design choices with statistical significance</span>
+          </div>
+          <div>
+            <strong>Cross-Functional Collaboration:</strong><br>
+            <span style="font-size: 0.875rem;">Design, PM, and Engineering alignment reduced post-launch revisions</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Product Manager workflow simulation
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('📊 Product Manager AI Workflow loaded');
+      
+      // Simulate real PM metrics tracking
+      const pmMetrics = {
+        designCycleReduction: 70,
+        iterationsCompleted: 12,
+        stakeholderApproval: 94,
+        userEngagementIncrease: 3.2,
+        bounceRateReduction: 67,
+        featureAdoptionIncrease: 89,
+        timeToMarketSaved: 2.1, // weeks
+        estimatedRevenueImpact: 180000 // dollars
+      };
+      
+      // Simulate decision matrix calculations
+      const evaluationCriteria = {
+        userExperience: { weight: 0.35, cardGrid: 9, sidebar: 8, tabs: 7 },
+        mobileResponsive: { weight: 0.25, cardGrid: 9, sidebar: 7, tabs: 5 },
+        developmentEffort: { weight: 0.20, cardGrid: 6, sidebar: 9, tabs: 7 },
+        customization: { weight: 0.20, cardGrid: 9, sidebar: 6, tabs: 8 }
+      };
+      
+      const calculateOverallScore = (option) => {
+        let score = 0;
+        for (const criterion in evaluationCriteria) {
+          const { weight, [option]: value } = evaluationCriteria[criterion];
+          score += weight * value;
+        }
+        return Math.round(score * 10) / 10;
+      };
+      
+      const scores = {
+        cardGrid: calculateOverallScore('cardGrid'),
+        sidebar: calculateOverallScore('sidebar'), 
+        tabs: calculateOverallScore('tabs')
+      };
+      
+      console.log('📊 PM Evaluation Scores:', scores);
+      console.log('🎯 PM Success Metrics:', pmMetrics);
+      
+      // Simulate user testing results
+      const userTestResults = {
+        taskCompletionRate: 92,
+        averageTaskTime: 1.3, // minutes
+        userSatisfaction: 4.6, // out of 5
+        mobileUsabilityScore: 88,
+        accessibilityCompliance: 100,
+        performanceScore: 94
+      };
+      
+      // Track workflow progression
+      const workflowProgress = {
+        contextGathering: 'completed',
+        requirementsDefinition: 'completed',
+        aiGeneration: 'completed',
+        stakeholderReview: 'completed',
+        userValidation: 'completed',
+        implementation: 'in-progress',
+        rollout: 'planned'
+      };
+      
+      // Simulate real-time metrics updates (in a real app)
+      const simulateMetricsUpdate = () => {
+        const updates = {
+          bounceRate: Math.max(5, 23 - Math.floor(Math.random() * 18)), // Improved from 23% 
+          featureAdoption: Math.min(95, 34 + Math.floor(Math.random() * 60)), // Improved from 34%
+          timeToValue: Math.max(1, 8.3 - Math.random() * 5), // Improved from 8.3 days
+          supportTickets: Math.max(15, 45 - Math.floor(Math.random() * 25)) // Reduced from 45/week
+        };
+        
+        console.log('📈 Updated Metrics:', updates);
+        return updates;
+      };
+      
+      // Export PM workflow data for analysis
+      window.pmWorkflowData = {
+        metrics: pmMetrics,
+        evaluationCriteria,
+        scores,
+        userTestResults,
+        workflowProgress,
+        simulateMetricsUpdate
+      };
+      
+      // Animate metrics on scroll (simplified)
+      const observeMetrics = () => {
+        const metricCards = document.querySelectorAll('.metric-card');
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.style.transform = 'translateY(0)';
+              entry.target.style.opacity = '1';
+            }
+          });
+        });
+        
+        metricCards.forEach(card => {
+          card.style.transform = 'translateY(20px)';
+          card.style.opacity = '0';
+          card.style.transition = 'all 0.5s ease';
+          observer.observe(card);
+        });
+      };
+      
+      observeMetrics();
+      
+      console.log('✅ PM workflow simulation ready');
+    });
+  </script>
+</body>
+</html>

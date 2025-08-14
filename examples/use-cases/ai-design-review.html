@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Design Review Workflow - Iteration Deck</title>
+  <script type="module" src="../../dist/iterationdeck/iterationdeck.esm.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+      background: #f8fafc;
+      color: #1f2937;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    .workflow-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 3rem 2rem;
+      border-radius: 12px;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    
+    .workflow-step {
+      margin: 2rem 0;
+      padding: 2rem;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      border-left: 4px solid #3b82f6;
+    }
+    
+    .ai-metadata {
+      background: #f0f9ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 6px;
+      padding: 1rem;
+      margin: 1rem 0;
+      font-size: 0.875rem;
+    }
+    
+    .confidence-bar {
+      width: 100%;
+      height: 8px;
+      background: #e5e7eb;
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 0.5rem 0;
+    }
+    
+    .confidence-fill {
+      height: 100%;
+      transition: width 0.3s ease;
+    }
+    
+    .confidence-high { background: #10b981; }
+    .confidence-medium { background: #f59e0b; }
+    .confidence-low { background: #ef4444; }
+    
+    .feedback-panel {
+      background: #fffbeb;
+      border: 1px solid #fbbf24;
+      border-radius: 6px;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+    
+    .stakeholder-comments {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    
+    .comment-card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 1rem;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+    
+    .comment-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+      font-size: 0.875rem;
+      color: #6b7280;
+    }
+    
+    .rating-stars {
+      color: #fbbf24;
+    }
+    
+    .generation-timeline {
+      position: relative;
+      padding-left: 2rem;
+    }
+    
+    .generation-timeline::before {
+      content: '';
+      position: absolute;
+      left: 0.75rem;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: #e5e7eb;
+    }
+    
+    .timeline-item {
+      position: relative;
+      margin-bottom: 1.5rem;
+      background: white;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -1.5rem;
+      top: 1rem;
+      width: 12px;
+      height: 12px;
+      background: #3b82f6;
+      border-radius: 50%;
+      border: 3px solid white;
+    }
+    
+    .iteration-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    
+    .stat-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    
+    .stat-number {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #3b82f6;
+    }
+    
+    .stat-label {
+      color: #6b7280;
+      font-size: 0.875rem;
+      margin-top: 0.5rem;
+    }
+    
+    .keyboard-help {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.9);
+      color: white;
+      padding: 1rem;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      max-width: 200px;
+      z-index: 1001;
+    }
+    
+    .prompt-box {
+      background: #f9fafb;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      padding: 1rem;
+      font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+      font-size: 0.875rem;
+      white-space: pre-wrap;
+      margin: 1rem 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="keyboard-help">
+    <strong>⌨️ Navigation</strong><br>
+    Ctrl/Cmd + ←/→: Navigate slides<br>
+    Use toolbar dropdown to switch between design elements
+  </div>
+
+  <div class="container">
+    <div class="workflow-header">
+      <h1>🤖 AI Design Review Workflow</h1>
+      <p>A complete stakeholder review process for AI-generated UI components</p>
+      <p style="opacity: 0.8; font-size: 0.9rem;">
+        This example demonstrates a real-world design review workflow where AI generates component variations, 
+        stakeholders provide feedback, and iterations are tracked with confidence scoring.
+      </p>
+    </div>
+
+    <!-- Workflow Statistics -->
+    <div class="iteration-stats">
+      <div class="stat-card">
+        <div class="stat-number">12</div>
+        <div class="stat-label">AI Iterations</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">8</div>
+        <div class="stat-label">Stakeholder Reviews</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">94%</div>
+        <div class="stat-label">Final Confidence</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">3.2hrs</div>
+        <div class="stat-label">Time Saved</div>
+      </div>
+    </div>
+
+    <!-- Step 1: Initial AI Generation -->
+    <div class="workflow-step">
+      <h2>Step 1: AI Component Generation</h2>
+      <p>Product Manager provides initial requirements and AI generates multiple button variations for the new landing page CTA.</p>
+      
+      <div class="ai-metadata">
+        <strong>🧠 AI Generation Context:</strong><br>
+        Model: GPT-4 Turbo • Temperature: 0.7 • Max Tokens: 2000<br>
+        Session: design-review-2024-001 • Generated: 2024-08-14 09:15 AM
+      </div>
+
+      <div class="prompt-box">Initial Prompt: "Create 3 call-to-action button variations for a B2B SaaS landing page. Focus on high conversion rates, accessibility (WCAG AA), and modern design trends. The buttons should convey trust and professionalism while standing out against a light background. Include primary, secondary, and alternative styles."</div>
+      
+      <iteration-deck 
+        id="initial-generation" 
+        label="Initial AI Generation"
+        prompt="Create 3 call-to-action button variations for B2B SaaS landing page"
+        description="First round of AI-generated button designs for stakeholder review">
+        
+        <iteration-deck-slide 
+          label="Primary Bold" 
+          ai-prompt="Bold primary button with high contrast, modern gradients, and strong visual hierarchy"
+          confidence="0.89"
+          notes="AI suggests this for main CTA due to high visibility and contrast ratio of 4.8:1">
+          <div style="padding: 2rem; text-align: center; background: #f9fafb; border-radius: 8px;">
+            <button style="
+              background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+              color: white;
+              border: none;
+              padding: 16px 32px;
+              border-radius: 8px;
+              font-size: 18px;
+              font-weight: 600;
+              cursor: pointer;
+              box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+              transition: all 0.2s ease;
+            " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(59, 130, 246, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(59, 130, 246, 0.3)'">
+              Start Free Trial
+            </button>
+            
+            <div class="ai-metadata">
+              <strong>Design Rationale:</strong> High contrast gradient with 4.8:1 ratio ensures accessibility. Shadow creates depth and premium feel. Blue conveys trust and professionalism.
+              
+              <div style="margin-top: 0.5rem;">
+                <strong>Confidence Score: 89%</strong>
+                <div class="confidence-bar">
+                  <div class="confidence-fill confidence-high" style="width: 89%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </iteration-deck-slide>
+        
+        <iteration-deck-slide 
+          label="Outline Professional" 
+          ai-prompt="Professional outline button with subtle hover effects and refined typography"
+          confidence="0.82"
+          notes="AI recommends for secondary actions, maintains brand consistency with primary">
+          <div style="padding: 2rem; text-align: center; background: #f9fafb; border-radius: 8px;">
+            <button style="
+              background: transparent;
+              color: #3b82f6;
+              border: 2px solid #3b82f6;
+              padding: 14px 30px;
+              border-radius: 8px;
+              font-size: 18px;
+              font-weight: 600;
+              cursor: pointer;
+              transition: all 0.2s ease;
+            " onmouseover="this.style.background='#3b82f6'; this.style.color='white'" onmouseout="this.style.background='transparent'; this.style.color='#3b82f6'">
+              View Demo
+            </button>
+            
+            <div class="ai-metadata">
+              <strong>Design Rationale:</strong> Outline style provides clear hierarchy without competing with primary CTA. Hover state confirms interaction affordance.
+              
+              <div style="margin-top: 0.5rem;">
+                <strong>Confidence Score: 82%</strong>
+                <div class="confidence-bar">
+                  <div class="confidence-fill confidence-medium" style="width: 82%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </iteration-deck-slide>
+        
+        <iteration-deck-slide 
+          label="Minimal Clean" 
+          ai-prompt="Ultra-minimal button focusing on typography and subtle interactions"
+          confidence="0.76"
+          notes="AI flags potential low conversion due to reduced visual prominence">
+          <div style="padding: 2rem; text-align: center; background: #f9fafb; border-radius: 8px;">
+            <button style="
+              background: #f3f4f6;
+              color: #374151;
+              border: none;
+              padding: 16px 32px;
+              border-radius: 8px;
+              font-size: 18px;
+              font-weight: 500;
+              cursor: pointer;
+              transition: all 0.2s ease;
+            " onmouseover="this.style.background='#e5e7eb'; this.style.transform='translateY(-1px)'" onmouseout="this.style.background='#f3f4f6'; this.style.transform='translateY(0)'">
+              Learn More →
+            </button>
+            
+            <div class="ai-metadata">
+              <strong>Design Rationale:</strong> Minimal approach reduces visual competition. May be suitable for content-heavy sections where strong CTAs could be distracting.
+              
+              <div style="margin-top: 0.5rem;">
+                <strong>Confidence Score: 76%</strong>
+                <div class="confidence-bar">
+                  <div class="confidence-fill confidence-medium" style="width: 76%"></div>
+                </div>
+              </div>
+              
+              <div style="margin-top: 0.5rem; padding: 0.5rem; background: #fef3c7; border-radius: 4px; color: #92400e;">
+                ⚠️ AI Warning: Lower confidence due to reduced visual prominence for primary CTA use case.
+              </div>
+            </div>
+          </div>
+        </iteration-deck-slide>
+      </iteration-deck>
+    </div>
+
+    <!-- Step 2: Stakeholder Feedback -->
+    <div class="workflow-step">
+      <h2>Step 2: Stakeholder Review & Feedback</h2>
+      <p>Design team, product managers, and marketing stakeholders review the initial variations and provide structured feedback.</p>
+      
+      <div class="feedback-panel">
+        <strong>📝 Review Session Summary</strong><br>
+        Date: August 14, 2024 • Duration: 45 minutes • Attendees: 6<br>
+        Focus Areas: Conversion optimization, brand alignment, accessibility compliance
+      </div>
+
+      <iteration-deck 
+        id="stakeholder-feedback" 
+        label="Stakeholder Feedback Round"
+        prompt="Collect and synthesize stakeholder feedback on initial button variations"
+        description="Each slide shows the same designs with collected feedback and ratings">
+        
+        <iteration-deck-slide 
+          label="Primary Bold - Feedback" 
+          ai-prompt="Display stakeholder feedback and ratings for the primary bold button design">
+          <div style="padding: 2rem; background: #f9fafb; border-radius: 8px;">
+            <div style="text-align: center; margin-bottom: 2rem;">
+              <button style="
+                background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+                color: white;
+                border: none;
+                padding: 16px 32px;
+                border-radius: 8px;
+                font-size: 18px;
+                font-weight: 600;
+                cursor: pointer;
+                box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+              ">
+                Start Free Trial
+              </button>
+            </div>
+            
+            <div class="stakeholder-comments">
+              <div class="comment-card">
+                <div class="comment-header">
+                  <strong>Sarah Chen</strong> • Lead Designer
+                  <div class="rating-stars">★★★★★</div>
+                </div>
+                <p>"Love the gradient and depth! Perfect contrast ratio. Might want to test with slightly rounded corners for a softer feel."</p>
+                <div style="font-size: 0.75rem; color: #6b7280;">Accessibility score: A+ • Visual appeal: 5/5</div>
+              </div>
+              
+              <div class="comment-card">
+                <div class="comment-header">
+                  <strong>Mike Rodriguez</strong> • Product Manager
+                  <div class="rating-stars">★★★★☆</div>
+                </div>
+                <p>"Strong visual hierarchy, definitely grabs attention. Concerned about gradient rendering on older devices. Need fallback?"</p>
+                <div style="font-size: 0.75rem; color: #6b7280;">Conversion estimate: High • Technical concern flagged</div>
+              </div>
+              
+              <div class="comment-card">
+                <div class="comment-header">
+                  <strong>Lisa Park</strong> • Marketing Director
+                  <div class="rating-stars">★★★★★</div>
+                </div>
+                <p>"Aligns well with our premium positioning. The shadow adds perceived value. Let's A/B test this as primary."</p>
+                <div style="font-size: 0.75rem; color: #6b7280;">Brand alignment: Excellent • Test recommendation: Primary candidate</div>
+              </div>
+            </div>
+            
+            <div style="margin-top: 1rem; padding: 1rem; background: #f0fdf4; border-radius: 6px; border: 1px solid #22c55e;">
+              <strong>✅ Consensus: APPROVED FOR TESTING</strong><br>
+              Average Rating: 4.7/5 • Primary recommendation for A/B test
+            </div>
+          </div>
+        </iteration-deck-slide>
+        
+        <iteration-deck-slide 
+          label="Outline Professional - Feedback">
+          <div style="padding: 2rem; background: #f9fafb; border-radius: 8px;">
+            <div style="text-align: center; margin-bottom: 2rem;">
+              <button style="
+                background: transparent;
+                color: #3b82f6;
+                border: 2px solid #3b82f6;
+                padding: 14px 30px;
+                border-radius: 8px;
+                font-size: 18px;
+                font-weight: 600;
+                cursor: pointer;
+              ">
+                View Demo
+              </button>
+            </div>
+            
+            <div class="stakeholder-comments">
+              <div class="comment-card">
+                <div class="comment-header">
+                  <strong>Sarah Chen</strong> • Lead Designer
+                  <div class="rating-stars">★★★★☆</div>
+                </div>
+                <p>"Clean and professional. Good for secondary actions but might get lost on busy layouts. Consider increasing border width."</p>
+                <div style="font-size: 0.75rem; color: #6b7280;">Hierarchy: Good • Visibility concern noted</div>
+              </div>
+              
+              <div class="comment-card">
+                <div class="comment-header">
+                  <strong>Tom Wilson</strong> • Developer Lead
+                  <div class="rating-stars">★★★★★</div>
+                </div>
+                <p>"Perfect implementation ease. Hover states work great. Accessibility is solid with proper focus indicators."</p>
+                <div style="font-size: 0.75rem; color: #6b7280;">Implementation: Simple • A11y: Compliant</div>
+              </div>
+              
+              <div class="comment-card">
+                <div class="comment-header">
+                  <strong>Lisa Park</strong> • Marketing Director
+                  <div class="rating-stars">★★★☆☆</div>
+                </div>
+                <p>"Too subtle for our conversion goals. Works well in forms but not for hero CTAs. Good secondary option."</p>
+                <div style="font-size: 0.75rem; color: #6b7280;">Conversion potential: Medium • Use case: Secondary</div>
+              </div>
+            </div>
+            
+            <div style="margin-top: 1rem; padding: 1rem; background: #fffbeb; border-radius: 6px; border: 1px solid #f59e0b;">
+              <strong>⚡ Decision: APPROVED FOR SECONDARY USE</strong><br>
+              Average Rating: 4.0/5 • Recommended for forms and secondary actions
+            </div>
+          </div>
+        </iteration-deck-slide>
+        
+        <iteration-deck-slide 
+          label="Minimal Clean - Feedback">
+          <div style="padding: 2rem; background: #f9fafb; border-radius: 8px;">
+            <div style="text-align: center; margin-bottom: 2rem;">
+              <button style="
+                background: #f3f4f6;
+                color: #374151;
+                border: none;
+                padding: 16px 32px;
+                border-radius: 8px;
+                font-size: 18px;
+                font-weight: 500;
+                cursor: pointer;
+              ">
+                Learn More →
+              </button>
+            </div>
+            
+            <div class="stakeholder-comments">
+              <div class="comment-card">
+                <div class="comment-header">
+                  <strong>Sarah Chen</strong> • Lead Designer
+                  <div class="rating-stars">★★☆☆☆</div>
+                </div>
+                <p>"Too minimal for a primary CTA. Doesn't create enough visual weight. Might work in content areas but not hero sections."</p>
+                <div style="font-size: 0.75rem; color: #6b7280;">Visual weight: Insufficient • Primary CTA: Not recommended</div>
+              </div>
+              
+              <div class="comment-card">
+                <div class="comment-header">
+                  <strong>Mike Rodriguez</strong> • Product Manager
+                  <div class="rating-stars">★★☆☆☆</div>
+                </div>
+                <p>"Doesn't align with our conversion optimization goals. Users might not recognize it as a primary action. Skip for now."</p>
+                <div style="font-size: 0.75rem; color: #6b7280;">Conversion risk: High • Recognition: Poor</div>
+              </div>
+              
+              <div class="comment-card">
+                <div class="comment-header">
+                  <strong>Alex Kim</strong> • UX Researcher
+                  <div class="rating-stars">★★★☆☆</div>
+                </div>
+                <p>"Interesting for content-heavy pages where strong CTAs might be distracting. Not suitable for landing page hero though."</p>
+                <div style="font-size: 0.75rem; color: #6b7280;">Use case: Content pages • Hero section: Not suitable</div>
+              </div>
+            </div>
+            
+            <div style="margin-top: 1rem; padding: 1rem; background: #fef2f2; border-radius: 6px; border: 1px solid #ef4444;">
+              <strong>❌ Decision: REJECTED FOR PRIMARY USE</strong><br>
+              Average Rating: 2.3/5 • Consider for future content page designs
+            </div>
+          </div>
+        </iteration-deck-slide>
+      </iteration-deck>
+    </div>
+
+    <!-- Step 3: AI Iteration Based on Feedback -->
+    <div class="workflow-step">
+      <h2>Step 3: AI-Driven Iterations</h2>
+      <p>Based on stakeholder feedback, AI generates refined variations addressing specific concerns and suggestions.</p>
+      
+      <div class="ai-metadata">
+        <strong>🔄 Iteration Context:</strong><br>
+        Feedback Integration: 8 comments processed • Issues Addressed: Accessibility, conversion, brand alignment<br>
+        Refined Prompt: Enhanced with stakeholder requirements and specific technical constraints
+      </div>
+
+      <div class="prompt-box">Refined Prompt: "Based on stakeholder feedback, refine the primary button design with these requirements:
+1. Maintain gradient but add fallback for older devices
+2. Increase border radius slightly (10px) for softer feel
+3. Ensure 5:1 contrast ratio for AAA compliance
+4. Add micro-interaction for premium feel
+5. Test with different shadow depths
+6. Consider brand color variations
+
+Keep the high visual weight and conversion-optimized design while addressing technical and aesthetic feedback."</div>
+      
+      <iteration-deck 
+        id="refined-iterations" 
+        label="AI-Refined Iterations"
+        prompt="Refine button designs based on stakeholder feedback and technical requirements"
+        description="Second round of AI generation incorporating specific feedback points">
+        
+        <iteration-deck-slide 
+          label="Enhanced Primary" 
+          ai-prompt="Refined primary button with increased border radius, better contrast, and fallback colors"
+          confidence="0.94"
+          notes="AI incorporated all feedback: softer corners, AAA contrast, device fallbacks">
+          <div style="padding: 2rem; text-align: center; background: #f9fafb; border-radius: 8px;">
+            <button style="
+              background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+              color: white;
+              border: none;
+              padding: 16px 32px;
+              border-radius: 10px;
+              font-size: 18px;
+              font-weight: 600;
+              cursor: pointer;
+              box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+              transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+              position: relative;
+              overflow: hidden;
+            " onmouseover="
+              this.style.transform='translateY(-2px)'; 
+              this.style.boxShadow='0 8px 20px rgba(37, 99, 235, 0.4)';
+            " onmouseout="
+              this.style.transform='translateY(0)'; 
+              this.style.boxShadow='0 4px 14px rgba(37, 99, 235, 0.35)';
+            ">
+              Start Free Trial
+            </button>
+            
+            <div class="ai-metadata">
+              <strong>✅ Improvements Applied:</strong>
+              <ul style="margin: 0.5rem 0; padding-left: 1.25rem; font-size: 0.875rem;">
+                <li>Border radius increased to 10px (was 8px)</li>
+                <li>Contrast ratio improved to 5.2:1 (AAA compliance)</li>
+                <li>Enhanced shadow depth with better color matching</li>
+                <li>Added cubic-bezier easing for premium feel</li>
+                <li>CSS fallback: solid #2563eb for non-gradient browsers</li>
+              </ul>
+              
+              <div style="margin-top: 1rem;">
+                <strong>Confidence Score: 94% (+5% from feedback integration)</strong>
+                <div class="confidence-bar">
+                  <div class="confidence-fill confidence-high" style="width: 94%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </iteration-deck-slide>
+        
+        <iteration-deck-slide 
+          label="Brand Color Variant" 
+          ai-prompt="Alternative using company brand colors with same enhanced interaction patterns"
+          confidence="0.91"
+          notes="Uses primary brand purple, maintains accessibility and interaction improvements">
+          <div style="padding: 2rem; text-align: center; background: #f9fafb; border-radius: 8px;">
+            <button style="
+              background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+              color: white;
+              border: none;
+              padding: 16px 32px;
+              border-radius: 10px;
+              font-size: 18px;
+              font-weight: 600;
+              cursor: pointer;
+              box-shadow: 0 4px 14px rgba(139, 92, 246, 0.35);
+              transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            " onmouseover="
+              this.style.transform='translateY(-2px)'; 
+              this.style.boxShadow='0 8px 20px rgba(139, 92, 246, 0.4)';
+            " onmouseout="
+              this.style.transform='translateY(0)'; 
+              this.style.boxShadow='0 4px 14px rgba(139, 92, 246, 0.35)';
+            ">
+              Start Free Trial
+            </button>
+            
+            <div class="ai-metadata">
+              <strong>🎨 Brand Integration:</strong>
+              <ul style="margin: 0.5rem 0; padding-left: 1.25rem; font-size: 0.875rem;">
+                <li>Primary brand purple (#8b5cf6) as base</li>
+                <li>Maintains 4.9:1 contrast ratio (AA+ compliance)</li>
+                <li>Shadows adjusted to complement purple tones</li>
+                <li>All accessibility and interaction improvements retained</li>
+              </ul>
+              
+              <div style="margin-top: 1rem;">
+                <strong>Confidence Score: 91%</strong>
+                <div class="confidence-bar">
+                  <div class="confidence-fill confidence-high" style="width: 91%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </iteration-deck-slide>
+        
+        <iteration-deck-slide 
+          label="Conservative Fallback" 
+          ai-prompt="Solid color version optimized for maximum compatibility and loading speed"
+          confidence="0.88"
+          notes="No gradients, optimized for slow connections and older browsers">
+          <div style="padding: 2rem; text-align: center; background: #f9fafb; border-radius: 8px;">
+            <button style="
+              background: #2563eb;
+              color: white;
+              border: none;
+              padding: 16px 32px;
+              border-radius: 10px;
+              font-size: 18px;
+              font-weight: 600;
+              cursor: pointer;
+              box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+              transition: all 0.2s ease;
+            " onmouseover="
+              this.style.background='#1d4ed8';
+              this.style.transform='translateY(-2px)'; 
+              this.style.boxShadow='0 6px 16px rgba(37, 99, 235, 0.3)';
+            " onmouseout="
+              this.style.background='#2563eb';
+              this.style.transform='translateY(0)'; 
+              this.style.boxShadow='0 4px 14px rgba(37, 99, 235, 0.25)';
+            ">
+              Start Free Trial
+            </button>
+            
+            <div class="ai-metadata">
+              <strong>⚡ Performance Optimized:</strong>
+              <ul style="margin: 0.5rem 0; padding-left: 1.25rem; font-size: 0.875rem;">
+                <li>Solid color - no gradient rendering overhead</li>
+                <li>Lighter shadow for better performance</li>
+                <li>Simple hover state color change</li>
+                <li>Universal browser compatibility</li>
+                <li>Faster loading on slow connections</li>
+              </ul>
+              
+              <div style="margin-top: 1rem;">
+                <strong>Confidence Score: 88%</strong>
+                <div class="confidence-bar">
+                  <div class="confidence-fill confidence-high" style="width: 88%"></div>
+                </div>
+              </div>
+              
+              <div style="margin-top: 0.5rem; padding: 0.5rem; background: #f0f9ff; border-radius: 4px; color: #1e40af;">
+                💡 AI Recommendation: Use as fallback for users with slow connections or older devices.
+              </div>
+            </div>
+          </div>
+        </iteration-deck-slide>
+      </iteration-deck>
+    </div>
+
+    <!-- Step 4: Final Decision & Implementation -->
+    <div class="workflow-step">
+      <h2>Step 4: Final Decision & A/B Test Setup</h2>
+      <p>Team selects final candidates and sets up A/B testing with clear success metrics and implementation guidelines.</p>
+      
+      <div class="generation-timeline">
+        <div class="timeline-item">
+          <strong>Final Selection Meeting</strong> - August 14, 2024, 2:00 PM<br>
+          <small>Selected "Enhanced Primary" and "Brand Color Variant" for A/B testing</small>
+        </div>
+        <div class="timeline-item">
+          <strong>Development Handoff</strong> - August 14, 2024, 4:30 PM<br>
+          <small>CSS and implementation specs delivered to engineering team</small>
+        </div>
+        <div class="timeline-item">
+          <strong>A/B Test Launch</strong> - August 15, 2024, 9:00 AM<br>
+          <small>50/50 split test launched with 95% confidence threshold</small>
+        </div>
+      </div>
+      
+      <div style="background: #f0fdf4; border: 1px solid #22c55e; border-radius: 8px; padding: 1.5rem; margin-top: 2rem;">
+        <h4 style="margin: 0 0 1rem 0; color: #166534;">🎯 Success Metrics & KPIs</h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+          <div>
+            <strong>Primary:</strong><br>
+            • Click-through rate<br>
+            • Conversion to sign-up<br>
+            • Time to first click
+          </div>
+          <div>
+            <strong>Secondary:</strong><br>
+            • Accessibility score<br>
+            • Page load impact<br>
+            • Mobile performance
+          </div>
+          <div>
+            <strong>Qualitative:</strong><br>
+            • User feedback<br>
+            • Support questions<br>
+            • Brand perception
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results Summary -->
+    <div class="workflow-step">
+      <h2>📊 Workflow Results & Learnings</h2>
+      <p>Complete end-to-end AI design workflow with measurable outcomes and process improvements.</p>
+      
+      <div class="iteration-stats">
+        <div class="stat-card">
+          <div class="stat-number">2.3x</div>
+          <div class="stat-label">Faster than traditional design</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">94%</div>
+          <div class="stat-label">Stakeholder satisfaction</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">8/8</div>
+          <div class="stat-label">Accessibility criteria met</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">100%</div>
+          <div class="stat-label">Technical requirements</div>
+        </div>
+      </div>
+      
+      <div style="background: #fffbeb; border: 1px solid #f59e0b; border-radius: 8px; padding: 1.5rem; margin-top: 2rem;">
+        <h4 style="margin: 0 0 1rem 0; color: #92400e;">🎓 Key Learnings</h4>
+        <ul style="margin: 0; color: #92400e;">
+          <li><strong>AI Confidence Scoring:</strong> Correlates well with stakeholder ratings - use as pre-screening</li>
+          <li><strong>Structured Feedback:</strong> Role-specific review templates improve feedback quality</li>
+          <li><strong>Iterative Prompts:</strong> Incorporating feedback into prompts increases success rate by 40%</li>
+          <li><strong>Technical Constraints:</strong> Include device compatibility in initial prompts to avoid late-stage changes</li>
+          <li><strong>Brand Guidelines:</strong> AI performs better with explicit brand guideline references</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Simulate real-time confidence score updates
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('🤖 AI Design Review Workflow loaded');
+      
+      // Track which slides users spend time on
+      const slideTracker = {
+        views: {},
+        startTime: Date.now(),
+      };
+      
+      // Simulate analytics tracking (in real implementation, this would send to your analytics service)
+      const trackSlideView = (deckId, slideLabel) => {
+        const key = `${deckId}-${slideLabel}`;
+        slideTracker.views[key] = (slideTracker.views[key] || 0) + 1;
+        console.log(`📈 Slide view tracked: ${slideLabel} (${slideTracker.views[key]} times)`);
+      };
+      
+      // Enhanced workflow statistics
+      const workflowStats = {
+        totalIterations: 12,
+        stakeholderReviews: 8,
+        finalConfidence: 94,
+        timeSaved: 3.2,
+        accessibilityCriteria: 8,
+        technicalRequirements: 100,
+      };
+      
+      console.log('📊 Workflow Statistics:', workflowStats);
+      
+      // Simulate confidence score animation on page load
+      setTimeout(() => {
+        const confidenceBars = document.querySelectorAll('.confidence-fill');
+        confidenceBars.forEach(bar => {
+          const width = bar.style.width;
+          bar.style.width = '0%';
+          setTimeout(() => {
+            bar.style.width = width;
+          }, 100);
+        });
+      }, 500);
+      
+      // Example: Export feedback for external analysis
+      const exportFeedbackData = () => {
+        const feedbackData = {
+          session: 'design-review-2024-001',
+          date: '2024-08-14',
+          components: [
+            {
+              id: 'primary-bold',
+              ratings: [5, 4, 5],
+              avgRating: 4.7,
+              status: 'approved',
+              comments: 3,
+            },
+            {
+              id: 'outline-professional', 
+              ratings: [4, 5, 3],
+              avgRating: 4.0,
+              status: 'approved-secondary',
+              comments: 3,
+            },
+            {
+              id: 'minimal-clean',
+              ratings: [2, 2, 3],
+              avgRating: 2.3,
+              status: 'rejected',
+              comments: 3,
+            },
+          ],
+        };
+        
+        return feedbackData;
+      };
+      
+      // Make functions available globally for demo purposes
+      window.iterationDeckWorkflow = {
+        trackSlideView,
+        workflowStats,
+        exportFeedbackData,
+      };
+    });
+  </script>
+</body>
+</html>

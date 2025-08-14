@@ -42,9 +42,9 @@ describe('iteration-deck-slide', () => {
       `,
     });
     
-    const slotContent = page.root.querySelector('.test-content');
+    const slotContent = page.root?.querySelector('.test-content');
     expect(slotContent).toBeTruthy();
-    expect(slotContent.textContent).toBe('Custom slot content');
+    expect(slotContent?.textContent).toBe('Custom slot content');
   });
 
   it('handles AI metadata props', async () => {
@@ -88,7 +88,7 @@ describe('iteration-deck-slide', () => {
     
     // In dev mode with confidence, should render confidence UI
     if (!page.rootInstance.isProduction && page.rootInstance.confidence) {
-      const metadata = page.root.shadowRoot.querySelector('.slide-metadata');
+      const metadata = page.root?.shadowRoot?.querySelector('.slide-metadata');
       expect(metadata).toBeTruthy();
     }
   });
@@ -114,7 +114,7 @@ describe('iteration-deck-slide', () => {
     
     // In dev mode with notes, should render notes UI
     if (!page.rootInstance.isProduction && page.rootInstance.notes) {
-      const notesToggle = page.root.shadowRoot.querySelector('.notes-toggle');
+      const notesToggle = page.root?.shadowRoot?.querySelector('.notes-toggle');
       expect(notesToggle).toBeTruthy();
     }
   });
@@ -150,7 +150,9 @@ describe('iteration-deck-slide', () => {
     });
     
     // Manually set up the DOM relationship for testing
-    parentElement.appendChild(page.root);
+    if (page.root) {
+      parentElement.appendChild(page.root);
+    }
     
     // Trigger the slide index calculation
     page.rootInstance.calculateSlideIndex();

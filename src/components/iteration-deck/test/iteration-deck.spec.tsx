@@ -78,8 +78,8 @@ describe('iteration-deck', () => {
     expect(page.root).toBeTruthy();
     
     // Check that the deck has slides
-    const slideElements = page.root.querySelectorAll('iteration-deck-slide');
-    expect(slideElements.length).toBe(2);
+    const slideElements = page.root?.querySelectorAll('iteration-deck-slide');
+    expect(slideElements?.length).toBe(2);
     
     // First slide should be active by default
     expect(page.rootInstance.activeIndex).toBe(0);
@@ -121,7 +121,6 @@ describe('iteration-deck', () => {
     await page.waitForChanges();
     
     // Should show slide indicators since we have multiple slides and are in dev mode
-    const indicators = page.root.shadowRoot.querySelector('.slide-indicator');
     // Check if it exists or check slides length instead
     expect(page.rootInstance.slides.length).toBeGreaterThan(1);
   });

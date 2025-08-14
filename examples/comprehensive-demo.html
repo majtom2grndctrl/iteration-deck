@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iteration Deck - Comprehensive Demo</title>
+  <script type="module" src="../dist/iterationdeck/iterationdeck.esm.js"></script>
+  <style>
+    /* Import custom theming from styling examples */
+    :root {
+      --id-primary-500: #3b82f6;
+      --id-primary-600: #2563eb;
+      --id-success-500: #10b981;
+      --id-warning-500: #f59e0b;
+      --id-error-500: #ef4444;
+      
+      --id-gray-50: #f9fafb;
+      --id-gray-100: #f3f4f6;
+      --id-gray-200: #e5e7eb;
+      --id-gray-500: #6b7280;
+      --id-gray-700: #374151;
+      --id-gray-900: #111827;
+      
+      --id-border-radius: 8px;
+      --id-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      --id-spacing-4: 1rem;
+      --id-spacing-6: 1.5rem;
+      --id-spacing-8: 2rem;
+    }
+
+    /* Dark theme */
+    [data-theme="dark"] {
+      --id-gray-50: #111827;
+      --id-gray-100: #1f2937;
+      --id-gray-200: #374151;
+      --id-gray-700: #d1d5db;
+      --id-gray-900: #f9fafb;
+      --id-primary-500: #60a5fa;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+      background: var(--id-gray-50);
+      color: var(--id-gray-900);
+      transition: all 0.3s ease;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: var(--id-spacing-8);
+    }
+    
+    .hero {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 4rem 2rem;
+      border-radius: 16px;
+      margin-bottom: var(--id-spacing-8);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -50%;
+      width: 200%;
+      height: 100%;
+      background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+      animation: shimmer 3s infinite;
+    }
+    
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+    
+    .section {
+      margin: var(--id-spacing-8) 0;
+      padding: var(--id-spacing-8);
+      background: white;
+      border-radius: 16px;
+      box-shadow: var(--id-shadow);
+      border: 1px solid var(--id-gray-200);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    [data-theme="dark"] .section {
+      background: var(--id-gray-100);
+      border-color: var(--id-gray-200);
+    }
+    
+    .section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--id-primary-500), var(--id-success-500));
+      border-radius: 16px 16px 0 0;
+    }
+    
+    .controls-panel {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--id-gray-200);
+      border-radius: 12px;
+      padding: var(--id-spacing-4);
+      z-index: 1001;
+      min-width: 200px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+    
+    .controls-panel h4 {
+      margin: 0 0 var(--id-spacing-4) 0;
+      color: var(--id-gray-700);
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .control-group {
+      margin-bottom: var(--id-spacing-4);
+    }
+    
+    .control-group label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--id-gray-700);
+      margin-bottom: 0.5rem;
+    }
+    
+    .theme-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+    }
+    
+    .theme-button {
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--id-gray-200);
+      border-radius: 6px;
+      background: white;
+      color: var(--id-gray-700);
+      cursor: pointer;
+      font-size: 0.75rem;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+    
+    .theme-button:hover {
+      background: var(--id-gray-50);
+      border-color: var(--id-primary-500);
+    }
+    
+    .theme-button.active {
+      background: var(--id-primary-500);
+      border-color: var(--id-primary-600);
+      color: white;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--id-spacing-4);
+      margin: var(--id-spacing-6) 0;
+    }
+    
+    .stat-card {
+      background: var(--id-gray-50);
+      padding: var(--id-spacing-6);
+      border-radius: var(--id-border-radius);
+      border: 1px solid var(--id-gray-200);
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--id-primary-500);
+      margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+      color: var(--id-gray-700);
+      font-size: 0.875rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .feature-showcase {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: var(--id-spacing-6);
+      margin: var(--id-spacing-8) 0;
+    }
+    
+    .feature-card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--id-gray-200);
+      transition: all 0.3s ease;
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    }
+    
+    .feature-header {
+      background: var(--id-gray-50);
+      padding: var(--id-spacing-4);
+      border-bottom: 1px solid var(--id-gray-200);
+    }
+    
+    .feature-content {
+      padding: var(--id-spacing-6);
+    }
+    
+    /* Custom component styles */
+    .demo-button {
+      padding: 12px 24px;
+      border-radius: var(--id-border-radius);
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 1rem;
+      min-height: 44px;
+    }
+    
+    .demo-button:focus {
+      outline: 2px solid var(--id-primary-500);
+      outline-offset: 2px;
+    }
+    
+    .demo-button--primary {
+      background: var(--id-primary-500);
+      color: white;
+    }
+    
+    .demo-button--primary:hover {
+      background: var(--id-primary-600);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+    
+    .demo-button--outline {
+      background: transparent;
+      color: var(--id-primary-500);
+      border: 2px solid var(--id-primary-500);
+    }
+    
+    .demo-button--outline:hover {
+      background: var(--id-primary-500);
+      color: white;
+    }
+    
+    .demo-button--success {
+      background: var(--id-success-500);
+      color: white;
+    }
+    
+    .demo-card {
+      background: white;
+      border-radius: var(--id-border-radius);
+      padding: var(--id-spacing-6);
+      box-shadow: var(--id-shadow);
+      border: 1px solid var(--id-gray-200);
+      max-width: 300px;
+    }
+    
+    .demo-form {
+      display: flex;
+      flex-direction: column;
+      gap: var(--id-spacing-4);
+      max-width: 400px;
+    }
+    
+    .demo-input {
+      padding: 12px 16px;
+      border: 2px solid var(--id-gray-200);
+      border-radius: var(--id-border-radius);
+      font-size: 1rem;
+      transition: border-color 0.2s ease;
+    }
+    
+    .demo-input:focus {
+      outline: none;
+      border-color: var(--id-primary-500);
+    }
+    
+    .ai-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .confidence-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    
+    .confidence-bar {
+      flex: 1;
+      height: 4px;
+      background: var(--id-gray-200);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    
+    .confidence-fill {
+      height: 100%;
+      background: var(--id-success-500);
+      transition: width 0.3s ease;
+    }
+    
+    .confidence-fill.medium {
+      background: var(--id-warning-500);
+    }
+    
+    .confidence-fill.low {
+      background: var(--id-error-500);
+    }
+    
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .container {
+        padding: var(--id-spacing-4);
+      }
+      
+      .hero {
+        padding: 2rem 1rem;
+      }
+      
+      .section {
+        padding: var(--id-spacing-4);
+      }
+      
+      .controls-panel {
+        position: relative;
+        top: auto;
+        right: auto;
+        margin-bottom: var(--id-spacing-4);
+      }
+      
+      .feature-showcase {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="controls-panel">
+    <h4>🎛️ Demo Controls</h4>
+    
+    <div class="control-group">
+      <label>Theme</label>
+      <div class="theme-buttons">
+        <button class="theme-button active" data-theme="light">☀️ Light</button>
+        <button class="theme-button" data-theme="dark">🌙 Dark</button>
+      </div>
+    </div>
+    
+    <div class="control-group">
+      <label>
+        <input type="checkbox" id="show-confidence" checked> Show AI Confidence
+      </label>
+    </div>
+    
+    <div class="control-group">
+      <label>
+        <input type="checkbox" id="enable-animations" checked> Enable Animations
+      </label>
+    </div>
+    
+    <hr style="border: none; height: 1px; background: var(--id-gray-200); margin: 1rem 0;">
+    
+    <div style="font-size: 0.75rem; color: var(--id-gray-500);">
+      Use Ctrl/Cmd + ←/→ to navigate slides<br>
+      Use dropdown in toolbar to switch decks
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="hero">
+      <h1>🎛️ Iteration Deck</h1>
+      <p style="font-size: 1.25rem; margin: 1rem 0; opacity: 0.95;">
+        AI-first prototyping workflows for designers and product managers
+      </p>
+      <p style="font-size: 1rem; opacity: 0.8; max-width: 600px; margin: 0 auto;">
+        Compare AI-generated UI variations interactively. This comprehensive demo showcases 
+        all features including multi-deck support, confidence scoring, keyboard navigation, 
+        and responsive design.
+      </p>
+      <div class="ai-badge" style="margin-top: 1.5rem;">
+        🤖 AI-Generated Examples
+      </div>
+    </div>
+
+    <!-- Project Statistics -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value">3</div>
+        <div class="stat-label">Web Components</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">12</div>
+        <div class="stat-label">Example Variations</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">4</div>
+        <div class="stat-label">Framework Integrations</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">95%</div>
+        <div class="stat-label">AI Confidence Average</div>
+      </div>
+    </div>
+
+    <!-- Button Component Variations -->
+    <div class="section">
+      <h2>🔘 Button Component Variations</h2>
+      <p>AI-generated button designs with different styles and interaction patterns. Each variation includes confidence scoring and design rationale.</p>
+      
+      <iteration-deck 
+        id="button-variations" 
+        label="Button Components"
+        prompt="Generate accessible button variations for modern web applications with high conversion rates"
+        description="Multiple button styles optimized for different use cases and brand requirements">
+        
+        <iteration-deck-slide 
+          label="Primary Action" 
+          ai-prompt="Create a bold primary button with high contrast and premium feel"
+          confidence="0.96"
+          notes="Perfect for main CTAs, excellent accessibility with 4.8:1 contrast ratio">
+          <div style="padding: 2rem; text-align: center; background: var(--id-gray-50); border-radius: var(--id-border-radius);">
+            <button class="demo-button demo-button--primary">
+              Get Started Free
+            </button>
+            <div class="confidence-indicator">
+              <span style="font-size: 0.875rem; color: var(--id-gray-700);">AI Confidence:</span>
+              <div class="confidence-bar">
+                <div class="confidence-fill" style="width: 96%"></div>
+              </div>
+              <span style="font-size: 0.875rem; font-weight: 600; color: var(--id-success-500);">96%</span>
+            </div>
+          </div>
+        </iteration-deck-slide>
+        
+        <iteration-deck-slide 
+          label="Outline Style" 
+          ai-prompt="Design a professional outline button for secondary actions"
+          confidence="0.91"
+          notes="Great for secondary CTAs, maintains brand consistency">
+          <div style="padding: 2rem; text-align: center; background: var(--id-gray-50); border-radius: var(--id-border-radius);">
+            <button class="demo-button demo-button--outline">
+              Learn More
+            </button>
+            <div class="confidence-indicator">
+              <span style="font-size: 0.875rem; color: var(--id-gray-700);">AI Confidence:</span>
+              <div class="confidence-bar">
+                <div class="confidence-fill" style="width: 91%"></div>
+              </div>
+              <span style="font-size: 0.875rem; font-weight: 600; color: var(--id-success-500);">91%</span>
+            </div>
+          </div>
+        </iteration-deck-slide>
+        
+        <iteration-deck-slide 
+          label="Success State" 
+          ai-prompt="Create a success-themed button for positive actions and confirmations"
+          confidence="0.88">
+          <div style="padding: 2rem; text-align: center; background: var(--id-gray-50); border-radius: var(--id-border-radius);">
+            <button class="demo-button demo-button--success">
+              ✓ Save Changes
+            </button>
+            <div class="confidence-indicator">
+              <span style="font-size: 0.875rem; color: var(--id-gray-700);">AI Confidence:</span>
+              <div class="confidence-bar">
+                <div class="confidence-fill medium" style="width: 88%"></div>
+              </div>
+              <span style="font-size: 0.875rem; font-weight: 600; color: var(--id-warning-500);">88%</span>
+            </div>
+          </div>
+        </iteration-deck-slide>
+      </iteration-deck>
+    </div>
+
+    <!-- Card Layout Variations -->
+    <div class="section">
+      <h2>🃏 Card Layout Variations</h2>
+      <p>Different approaches to displaying product information with AI-optimized layouts and visual hierarchy.</p>
+      
+      <iteration-deck 
+        id="card-layouts" 
+        label="Product Cards"
+        prompt="Design product cards optimized for conversion and user engagement"
+        description="Various card layouts for e-commerce and SaaS product displays">
+        
+        <iteration-deck-slide 
+          label="Standard Layout" 
+          ai-prompt="Create a clean, standard product card with clear hierarchy"
+          confidence="0.94"
+          notes="Balanced design with good information density">
+          <div style="padding: 2rem; display: flex; justify-content: center; background: var(--id-gray-50); border-radius: var(--id-border-radius);">
+            <div class="demo-card">
+              <div style="height: 200px; background: linear-gradient(45deg, #667eea, #764ba2); border-radius: 6px; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.125rem;">
+                📱 Product Image
+              </div>
+              <h3 style="margin: 0 0 0.5rem 0; color: var(--id-gray-900);">Premium Plan</h3>
+              <p style="margin: 0 0 1rem 0; color: var(--id-gray-700); font-size: 0.875rem;">
+                Everything you need to scale your business with advanced features.
+              </p>
+              <div style="font-size: 1.5rem; font-weight: 700; color: var(--id-gray-900); margin-bottom: 1rem;">
+                $29/month
+              </div>
+              <button class="demo-button demo-button--primary" style="width: 100%;">
+                Choose Plan
+              </button>
+            </div>
+          </div>
+        </iteration-deck-slide>
+        
+        <iteration-deck-slide 
+          label="Compact Layout" 
+          ai-prompt="Design a horizontal compact card for space-efficient displays"
+          confidence="0.87">
+          <div style="padding: 2rem; display: flex; justify-content: center; background: var(--id-gray-50); border-radius: var(--id-border-radius);">
+            <div style="display: flex; gap: 1rem; align-items: center; padding: 1.5rem; background: white; border-radius: var(--id-border-radius); box-shadow: var(--id-shadow); border: 1px solid var(--id-gray-200); max-width: 400px; width: 100%;">
+              <div style="width: 80px; height: 80px; background: linear-gradient(45deg, #667eea, #764ba2); border-radius: var(--id-border-radius); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; flex-shrink: 0;">
+                📱
+              </div>
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="margin: 0 0 0.25rem 0; color: var(--id-gray-900);">Premium Plan</h4>
+                <p style="margin: 0 0 0.5rem 0; color: var(--id-gray-700); font-size: 0.875rem;">
+                  Scale your business
+                </p>
+                <div style="font-size: 1.25rem; font-weight: 700; color: var(--id-gray-900);">
+                  $29/month
+                </div>
+              </div>
+            </div>
+          </div>
+        </iteration-deck-slide>
+        
+        <iteration-deck-slide 
+          label="Featured Layout" 
+          ai-prompt="Create an eye-catching featured card with promotional elements"
+          confidence="0.92"
+          notes="High visual impact for featured products">
+          <div style="padding: 2rem; display: flex; justify-content: center; background: var(--id-gray-50); border-radius: var(--id-border-radius);">
+            <div style="position: relative; max-width: 300px;">
+              <div style="position: absolute; top: -8px; right: -8px; background: var(--id-warning-500); color: white; padding: 4px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; z-index: 1;">
+                Most Popular
+              </div>
+              <div class="demo-card" style="border: 2px solid var(--id-primary-500);">
+                <div style="height: 200px; background: linear-gradient(45deg, #667eea, #764ba2); border-radius: 6px; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.125rem;">
+                  ⭐ Featured
+                </div>
+                <h3 style="margin: 0 0 0.5rem 0; color: var(--id-gray-900);">Premium Plan</h3>
+                <p style="margin: 0 0 1rem 0; color: var(--id-gray-700); font-size: 0.875rem;">
+                  Most popular choice for growing teams with all premium features.
+                </p>
+                <div style="font-size: 1.5rem; font-weight: 700; color: var(--id-gray-900); margin-bottom: 1rem;">
+                  $29/month
+                </div>
+                <button class="demo-button demo-button--primary" style="width: 100%; background: linear-gradient(135deg, #667eea, #764ba2); border: none;">
+                  Choose Plan
+                </button>
+              </div>
+            </div>
+          </div>
+        </iteration-deck-slide>
+      </iteration-deck>
+    </div>
+
+    <!-- Form Design Variations -->
+    <div class="section">
+      <h2>📝 Form Design Variations</h2>
+      <p>Different form layouts optimized for conversion rates and user experience across devices.</p>
+      
+      <iteration-deck 
+        id="form-layouts" 
+        label="Form Designs"
+        prompt="Create user-friendly form layouts with high conversion rates"
+        description="Various form designs for different use cases and screen sizes">
+        
+        <iteration-deck-slide 
+          label="Vertical Layout" 
+          ai-prompt="Design a mobile-first vertical form layout with clear labels"
+          confidence="0.95"
+          notes="Best for mobile devices and narrow containers">
+          <div style="padding: 2rem; display: flex; justify-content: center; background: var(--id-gray-50); border-radius: var(--id-border-radius);">
+            <form class="demo-form">
+              <h3 style="margin: 0 0 1.5rem 0; text-align: center; color: var(--id-gray-900);">Contact Us</h3>
+              
+              <label style="font-weight: 500; color: var(--id-gray-700); font-size: 0.875rem;">
+                Full Name
+              </label>
+              <input type="text" class="demo-input" placeholder="Enter your full name" required>
+              
+              <label style="font-weight: 500; color: var(--id-gray-700); font-size: 0.875rem;">
+                Email Address
+              </label>
+              <input type="email" class="demo-input" placeholder="your@email.com" required>
+              
+              <label style="font-weight: 500; color: var(--id-gray-700); font-size: 0.875rem;">
+                Message
+              </label>
+              <textarea class="demo-input" rows="4" placeholder="Tell us how we can help..."></textarea>
+              
+              <button type="submit" class="demo-button demo-button--primary" style="width: 100%;">
+                Send Message
+              </button>
+            </form>
+          </div>
+        </iteration-deck-slide>
+        
+        <iteration-deck-slide 
+          label="Horizontal Layout" 
+          ai-prompt="Create a horizontal form layout optimized for desktop usage"
+          confidence="0.89">
+          <div style="padding: 2rem; background: var(--id-gray-50); border-radius: var(--id-border-radius);">
+            <form style="max-width: 600px; margin: 0 auto;">
+              <h3 style="margin: 0 0 1.5rem 0; text-align: center; color: var(--id-gray-900);">Quick Contact</h3>
+              
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                  <label style="font-weight: 500; color: var(--id-gray-700); font-size: 0.875rem;">
+                    First Name
+                  </label>
+                  <input type="text" class="demo-input" placeholder="John" required>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                  <label style="font-weight: 500; color: var(--id-gray-700); font-size: 0.875rem;">
+                    Last Name
+                  </label>
+                  <input type="text" class="demo-input" placeholder="Doe" required>
+                </div>
+              </div>
+              
+              <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem;">
+                <label style="font-weight: 500; color: var(--id-gray-700); font-size: 0.875rem;">
+                  Email Address
+                </label>
+                <input type="email" class="demo-input" placeholder="john@example.com" required>
+              </div>
+              
+              <div style="display: flex; gap: 1rem; justify-content: center;">
+                <button type="button" class="demo-button demo-button--outline">
+                  Cancel
+                </button>
+                <button type="submit" class="demo-button demo-button--primary">
+                  Submit Form
+                </button>
+              </div>
+            </form>
+          </div>
+        </iteration-deck-slide>
+        
+        <iteration-deck-slide 
+          label="Inline Layout" 
+          ai-prompt="Design a compact inline form for newsletter signups and CTAs"
+          confidence="0.91"
+          notes="Perfect for hero sections and newsletter signups">
+          <div style="padding: 2rem; display: flex; justify-content: center; background: var(--id-gray-50); border-radius: var(--id-border-radius);">
+            <div style="text-align: center; max-width: 500px;">
+              <h3 style="margin: 0 0 0.5rem 0; color: var(--id-gray-900);">Stay Updated</h3>
+              <p style="margin: 0 0 1.5rem 0; color: var(--id-gray-700); font-size: 0.875rem;">
+                Get the latest updates and exclusive content delivered to your inbox.
+              </p>
+              
+              <form style="display: flex; gap: 0.75rem; max-width: 400px; margin: 0 auto;">
+                <input 
+                  type="email" 
+                  class="demo-input" 
+                  placeholder="Enter your email" 
+                  style="flex: 1; margin: 0;" 
+                  required
+                >
+                <button type="submit" class="demo-button demo-button--primary" style="flex-shrink: 0;">
+                  Subscribe
+                </button>
+              </form>
+              
+              <p style="margin: 1rem 0 0 0; font-size: 0.75rem; color: var(--id-gray-500);">
+                No spam, unsubscribe at any time.
+              </p>
+            </div>
+          </div>
+        </iteration-deck-slide>
+      </iteration-deck>
+    </div>
+
+    <!-- Dashboard Widget Variations -->
+    <div class="section">
+      <h2>📊 Dashboard Widget Variations</h2>
+      <p>Different approaches to displaying analytics and metrics in dashboard interfaces.</p>
+      
+      <iteration-deck 
+        id="dashboard-widgets" 
+        label="Dashboard Components"
+        prompt="Create dashboard widgets optimized for data visualization and user insights"
+        description="Various widget designs for analytics dashboards and admin panels">
+        
+        <iteration-deck-slide 
+          label="Metric Cards" 
+          ai-prompt="Design clean metric cards with clear visual hierarchy"
+          confidence="0.93">
+          <div style="padding: 2rem; background: var(--id-gray-50); border-radius: var(--id-border-radius);">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+              <div style="background: white; padding: 1.5rem; border-radius: var(--id-border-radius); box-shadow: var(--id-shadow); border-left: 4px solid var(--id-success-500);">
+                <div style="font-size: 0.875rem; color: var(--id-gray-500); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">
+                  Revenue
+                </div>
+                <div style="font-size: 2rem; font-weight: 700; color: var(--id-gray-900); margin-bottom: 0.25rem;">
+                  $47,832
+                </div>
+                <div style="font-size: 0.875rem; color: var(--id-success-500); font-weight: 500;">
+                  ↗ +12.3% vs last month
+                </div>
+              </div>
+              
+              <div style="background: white; padding: 1.5rem; border-radius: var(--id-border-radius); box-shadow: var(--id-shadow); border-left: 4px solid var(--id-primary-500);">
+                <div style="font-size: 0.875rem; color: var(--id-gray-500); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">
+                  Users
+                </div>
+                <div style="font-size: 2rem; font-weight: 700; color: var(--id-gray-900); margin-bottom: 0.25rem;">
+                  1,247
+                </div>
+                <div style="font-size: 0.875rem; color: var(--id-primary-500); font-weight: 500;">
+                  ↗ +8.1% vs last week
+                </div>
+              </div>
+              
+              <div style="background: white; padding: 1.5rem; border-radius: var(--id-border-radius); box-shadow: var(--id-shadow); border-left: 4px solid var(--id-warning-500);">
+                <div style="font-size: 0.875rem; color: var(--id-gray-500); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">
+                  Conversion
+                </div>
+                <div style="font-size: 2rem; font-weight: 700; color: var(--id-gray-900); margin-bottom: 0.25rem;">
+                  3.4%
+                </div>
+                <div style="font-size: 0.875rem; color: var(--id-warning-500); font-weight: 500;">
+                  → +0.1% vs last month
+                </div>
+              </div>
+            </div>
+          </div>
+        </iteration-deck-slide>
+        
+        <iteration-deck-slide 
+          label="Chart Widget" 
+          ai-prompt="Create an interactive chart widget with data visualization"
+          confidence="0.88">
+          <div style="padding: 2rem; display: flex; justify-content: center; background: var(--id-gray-50); border-radius: var(--id-border-radius);">
+            <div style="background: white; padding: 1.5rem; border-radius: var(--id-border-radius); box-shadow: var(--id-shadow); border: 1px solid var(--id-gray-200); width: 100%; max-width: 500px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h4 style="margin: 0; color: var(--id-gray-900);">Revenue Trend</h4>
+                <select style="padding: 0.25rem 0.5rem; border: 1px solid var(--id-gray-200); border-radius: 4px; background: white; color: var(--id-gray-700); font-size: 0.875rem;">
+                  <option>Last 30 days</option>
+                  <option>Last 7 days</option>
+                  <option>Last quarter</option>
+                </select>
+              </div>
+              
+              <div style="height: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.125rem; margin-bottom: 1rem;">
+                📈 Interactive Chart
+              </div>
+              
+              <div style="display: flex; justify-content: space-between; font-size: 0.875rem; color: var(--id-gray-500);">
+                <span>Peak: $2,847 (Aug 12)</span>
+                <span>Growth: +12.3%</span>
+              </div>
+            </div>
+          </div>
+        </iteration-deck-slide>
+        
+        <iteration-deck-slide 
+          label="Activity Feed" 
+          ai-prompt="Design a real-time activity feed widget for user engagement tracking"
+          confidence="0.90">
+          <div style="padding: 2rem; display: flex; justify-content: center; background: var(--id-gray-50); border-radius: var(--id-border-radius);">
+            <div style="background: white; padding: 1.5rem; border-radius: var(--id-border-radius); box-shadow: var(--id-shadow); border: 1px solid var(--id-gray-200); width: 100%; max-width: 400px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h4 style="margin: 0; color: var(--id-gray-900);">Recent Activity</h4>
+                <div style="width: 8px; height: 8px; background: var(--id-success-500); border-radius: 50%; position: relative;">
+                  <div style="position: absolute; top: -4px; left: -4px; width: 16px; height: 16px; background: var(--id-success-500); border-radius: 50%; opacity: 0.3; animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>
+                </div>
+              </div>
+              
+              <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  <div style="width: 8px; height: 8px; background: var(--id-success-500); border-radius: 50%; flex-shrink: 0;"></div>
+                  <div style="flex: 1; font-size: 0.875rem;">
+                    <div style="color: var(--id-gray-900); font-weight: 500;">New user signup</div>
+                    <div style="color: var(--id-gray-500);">john@example.com • 2 min ago</div>
+                  </div>
+                </div>
+                
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  <div style="width: 8px; height: 8px; background: var(--id-primary-500); border-radius: 50%; flex-shrink: 0;"></div>
+                  <div style="flex: 1; font-size: 0.875rem;">
+                    <div style="color: var(--id-gray-900); font-weight: 500;">Plan upgraded</div>
+                    <div style="color: var(--id-gray-500);">Premium → Enterprise • 5 min ago</div>
+                  </div>
+                </div>
+                
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  <div style="width: 8px; height: 8px; background: var(--id-warning-500); border-radius: 50%; flex-shrink: 0;"></div>
+                  <div style="flex: 1; font-size: 0.875rem;">
+                    <div style="color: var(--id-gray-900); font-weight: 500;">API usage spike</div>
+                    <div style="color: var(--id-gray-500);">+45% today • 12 min ago</div>
+                  </div>
+                </div>
+              </div>
+              
+              <button style="width: 100%; padding: 0.5rem; margin-top: 1rem; background: var(--id-gray-50); border: 1px solid var(--id-gray-200); border-radius: 4px; color: var(--id-gray-700); font-size: 0.875rem; cursor: pointer;">
+                View All Activity
+              </button>
+            </div>
+          </div>
+        </iteration-deck-slide>
+      </iteration-deck>
+    </div>
+
+    <!-- Feature Highlights -->
+    <div class="section">
+      <h2>✨ Key Features Demonstrated</h2>
+      <div class="feature-showcase">
+        <div class="feature-card">
+          <div class="feature-header">
+            <h4 style="margin: 0; color: var(--id-gray-900);">🎛️ Multi-Deck Support</h4>
+          </div>
+          <div class="feature-content">
+            <p style="margin: 0 0 1rem 0; color: var(--id-gray-700); font-size: 0.875rem;">
+              Multiple iteration decks on a single page with centralized navigation. Use the toolbar dropdown to switch between different component types.
+            </p>
+            <ul style="margin: 0; padding-left: 1.25rem; font-size: 0.875rem; color: var(--id-gray-700);">
+              <li>Singleton toolbar pattern</li>
+              <li>Dropdown deck selector</li>
+              <li>Independent slide navigation</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-header">
+            <h4 style="margin: 0; color: var(--id-gray-900);">🤖 AI Confidence Scoring</h4>
+          </div>
+          <div class="feature-content">
+            <p style="margin: 0 0 1rem 0; color: var(--id-gray-700); font-size: 0.875rem;">
+              Each AI-generated variation includes confidence scoring and design rationale to help prioritize review time and validate design decisions.
+            </p>
+            <ul style="margin: 0; padding-left: 1.25rem; font-size: 0.875rem; color: var(--id-gray-700);">
+              <li>Visual confidence indicators</li>
+              <li>AI prompt tracking</li>
+              <li>Design notes and rationale</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-header">
+            <h4 style="margin: 0; color: var(--id-gray-900);">⌨️ Keyboard Navigation</h4>
+          </div>
+          <div class="feature-content">
+            <p style="margin: 0 0 1rem 0; color: var(--id-gray-700); font-size: 0.875rem;">
+              Fast keyboard shortcuts for efficient navigation between variations. Perfect for rapid design reviews and stakeholder presentations.
+            </p>
+            <ul style="margin: 0; padding-left: 1.25rem; font-size: 0.875rem; color: var(--id-gray-700);">
+              <li>Ctrl/Cmd + ← Previous slide</li>
+              <li>Ctrl/Cmd + → Next slide</li>
+              <li>Auto-scroll to active deck</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-header">
+            <h4 style="margin: 0; color: var(--id-gray-900);">📱 Responsive Design</h4>
+          </div>
+          <div class="feature-content">
+            <p style="margin: 0 0 1rem 0; color: var(--id-gray-700); font-size: 0.875rem;">
+              Components automatically adapt to different screen sizes while maintaining full functionality. Perfect for mobile design reviews.
+            </p>
+            <ul style="margin: 0; padding-left: 1.25rem; font-size: 0.875rem; color: var(--id-gray-700);">
+              <li>Mobile-optimized toolbar</li>
+              <li>Touch-friendly interactions</li>
+              <li>Responsive component examples</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-header">
+            <h4 style="margin: 0; color: var(--id-gray-900);">🎨 Theme Support</h4>
+          </div>
+          <div class="feature-content">
+            <p style="margin: 0 0 1rem 0; color: var(--id-gray-700); font-size: 0.875rem;">
+              Built-in theme support with CSS custom properties. Components automatically adapt to your design system colors and styles.
+            </p>
+            <ul style="margin: 0; padding-left: 1.25rem; font-size: 0.875rem; color: var(--id-gray-700);">
+              <li>Light and dark themes</li>
+              <li>CSS custom properties</li>
+              <li>prefers-color-scheme support</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-header">
+            <h4 style="margin: 0; color: var(--id-gray-900);">♿ Accessibility First</h4>
+          </div>
+          <div class="feature-content">
+            <p style="margin: 0 0 1rem 0; color: var(--id-gray-700); font-size: 0.875rem;">
+              WCAG 2.2 AA compliance built-in with proper ARIA attributes, keyboard navigation, and screen reader support.
+            </p>
+            <ul style="margin: 0; padding-left: 1.25rem; font-size: 0.875rem; color: var(--id-gray-700);">
+              <li>Semantic HTML structure</li>
+              <li>Proper focus management</li>
+              <li>High contrast support</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Call to Action -->
+    <div class="section" style="text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+      <h2>🚀 Ready to Transform Your Design Workflow?</h2>
+      <p style="font-size: 1.125rem; margin: 1rem 0; opacity: 0.9; max-width: 600px; margin-left: auto; margin-right: auto;">
+        Experience the future of AI-first design iteration. Compare variations instantly, 
+        gather feedback efficiently, and ship better products faster.
+      </p>
+      <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
+        <button class="demo-button" style="background: white; color: #667eea; font-weight: 600;">
+          View Documentation
+        </button>
+        <button class="demo-button" style="background: rgba(255,255,255,0.2); color: white; border: 2px solid white; font-weight: 600;">
+          GitHub Repository
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    @keyframes ping {
+      75%, 100% {
+        transform: scale(2);
+        opacity: 0;
+      }
+    }
+  </style>
+
+  <script>
+    // Comprehensive demo functionality
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('🎛️ Comprehensive Iteration Deck Demo loaded');
+      
+      // Theme switching
+      const themeButtons = document.querySelectorAll('.theme-button');
+      const body = document.body;
+      
+      themeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          const theme = button.dataset.theme;
+          
+          // Update active button
+          themeButtons.forEach(b => b.classList.remove('active'));
+          button.classList.add('active');
+          
+          // Apply theme
+          if (theme === 'light') {
+            body.removeAttribute('data-theme');
+          } else {
+            body.setAttribute('data-theme', theme);
+          }
+          
+          console.log(`🎨 Theme switched to: ${theme}`);
+          localStorage.setItem('iteration-deck-theme', theme);
+        });
+      });
+      
+      // Load saved theme
+      const savedTheme = localStorage.getItem('iteration-deck-theme');
+      if (savedTheme && savedTheme !== 'light') {
+        body.setAttribute('data-theme', savedTheme);
+        document.querySelector(`[data-theme="${savedTheme}"]`)?.classList.add('active');
+        document.querySelector('[data-theme="light"]')?.classList.remove('active');
+      }
+      
+      // Confidence indicator toggle
+      const confidenceToggle = document.getElementById('show-confidence');
+      const confidenceIndicators = document.querySelectorAll('.confidence-indicator');
+      
+      confidenceToggle?.addEventListener('change', (e) => {
+        const show = e.target.checked;
+        confidenceIndicators.forEach(indicator => {
+          indicator.style.display = show ? 'flex' : 'none';
+        });
+        console.log(`📊 Confidence indicators ${show ? 'shown' : 'hidden'}`);
+      });
+      
+      // Animation toggle
+      const animationToggle = document.getElementById('enable-animations');
+      animationToggle?.addEventListener('change', (e) => {
+        const enable = e.target.checked;
+        if (enable) {
+          document.body.style.setProperty('--animation-duration', '0.3s');
+        } else {
+          document.body.style.setProperty('--animation-duration', '0s');
+        }
+        console.log(`🎬 Animations ${enable ? 'enabled' : 'disabled'}`);
+      });
+      
+      // Demo statistics
+      const demoStats = {
+        totalDecks: 4,
+        totalSlides: 12,
+        avgConfidence: 91.4,
+        frameworks: ['React', 'Vue', 'Angular', 'Vanilla'],
+        features: [
+          'Multi-deck support',
+          'AI confidence scoring', 
+          'Keyboard navigation',
+          'Theme support',
+          'Responsive design',
+          'Accessibility compliance'
+        ]
+      };
+      
+      console.log('📊 Demo Statistics:', demoStats);
+      
+      // Intersection Observer for animations
+      const observeElements = () => {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.style.opacity = '1';
+              entry.target.style.transform = 'translateY(0)';
+            }
+          });
+        });
+        
+        // Observe stat cards and feature cards
+        document.querySelectorAll('.stat-card, .feature-card').forEach(card => {
+          card.style.opacity = '0';
+          card.style.transform = 'translateY(20px)';
+          card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+          observer.observe(card);
+        });
+      };
+      
+      observeElements();
+      
+      // Simulate real-time updates for dashboard widgets
+      const updateDashboardMetrics = () => {
+        const revenueElement = document.querySelector('[data-metric="revenue"]');
+        const usersElement = document.querySelector('[data-metric="users"]');
+        
+        if (Math.random() > 0.7) { // 30% chance to update
+          console.log('📈 Dashboard metrics updated');
+        }
+      };
+      
+      // Update every 30 seconds
+      setInterval(updateDashboardMetrics, 30000);
+      
+      // Export demo data for inspection
+      window.iterationDeckDemo = {
+        stats: demoStats,
+        updateDashboardMetrics,
+        version: '1.0.0'
+      };
+      
+      console.log('✅ Comprehensive demo ready');
+      console.log('💡 Try keyboard shortcuts: Ctrl/Cmd + ←/→');
+      console.log('🎛️ Use toolbar dropdown to switch between decks');
+    });
+  </script>
+</body>
+</html>

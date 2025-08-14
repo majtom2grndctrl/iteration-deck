@@ -1,0 +1,626 @@
+/**
+ * Custom CSS Guide for Iteration Deck Components
+ * 
+ * This comprehensive CSS file demonstrates all the customization options
+ * available for styling Iteration Deck components. Copy and modify these
+ * examples to match your design system.
+ */
+
+/* ============================================================================ */
+/* CSS Custom Properties (CSS Variables) API                                   */
+/* ============================================================================ */
+
+/**
+ * Complete list of available CSS custom properties for theming
+ * These can be overridden in your design system
+ */
+:root {
+  /* ========================================== */
+  /* Iteration Deck Container Properties       */
+  /* ========================================== */
+  
+  /* Background and surface colors */
+  --iteration-deck-background: #ffffff;
+  --iteration-deck-surface: #f9fafb;
+  --iteration-deck-surface-hover: #f3f4f6;
+  
+  /* Border and outline styles */
+  --iteration-deck-border-color: #e5e7eb;
+  --iteration-deck-border-width: 1px;
+  --iteration-deck-border-radius: 8px;
+  --iteration-deck-border-style: solid;
+  
+  /* Spacing and layout */
+  --iteration-deck-padding: 1.5rem;
+  --iteration-deck-margin: 1rem 0;
+  --iteration-deck-gap: 1rem;
+  
+  /* Shadow and elevation */
+  --iteration-deck-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --iteration-deck-shadow-hover: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --iteration-deck-shadow-active: 0 10px 15px rgba(0, 0, 0, 0.1);
+  
+  /* Focus and attention states */
+  --iteration-deck-focus-ring: 2px solid #3b82f6;
+  --iteration-deck-focus-offset: 2px;
+  --iteration-deck-glow-color: #3b82f6;
+  --iteration-deck-glow-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+  
+  /* ========================================== */
+  /* Slide Properties                          */
+  /* ========================================== */
+  
+  /* Slide state colors */
+  --slide-active-background: #ffffff;
+  --slide-inactive-background: transparent;
+  --slide-active-border-color: #3b82f6;
+  --slide-inactive-border-color: transparent;
+  
+  /* Slide transitions */
+  --slide-transition-duration: 0.3s;
+  --slide-transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
+  --slide-transition-property: opacity, transform, background-color;
+  
+  /* Slide content */
+  --slide-content-padding: 1rem;
+  --slide-content-gap: 0.75rem;
+  
+  /* ========================================== */
+  /* Toolbar Properties                        */
+  /* ========================================== */
+  
+  /* Toolbar surface and backdrop */
+  --toolbar-background: rgba(255, 255, 255, 0.95);
+  --toolbar-backdrop-filter: blur(10px);
+  --toolbar-border: 1px solid rgba(229, 231, 235, 0.8);
+  --toolbar-border-radius: 12px;
+  --toolbar-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  
+  /* Toolbar positioning */
+  --toolbar-bottom: 2rem;
+  --toolbar-z-index: 1000;
+  --toolbar-max-width: 90vw;
+  
+  /* Toolbar content */
+  --toolbar-padding: 0.75rem 1rem;
+  --toolbar-gap: 0.75rem;
+  --toolbar-font-size: 0.875rem;
+  
+  /* Toolbar buttons */
+  --toolbar-button-background: #f3f4f6;
+  --toolbar-button-background-hover: #e5e7eb;
+  --toolbar-button-background-active: #3b82f6;
+  --toolbar-button-color: #374151;
+  --toolbar-button-color-hover: #1f2937;
+  --toolbar-button-color-active: #ffffff;
+  --toolbar-button-border-radius: 6px;
+  --toolbar-button-padding: 0.5rem 0.75rem;
+  --toolbar-button-font-weight: 500;
+  
+  /* Toolbar select dropdown */
+  --toolbar-select-background: #ffffff;
+  --toolbar-select-border: 1px solid #d1d5db;
+  --toolbar-select-border-radius: 6px;
+  --toolbar-select-padding: 0.5rem 2rem 0.5rem 0.75rem;
+  --toolbar-select-font-size: 0.875rem;
+  --toolbar-select-arrow-color: #6b7280;
+  
+  /* ========================================== */
+  /* Typography Properties                     */
+  /* ========================================== */
+  
+  --iteration-deck-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --iteration-deck-font-size-sm: 0.875rem;
+  --iteration-deck-font-size-base: 1rem;
+  --iteration-deck-font-size-lg: 1.125rem;
+  --iteration-deck-font-weight-normal: 400;
+  --iteration-deck-font-weight-medium: 500;
+  --iteration-deck-font-weight-semibold: 600;
+  --iteration-deck-line-height: 1.5;
+  
+  /* ========================================== */
+  /* Color Palette                             */
+  /* ========================================== */
+  
+  /* Primary colors */
+  --iteration-deck-primary-50: #eff6ff;
+  --iteration-deck-primary-100: #dbeafe;
+  --iteration-deck-primary-500: #3b82f6;
+  --iteration-deck-primary-600: #2563eb;
+  --iteration-deck-primary-700: #1d4ed8;
+  
+  /* Gray colors */
+  --iteration-deck-gray-50: #f9fafb;
+  --iteration-deck-gray-100: #f3f4f6;
+  --iteration-deck-gray-200: #e5e7eb;
+  --iteration-deck-gray-300: #d1d5db;
+  --iteration-deck-gray-400: #9ca3af;
+  --iteration-deck-gray-500: #6b7280;
+  --iteration-deck-gray-600: #4b5563;
+  --iteration-deck-gray-700: #374151;
+  --iteration-deck-gray-800: #1f2937;
+  --iteration-deck-gray-900: #111827;
+  
+  /* Semantic colors */
+  --iteration-deck-success: #10b981;
+  --iteration-deck-warning: #f59e0b;
+  --iteration-deck-error: #ef4444;
+  --iteration-deck-info: #3b82f6;
+  
+  /* ========================================== */
+  /* Animation Properties                      */
+  /* ========================================== */
+  
+  --iteration-deck-animation-fast: 150ms;
+  --iteration-deck-animation-normal: 300ms;
+  --iteration-deck-animation-slow: 500ms;
+  --iteration-deck-easing-ease: ease;
+  --iteration-deck-easing-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --iteration-deck-easing-ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --iteration-deck-easing-ease-in: cubic-bezier(0.4, 0, 1, 1);
+}
+
+/* ============================================================================ */
+/* Dark Theme Override                                                          */
+/* ============================================================================ */
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Deck colors for dark mode */
+    --iteration-deck-background: #1f2937;
+    --iteration-deck-surface: #111827;
+    --iteration-deck-surface-hover: #374151;
+    --iteration-deck-border-color: #4b5563;
+    --iteration-deck-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    
+    /* Slide colors for dark mode */
+    --slide-active-background: #1f2937;
+    --slide-active-border-color: #60a5fa;
+    
+    /* Toolbar colors for dark mode */
+    --toolbar-background: rgba(31, 41, 55, 0.95);
+    --toolbar-border: 1px solid rgba(75, 85, 99, 0.8);
+    --toolbar-button-background: #4b5563;
+    --toolbar-button-background-hover: #6b7280;
+    --toolbar-button-color: #d1d5db;
+    --toolbar-button-color-hover: #f9fafb;
+    --toolbar-select-background: #374151;
+    --toolbar-select-border: 1px solid #6b7280;
+    
+    /* Update primary colors for better dark mode contrast */
+    --iteration-deck-primary-500: #60a5fa;
+    --iteration-deck-primary-600: #3b82f6;
+    --iteration-deck-glow-color: #60a5fa;
+  }
+}
+
+/* Explicit dark theme class override */
+[data-theme="dark"] {
+  --iteration-deck-background: #1f2937;
+  --iteration-deck-surface: #111827;
+  --iteration-deck-surface-hover: #374151;
+  --iteration-deck-border-color: #4b5563;
+  --iteration-deck-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  
+  --slide-active-background: #1f2937;
+  --slide-active-border-color: #60a5fa;
+  
+  --toolbar-background: rgba(31, 41, 55, 0.95);
+  --toolbar-border: 1px solid rgba(75, 85, 99, 0.8);
+  --toolbar-button-background: #4b5563;
+  --toolbar-button-background-hover: #6b7280;
+  --toolbar-button-color: #d1d5db;
+  --toolbar-button-color-hover: #f9fafb;
+  
+  --iteration-deck-primary-500: #60a5fa;
+  --iteration-deck-primary-600: #3b82f6;
+  --iteration-deck-glow-color: #60a5fa;
+}
+
+/* ============================================================================ */
+/* Component-Specific Styling Examples                                         */
+/* ============================================================================ */
+
+/**
+ * Style the main iteration-deck container
+ */
+iteration-deck {
+  /* Apply custom properties */
+  background: var(--iteration-deck-background);
+  border: var(--iteration-deck-border-width) var(--iteration-deck-border-style) var(--iteration-deck-border-color);
+  border-radius: var(--iteration-deck-border-radius);
+  padding: var(--iteration-deck-padding);
+  margin: var(--iteration-deck-margin);
+  box-shadow: var(--iteration-deck-shadow);
+  
+  /* Layout properties */
+  display: block;
+  width: 100%;
+  position: relative;
+  
+  /* Typography */
+  font-family: var(--iteration-deck-font-family);
+  font-size: var(--iteration-deck-font-size-base);
+  line-height: var(--iteration-deck-line-height);
+  
+  /* Transitions */
+  transition: box-shadow var(--iteration-deck-animation-normal) var(--iteration-deck-easing-ease-out);
+}
+
+/**
+ * Hover state for the deck container
+ */
+iteration-deck:hover {
+  box-shadow: var(--iteration-deck-shadow-hover);
+}
+
+/**
+ * Focus state for keyboard navigation
+ */
+iteration-deck:focus-within {
+  outline: var(--iteration-deck-focus-ring);
+  outline-offset: var(--iteration-deck-focus-offset);
+}
+
+/**
+ * Active deck with attention glow effect
+ */
+iteration-deck[data-attention="true"] {
+  box-shadow: var(--iteration-deck-glow-shadow), var(--iteration-deck-shadow);
+  border-color: var(--iteration-deck-glow-color);
+}
+
+/**
+ * Style individual slides
+ */
+iteration-deck-slide {
+  /* Layout */
+  display: block;
+  width: 100%;
+  padding: var(--slide-content-padding);
+  
+  /* Transitions */
+  transition: var(--slide-transition-property) var(--slide-transition-duration) var(--slide-transition-easing);
+  
+  /* Default inactive state */
+  background: var(--slide-inactive-background);
+  border: var(--iteration-deck-border-width) var(--iteration-deck-border-style) var(--slide-inactive-border-color);
+  border-radius: var(--iteration-deck-border-radius);
+  opacity: 0.7;
+  transform: scale(0.98);
+}
+
+/**
+ * Active slide state
+ */
+iteration-deck-slide[data-active="true"] {
+  background: var(--slide-active-background);
+  border-color: var(--slide-active-border-color);
+  opacity: 1;
+  transform: scale(1);
+}
+
+/**
+ * Style the toolbar component
+ */
+iteration-deck-toolbar {
+  /* Positioning */
+  position: fixed;
+  bottom: var(--toolbar-bottom);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--toolbar-z-index);
+  
+  /* Surface styling */
+  background: var(--toolbar-background);
+  backdrop-filter: var(--toolbar-backdrop-filter);
+  -webkit-backdrop-filter: var(--toolbar-backdrop-filter); /* Safari support */
+  border: var(--toolbar-border);
+  border-radius: var(--toolbar-border-radius);
+  box-shadow: var(--toolbar-shadow);
+  
+  /* Layout */
+  padding: var(--toolbar-padding);
+  display: flex;
+  align-items: center;
+  gap: var(--toolbar-gap);
+  max-width: var(--toolbar-max-width);
+  
+  /* Typography */
+  font-family: var(--iteration-deck-font-family);
+  font-size: var(--toolbar-font-size);
+  font-weight: var(--iteration-deck-font-weight-medium);
+}
+
+/**
+ * Toolbar buttons
+ */
+iteration-deck-toolbar button {
+  /* Reset default button styles */
+  border: none;
+  outline: none;
+  background: var(--toolbar-button-background);
+  color: var(--toolbar-button-color);
+  
+  /* Layout */
+  padding: var(--toolbar-button-padding);
+  border-radius: var(--toolbar-button-border-radius);
+  font-weight: var(--toolbar-button-font-weight);
+  font-size: inherit;
+  font-family: inherit;
+  
+  /* Interaction */
+  cursor: pointer;
+  transition: all var(--iteration-deck-animation-fast) var(--iteration-deck-easing-ease-out);
+  
+  /* Accessibility */
+  min-height: 44px; /* Touch target size */
+}
+
+iteration-deck-toolbar button:hover:not(:disabled) {
+  background: var(--toolbar-button-background-hover);
+  color: var(--toolbar-button-color-hover);
+  transform: translateY(-1px);
+}
+
+iteration-deck-toolbar button:active {
+  transform: translateY(0);
+}
+
+iteration-deck-toolbar button[aria-pressed="true"] {
+  background: var(--toolbar-button-background-active);
+  color: var(--toolbar-button-color-active);
+}
+
+iteration-deck-toolbar button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+iteration-deck-toolbar button:focus-visible {
+  outline: var(--iteration-deck-focus-ring);
+  outline-offset: var(--iteration-deck-focus-offset);
+}
+
+/**
+ * Toolbar select dropdown
+ */
+iteration-deck-toolbar select {
+  /* Reset default select styles */
+  border: var(--toolbar-select-border);
+  border-radius: var(--toolbar-select-border-radius);
+  background: var(--toolbar-select-background);
+  color: var(--toolbar-button-color);
+  
+  /* Layout */
+  padding: var(--toolbar-select-padding);
+  font-size: var(--toolbar-select-font-size);
+  font-family: inherit;
+  
+  /* Custom arrow */
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1rem;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  
+  /* Accessibility */
+  min-height: 44px;
+  cursor: pointer;
+}
+
+iteration-deck-toolbar select:focus {
+  outline: var(--iteration-deck-focus-ring);
+  outline-offset: var(--iteration-deck-focus-offset);
+  border-color: var(--iteration-deck-primary-500);
+}
+
+/* ============================================================================ */
+/* Responsive Design                                                            */
+/* ============================================================================ */
+
+/**
+ * Mobile-specific adjustments
+ */
+@media (max-width: 768px) {
+  iteration-deck {
+    --iteration-deck-padding: 1rem;
+    --iteration-deck-margin: 0.75rem 0;
+  }
+  
+  iteration-deck-toolbar {
+    --toolbar-padding: 0.5rem 0.75rem;
+    --toolbar-gap: 0.5rem;
+    --toolbar-font-size: 0.8rem;
+    --toolbar-bottom: 1rem;
+    --toolbar-max-width: calc(100vw - 2rem);
+  }
+  
+  iteration-deck-toolbar button {
+    --toolbar-button-padding: 0.5rem 0.75rem;
+  }
+  
+  iteration-deck-toolbar select {
+    --toolbar-select-padding: 0.5rem 1.5rem 0.5rem 0.75rem;
+    --toolbar-select-font-size: 0.8rem;
+  }
+}
+
+/**
+ * Large screen enhancements
+ */
+@media (min-width: 1024px) {
+  iteration-deck {
+    --iteration-deck-padding: 2rem;
+  }
+  
+  iteration-deck-toolbar {
+    --toolbar-padding: 0.875rem 1.25rem;
+    --toolbar-gap: 1rem;
+  }
+}
+
+/* ============================================================================ */
+/* Accessibility Enhancements                                                  */
+/* ============================================================================ */
+
+/**
+ * High contrast mode support
+ */
+@media (prefers-contrast: high) {
+  iteration-deck {
+    --iteration-deck-border-width: 2px;
+    --iteration-deck-border-color: #000000;
+    --slide-active-border-color: #0000ff;
+  }
+  
+  iteration-deck-toolbar button {
+    border: 2px solid transparent;
+  }
+  
+  iteration-deck-toolbar button:focus-visible {
+    border-color: #0000ff;
+  }
+}
+
+/**
+ * Reduced motion preferences
+ */
+@media (prefers-reduced-motion: reduce) {
+  iteration-deck,
+  iteration-deck-slide,
+  iteration-deck-toolbar,
+  iteration-deck-toolbar button {
+    --slide-transition-duration: 0.01ms;
+    --iteration-deck-animation-fast: 0.01ms;
+    --iteration-deck-animation-normal: 0.01ms;
+    --iteration-deck-animation-slow: 0.01ms;
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================================================ */
+/* Custom Theme Examples                                                        */
+/* ============================================================================ */
+
+/**
+ * Modern Gradient Theme
+ */
+.theme-gradient {
+  --iteration-deck-background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --iteration-deck-border-color: transparent;
+  --slide-active-background: rgba(255, 255, 255, 0.1);
+  --slide-active-border-color: rgba(255, 255, 255, 0.2);
+  --toolbar-background: rgba(255, 255, 255, 0.15);
+  --toolbar-backdrop-filter: blur(20px);
+  --toolbar-border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/**
+ * Neumorphism Theme
+ */
+.theme-neumorphism {
+  --iteration-deck-background: #e0e5ec;
+  --iteration-deck-border-color: transparent;
+  --iteration-deck-shadow: 
+    9px 9px 16px rgba(163, 177, 198, 0.6), 
+    -9px -9px 16px rgba(255, 255, 255, 0.5);
+  --slide-active-background: #e0e5ec;
+  --slide-active-border-color: transparent;
+  --toolbar-background: #e0e5ec;
+  --toolbar-shadow: 
+    5px 5px 10px rgba(163, 177, 198, 0.6), 
+    -5px -5px 10px rgba(255, 255, 255, 0.5);
+  --toolbar-border: none;
+  --toolbar-button-background: transparent;
+  --toolbar-button-background-hover: #d1d9e6;
+}
+
+/**
+ * Cyberpunk Theme
+ */
+.theme-cyberpunk {
+  --iteration-deck-background: #0a0a0a;
+  --iteration-deck-border-color: #00ff00;
+  --iteration-deck-glow-color: #00ff00;
+  --iteration-deck-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+  --slide-active-background: #111111;
+  --slide-active-border-color: #ff00ff;
+  --toolbar-background: rgba(10, 10, 10, 0.9);
+  --toolbar-border: 1px solid #00ff00;
+  --toolbar-button-background: #222222;
+  --toolbar-button-color: #00ff00;
+  --toolbar-button-background-active: #ff00ff;
+  --toolbar-button-color-active: #000000;
+}
+
+/**
+ * Glass Morphism Theme
+ */
+.theme-glass {
+  --iteration-deck-background: rgba(255, 255, 255, 0.1);
+  --iteration-deck-border-color: rgba(255, 255, 255, 0.2);
+  --iteration-deck-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+  --slide-active-background: rgba(255, 255, 255, 0.15);
+  --slide-active-border-color: rgba(255, 255, 255, 0.3);
+  --toolbar-background: rgba(255, 255, 255, 0.1);
+  --toolbar-backdrop-filter: blur(15px);
+  --toolbar-border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Apply glass theme to body for background */
+body.theme-glass {
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  min-height: 100vh;
+}
+
+/* ============================================================================ */
+/* Usage Instructions and Examples                                             */
+/* ============================================================================ */
+
+/**
+ * USAGE EXAMPLES:
+ * 
+ * 1. Basic Customization:
+ *    ```css
+ *    iteration-deck {
+ *      --iteration-deck-border-radius: 16px;
+ *      --iteration-deck-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+ *    }
+ *    ```
+ * 
+ * 2. Theme-Specific Overrides:
+ *    ```css
+ *    [data-theme="custom"] {
+ *      --iteration-deck-primary-500: #ff6b6b;
+ *      --toolbar-background: rgba(255, 107, 107, 0.1);
+ *    }
+ *    ```
+ * 
+ * 3. Component-Specific Styling:
+ *    ```css
+ *    iteration-deck[id="special-deck"] {
+ *      --iteration-deck-background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+ *    }
+ *    ```
+ * 
+ * 4. Responsive Overrides:
+ *    ```css
+ *    @media (max-width: 640px) {
+ *      iteration-deck {
+ *        --iteration-deck-padding: 0.75rem;
+ *      }
+ *    }
+ *    ```
+ * 
+ * 5. Animation Customization:
+ *    ```css
+ *    iteration-deck-slide {
+ *      --slide-transition-duration: 0.5s;
+ *      --slide-transition-easing: cubic-bezier(0.34, 1.56, 0.64, 1);
+ *    }
+ *    ```
+ */

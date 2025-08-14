@@ -70,7 +70,7 @@ describe('iteration-deck-toolbar', () => {
     });
     
     // Should return null in production mode
-    expect(page.root.shadowRoot.innerHTML).toBe('');
+    expect(page.root?.shadowRoot?.innerHTML).toBe('');
   });
 
   it('renders when in development mode and has decks', async () => {
