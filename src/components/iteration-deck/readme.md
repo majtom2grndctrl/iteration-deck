@@ -16,6 +16,19 @@
 | `prompt`              | `prompt`       | Optional AI prompt context for generation tracking | `string \| undefined` | `undefined` |
 
 
+## Dependencies
+
+### Depends on
+
+- [iteration-deck-toolbar](../iteration-deck-toolbar)
+
+### Graph
+```mermaid
+graph TD;
+  iteration-deck --> iteration-deck-toolbar
+  style iteration-deck fill:#f9f,stroke:#333,stroke-width:4px
+```
+
 ----------------------------------------------
 
 *Built with [StencilJS](https://stenciljs.com/)*

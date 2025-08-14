@@ -1,7 +1,22 @@
 import { Component, Host, h, Prop, State, Element, Watch, Listen } from '@stencil/core';
 import { useIterationDeckStore, DeckInfo, SlideInfo } from '../../store/iteration-deck-store';
-import { detectEnvironment } from '../../utils/environment';
-import * as styles from './iteration-deck.css';
+import { detectEnvironment, isDevMode } from '../../utils/environment';
+// import * as styles from './iteration-deck.css';
+
+// Toolbar singleton management
+let toolbarCreated = false;
+
+function ensureToolbarExists() {
+  if (!toolbarCreated && isDevMode()) {
+    // Check if toolbar already exists in DOM
+    const existingToolbar = document.querySelector('iteration-deck-toolbar');
+    if (!existingToolbar) {
+      const toolbar = document.createElement('iteration-deck-toolbar');
+      document.body.appendChild(toolbar);
+    }
+    toolbarCreated = true;
+  }
+}
 
 @Component({
   tag: 'iteration-deck',
@@ -28,10 +43,18 @@ export class IterationDeck {
   @State() isProduction: boolean = false;
   @State() slides: SlideInfo[] = [];
   @State() storeSubscription: (() => void) | null = null;
+  @State() isActiveDeck: boolean = false;
+  @State() justBecameActive: boolean = false;
+  @State() showAttentionGlow: boolean = false;
 
   private deckStore = useIterationDeckStore;
 
   connectedCallback() {
+    // Ensure activeIndex has a default value
+    if (this.activeIndex === undefined || this.activeIndex === null) {
+      this.activeIndex = 0;
+    }
+    
     // Detect environment
     const env = detectEnvironment();
     this.isProduction = env.isProduction;
@@ -44,6 +67,15 @@ export class IterationDeck {
 
     // Subscribe to store changes
     this.subscribeToStore();
+    
+    // Initialize active deck state
+    const state = this.deckStore.getState();
+    this.isActiveDeck = state.activeDeckId === this.deckId;
+    
+    // Initialize slide states after a brief delay to ensure slides are connected
+    setTimeout(() => {
+      this.updateSlideStates();
+    }, 200);
   }
 
   disconnectedCallback() {
@@ -58,7 +90,26 @@ export class IterationDeck {
 
   @Watch('activeIndex')
   onActiveIndexChange(newIndex: number) {
-    this.deckStore.getState().setActiveSlide(this.deckId, newIndex);
+    // Update all child slides about the active index change
+    this.updateSlideStates();
+    
+    // Only update store if this is the active deck
+    const state = this.deckStore.getState();
+    if (state.activeDeckId === this.deckId) {
+      state.setActiveSlide(newIndex);
+    }
+  }
+  
+  private updateSlideStates() {
+    // Force all slides to re-evaluate their active state
+    const slideElements = this.el.querySelectorAll('iteration-deck-slide');
+    slideElements.forEach((slide: any) => {
+      if (slide.updateActiveState) {
+        slide.updateActiveState();
+      }
+      // Also manually set a data attribute that slides can observe
+      slide.setAttribute('data-parent-active-index', this.activeIndex.toString());
+    });
   }
 
   @Listen('slotchange')
@@ -88,10 +139,14 @@ export class IterationDeck {
       prompt: this.prompt,
       description: this.description,
       slides: this.slides,
+      slideCount: this.slides.length,
       activeSlideIndex: this.activeIndex
     };
 
     this.deckStore.getState().registerDeck(deckInfo);
+    
+    // Create toolbar singleton on first deck registration
+    ensureToolbarExists();
   }
 
   private updateStoreSlides() {
@@ -100,36 +155,142 @@ export class IterationDeck {
 
   private subscribeToStore() {
     this.storeSubscription = this.deckStore.subscribe((state) => {
-      const deck = state.decks.get(this.deckId);
-      if (deck && deck.activeSlideIndex !== this.activeIndex) {
-        this.activeIndex = deck.activeSlideIndex;
+      const wasActive = this.isActiveDeck;
+      this.isActiveDeck = state.activeDeckId === this.deckId;
+      
+      // Trigger attention effects when deck becomes active
+      if (!wasActive && this.isActiveDeck) {
+        this.justBecameActive = true;
+        this.showAttentionGlow = true;
+        
+        // Auto-scroll to this deck
+        this.scrollIntoView();
+        
+        // Reset attention states after brief period
+        setTimeout(() => {
+          this.justBecameActive = false;
+        }, 800); // Shorter duration for "just became active"
+        
+        setTimeout(() => {
+          this.showAttentionGlow = false;
+        }, 2000); // Slightly longer for glow effect
       }
+      
+      // Only respond to store changes if this is the active deck
+      if (this.isActiveDeck) {
+        const deck = state.decks.get(this.deckId);
+        if (deck && deck.activeSlideIndex !== this.activeIndex) {
+          this.activeIndex = deck.activeSlideIndex;
+        }
+      }
+    });
+  }
+  
+  private scrollIntoView() {
+    if (!isDevMode()) return;
+    
+    // Scroll to bring the deck into the top half of the viewport
+    const rect = this.el.getBoundingClientRect();
+    const viewportHeight = window.innerHeight;
+    const targetPosition = window.scrollY + rect.top - viewportHeight * 0.25;
+    
+    window.scrollTo({
+      top: Math.max(0, targetPosition),
+      behavior: 'smooth'
     });
   }
 
   render() {
     const activeSlideIndex = this.isProduction ? 0 : this.activeIndex;
+    const showVisualFeedback = !this.isProduction && isDevMode();
+    
+    // Add keyframe animation for attention pulse
+    if (showVisualFeedback && this.showAttentionGlow && !document.getElementById('iteration-deck-attention-keyframes')) {
+      const style = document.createElement('style');
+      style.id = 'iteration-deck-attention-keyframes';
+      style.textContent = `
+        @keyframes iteration-deck-attention {
+          0% { 
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+            transform: scale(1);
+          }
+          50% {
+            box-shadow: 0 0 40px rgba(59, 130, 246, 0.8), 0 0 80px rgba(59, 130, 246, 0.4);
+            transform: scale(1.01);
+          }
+          100% {
+            box-shadow: 0 0 8px rgba(59, 130, 246, 0.15);
+            transform: scale(1);
+          }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+    
+    const hostStyles = {
+      display: 'block',
+      margin: '1rem 0',
+      borderRadius: '8px',
+      ...(showVisualFeedback && this.showAttentionGlow && {
+        animation: 'iteration-deck-attention 2s ease-out forwards',
+      }),
+      ...(showVisualFeedback && this.isActiveDeck && !this.showAttentionGlow && {
+        boxShadow: '0 0 8px rgba(59, 130, 246, 0.15)',
+        transition: 'box-shadow 0.3s ease'
+      })
+    };
     
     return (
       <Host class={{
-        [styles.host]: true,
+        'host': true,
+        'attention-glow': showVisualFeedback && this.showAttentionGlow,
+        'active-deck': this.isActiveDeck,
         'production-mode': this.isProduction,
         'development-mode': !this.isProduction
-      }}>
-        <div class={styles.deckContainer} data-active-slide={activeSlideIndex}>
+      }} style={hostStyles}>
+        <div class={{
+          'deck-container': true,
+          'deck-container-active': showVisualFeedback && this.isActiveDeck
+        }} data-active-slide={activeSlideIndex} style={{ position: 'relative' }}>
           <slot onSlotchange={() => this.onSlotChange()}></slot>
         </div>
         {!this.isProduction && this.slides.length > 1 && (
-          <div class={styles.slideIndicator}>
+          <div class="slide-indicator" style={{
+            position: 'absolute',
+            bottom: '-40px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            background: 'rgba(255, 255, 255, 0.9)',
+            padding: '8px 16px',
+            borderRadius: '20px',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+            fontSize: '12px'
+          }}>
             {this.slides.map((slide, index) => (
               <button
-                class={`${styles.slideDot} ${index === activeSlideIndex ? styles.slideDotActive : ''}`}
+                class={`slide-dot ${index === activeSlideIndex ? 'slide-dot-active' : ''}`}
                 onClick={() => this.activeIndex = index}
                 aria-label={`Go to slide ${index + 1}: ${slide.label}`}
                 title={slide.label}
+                style={{
+                  width: '8px',
+                  height: '8px',
+                  borderRadius: '50%',
+                  border: 'none',
+                  background: index === activeSlideIndex ? '#3b82f6' : '#d1d5db',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s ease'
+                }}
               ></button>
             ))}
-            <div class={styles.slideLabel}>
+            <div class="slide-label" style={{
+              marginLeft: '8px',
+              color: '#374151',
+              fontWeight: '500'
+            }}>
               {this.slides[activeSlideIndex]?.label || `Slide ${activeSlideIndex + 1}`}
             </div>
           </div>

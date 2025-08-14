@@ -1,16 +1,57 @@
-import { style, globalStyle } from '@vanilla-extract/css';
+import { style, keyframes } from '@vanilla-extract/css';
 import { tokens } from '../../styles/design-tokens.css';
 import { frostedGlass, pillShape, buttonReset, focusRing } from '../../styles/utilities.css';
+
+// Animation keyframes for pulsing glow effect
+const pulseGlow = keyframes({
+  '0%, 100%': {
+    boxShadow: `0 0 0 0 rgba(59, 130, 246, 0.4)`,
+  },
+  '50%': {
+    boxShadow: `0 0 0 8px rgba(59, 130, 246, 0)`,
+  },
+});
+
+const gentlePulse = keyframes({
+  '0%, 100%': {
+    boxShadow: `0 0 20px rgba(59, 130, 246, 0.3), 0 0 40px rgba(59, 130, 246, 0.1)`,
+  },
+  '50%': {
+    boxShadow: `0 0 30px rgba(59, 130, 246, 0.5), 0 0 60px rgba(59, 130, 246, 0.2)`,
+  },
+});
 
 // Host styles
 export const host = style({
   display: 'block',
   position: 'relative',
+  transition: tokens.transitions.base,
+});
+
+// Active deck glow effect (only in development mode)
+export const hostActiveGlow = style({
+  animation: `${gentlePulse} 2s infinite`,
+  borderRadius: tokens.radii.lg,
+});
+
+// Intense glow effect for newly selected deck
+export const hostSelectedGlow = style({
+  animation: `${pulseGlow} 1.5s ease-out`,
+  borderRadius: tokens.radii.lg,
 });
 
 export const deckContainer = style({
   position: 'relative',
   minHeight: '200px',
+  transition: tokens.transitions.base,
+});
+
+// Container with highlight border for active deck
+export const deckContainerActive = style({
+  border: `2px solid ${tokens.colors.primary200}`,
+  borderRadius: tokens.radii.lg,
+  padding: tokens.space.space50,
+  margin: `-${tokens.space.space50}`,
 });
 
 export const slideIndicator = style([
@@ -36,10 +77,12 @@ export const slideDot = style([
     background: tokens.colors.gray300,
     transition: tokens.transitions.fast,
     
-    ':hover': {
-      background: tokens.colors.gray400,
-      transform: 'scale(1.2)',
-    },
+    selectors: {
+      '&:hover': {
+        background: tokens.colors.gray400,
+        transform: 'scale(1.2)',
+      },
+    }
   }
 ]);
 
@@ -56,11 +99,5 @@ export const slideLabel = style({
   fontFamily: tokens.fonts.system,
 });
 
-// Global styles for slotted content
-globalStyle(`${host}.development-mode ::slotted(iteration-deck-slide:not(.active))`, {
-  display: 'none',
-});
-
-globalStyle(`${host}.production-mode ::slotted(iteration-deck-slide:not(:first-child))`, {
-  display: 'none',
-});
+// Note: Slide visibility is controlled by iteration-deck-slide component's own CSS
+// No need for ::slotted() styles since slides have their own shadow DOM

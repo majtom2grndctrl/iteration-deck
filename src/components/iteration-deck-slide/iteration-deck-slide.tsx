@@ -1,6 +1,6 @@
 import { Component, Host, h, Prop, State, Element } from '@stencil/core';
 import { detectEnvironment } from '../../utils/environment';
-import * as styles from './iteration-deck-slide.css';
+// import * as styles from './iteration-deck-slide.css';
 
 @Component({
   tag: 'iteration-deck-slide',
@@ -24,6 +24,8 @@ export class IterationDeckSlide {
   @State() isProduction: boolean = false;
   @State() isActive: boolean = false;
   @State() slideIndex: number = 0;
+  
+  private attributeObserver?: MutationObserver;
 
   connectedCallback() {
     // Detect environment
@@ -35,6 +37,30 @@ export class IterationDeckSlide {
 
     // Determine if this slide should be active
     this.updateActiveState();
+    
+    // Watch for parent attribute changes
+    this.setupAttributeObserver();
+  }
+  
+  disconnectedCallback() {
+    if (this.attributeObserver) {
+      this.attributeObserver.disconnect();
+    }
+  }
+  
+  private setupAttributeObserver() {
+    this.attributeObserver = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'data-parent-active-index') {
+          this.updateActiveState();
+        }
+      });
+    });
+    
+    this.attributeObserver.observe(this.el, {
+      attributes: true,
+      attributeFilter: ['data-parent-active-index']
+    });
   }
 
   private calculateSlideIndex() {
@@ -45,7 +71,8 @@ export class IterationDeckSlide {
     }
   }
 
-  private updateActiveState() {
+  // Make this method public so parent can call it
+  public updateActiveState() {
     const parent = this.el.closest('iteration-deck') as any;
     if (parent) {
       // In production, only first slide is active
@@ -55,6 +82,8 @@ export class IterationDeckSlide {
         // In development, check parent's activeIndex
         this.isActive = this.slideIndex === (parent.activeIndex || 0);
       }
+      
+      // Since isActive is a @State, changing it should trigger a re-render automatically
     }
   }
 
@@ -69,29 +98,58 @@ export class IterationDeckSlide {
       return null;
     }
 
+    const hostStyles = {
+      display: this.isActive || this.isProduction ? 'block' : 'none',
+      transition: 'opacity 0.3s ease',
+      opacity: (this.isActive || this.isProduction ? 1 : 0).toString()
+    };
+
     return (
       <Host class={{
-        [styles.host]: true,
-        [styles.hostActive]: this.isActive,
-        [styles.hostInactive]: !this.isActive,
+        'host': true,
+        'host-active': this.isActive,
+        'host-inactive': !this.isActive,
         'active': this.isActive,
         'inactive': !this.isActive,
         'production-mode': this.isProduction,
         'development-mode': !this.isProduction
-      }}>
-        <div class={styles.slideContent}>
+      }} style={hostStyles}>
+        <div class="slide-content" style={{ position: 'relative' }}>
           <slot></slot>
         </div>
         {!this.isProduction && this.confidence && (
-          <div class={styles.slideMetadata}>
-            <div class={styles.confidenceScore} title={`AI confidence: ${Math.round(this.confidence * 100)}%`}>
+          <div class="slide-metadata" style={{
+            position: 'absolute',
+            top: '8px',
+            right: '8px',
+            background: 'rgba(16, 185, 129, 0.1)',
+            color: '#10b981',
+            padding: '4px 8px',
+            borderRadius: '12px',
+            fontSize: '12px',
+            fontWeight: '500'
+          }}>
+            <div class="confidence-score" title={`AI confidence: ${Math.round(this.confidence * 100)}%`}>
               {Math.round(this.confidence * 100)}%
             </div>
           </div>
         )}
         {!this.isProduction && this.notes && (
-          <div class={styles.slideNotes} title={this.notes}>
-            <button class={styles.notesToggle} aria-label="Show notes">
+          <div class="slide-notes" title={this.notes} style={{
+            position: 'absolute',
+            top: '8px',
+            left: '8px'
+          }}>
+            <button class="notes-toggle" aria-label="Show notes" style={{
+              background: 'rgba(59, 130, 246, 0.1)',
+              color: '#3b82f6',
+              border: 'none',
+              borderRadius: '12px',
+              width: '24px',
+              height: '24px',
+              cursor: 'pointer',
+              fontSize: '12px'
+            }}>
               📝
             </button>
           </div>

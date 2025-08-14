@@ -47,6 +47,8 @@ export namespace Components {
          */
         "notes": string | undefined;
     }
+    interface IterationDeckToolbar {
+    }
     interface MyComponent {
         /**
           * The first name
@@ -75,6 +77,12 @@ declare global {
         prototype: HTMLIterationDeckSlideElement;
         new (): HTMLIterationDeckSlideElement;
     };
+    interface HTMLIterationDeckToolbarElement extends Components.IterationDeckToolbar, HTMLStencilElement {
+    }
+    var HTMLIterationDeckToolbarElement: {
+        prototype: HTMLIterationDeckToolbarElement;
+        new (): HTMLIterationDeckToolbarElement;
+    };
     interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
     }
     var HTMLMyComponentElement: {
@@ -84,6 +92,7 @@ declare global {
     interface HTMLElementTagNameMap {
         "iteration-deck": HTMLIterationDeckElement;
         "iteration-deck-slide": HTMLIterationDeckSlideElement;
+        "iteration-deck-toolbar": HTMLIterationDeckToolbarElement;
         "my-component": HTMLMyComponentElement;
     }
 }
@@ -129,6 +138,8 @@ declare namespace LocalJSX {
          */
         "notes"?: string | undefined;
     }
+    interface IterationDeckToolbar {
+    }
     interface MyComponent {
         /**
           * The first name
@@ -146,6 +157,7 @@ declare namespace LocalJSX {
     interface IntrinsicElements {
         "iteration-deck": IterationDeck;
         "iteration-deck-slide": IterationDeckSlide;
+        "iteration-deck-toolbar": IterationDeckToolbar;
         "my-component": MyComponent;
     }
 }
@@ -155,6 +167,7 @@ declare module "@stencil/core" {
         interface IntrinsicElements {
             "iteration-deck": LocalJSX.IterationDeck & JSXBase.HTMLAttributes<HTMLIterationDeckElement>;
             "iteration-deck-slide": LocalJSX.IterationDeckSlide & JSXBase.HTMLAttributes<HTMLIterationDeckSlideElement>;
+            "iteration-deck-toolbar": LocalJSX.IterationDeckToolbar & JSXBase.HTMLAttributes<HTMLIterationDeckToolbarElement>;
             "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
         }
     }

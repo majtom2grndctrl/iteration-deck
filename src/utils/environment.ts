@@ -16,46 +16,20 @@ export interface EnvironmentInfo {
  * In production: Hides toolbar, shows only first slide
  */
 export function detectEnvironment(): EnvironmentInfo {
-  // Check for explicit environment variables first
-  if (typeof process !== 'undefined' && process.env) {
-    const nodeEnv = process.env.NODE_ENV;
-    if (nodeEnv === 'production') {
-      return {
-        isDevelopment: false,
-        isProduction: true,
-        showDevTools: false,
-        enableToolbar: false
-      };
-    }
-    if (nodeEnv === 'development') {
-      return {
-        isDevelopment: true,
-        isProduction: false,
-        showDevTools: true,
-        enableToolbar: true
-      };
-    }
-  }
-
-  // Check for build-time flags
+  // In browser environments, use simple heuristics for dev detection
   if (typeof window !== 'undefined') {
-    // Check if we're running with dev server or hot reloading
-    const hasDevServer = !!(window as any).__stencil_dev_server__ || 
-                        !!(window as any).__webpack_dev_server__ ||
-                        !!(window as any).__vite_dev_server__;
+    // Check for Stencil dev markers (most reliable)
+    const hasStencilDevMarkers = document.querySelector('script[data-stencil]') !== null;
     
-    // Check for localhost or common dev ports
+    // Check for localhost
     const isLocalhost = window.location.hostname === 'localhost' || 
                        window.location.hostname === '127.0.0.1' ||
                        window.location.hostname === '0.0.0.0';
     
-    const isDevPort = ['3000', '3333', '4200', '5173', '8080'].includes(window.location.port);
+    // Check for explicit dev mode via URL
+    const forceDevMode = new URLSearchParams(window.location.search).has('dev');
     
-    // Check for query parameters that force dev mode
-    const urlParams = new URLSearchParams(window.location.search);
-    const forceDevMode = urlParams.has('iteration-deck-dev') || urlParams.has('dev');
-    
-    const isDevelopment = hasDevServer || (isLocalhost && isDevPort) || forceDevMode;
+    const isDevelopment = hasStencilDevMarkers || isLocalhost || forceDevMode;
     
     return {
       isDevelopment,
@@ -65,7 +39,7 @@ export function detectEnvironment(): EnvironmentInfo {
     };
   }
 
-  // Default to production mode if we can't determine environment
+  // Default to production mode (SSR, etc.)
   return {
     isDevelopment: false,
     isProduction: true,
@@ -122,4 +96,11 @@ export function isProductionMode(): boolean {
  */
 export function isDevelopmentMode(): boolean {
   return getEnvironment().isDevelopment;
+}
+
+/**
+ * Alias for isDevelopmentMode for convenience
+ */
+export function isDevMode(): boolean {
+  return isDevelopmentMode();
 }
