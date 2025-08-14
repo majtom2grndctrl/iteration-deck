@@ -26,6 +26,7 @@
       "Bash(pnpm vitest run:*)",
       "Bash(find:*)"
     ],
-    "deny": []
+    "deny": [],
+    "defaultMode": "acceptEdits"
   }
 }

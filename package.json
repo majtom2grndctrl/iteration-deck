@@ -36,15 +36,19 @@
     "start": "stencil build --dev --watch --serve",
     "test": "stencil test --spec --e2e",
     "test.watch": "stencil test --spec --e2e --watchAll",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo 'Linting not configured yet'",
     "generate": "stencil generate"
   },
   "devDependencies": {
     "@stencil/core": "^4.27.1",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.13.5",
+    "@vanilla-extract/rollup-plugin": "^1.4.1",
     "jest": "^29.7.0",
     "jest-cli": "^29.7.0",
-    "puppeteer": "^24.3.0"
+    "puppeteer": "^24.3.0",
+    "typescript": "^5.9.2"
   },
   "license": "MIT",
   "dependencies": {
