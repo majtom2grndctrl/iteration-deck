@@ -24,7 +24,8 @@
       "Bash(pnpm stencil test:*)",
       "Bash(mv:*)",
       "Bash(pnpm vitest run:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(pnpm generate:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits"

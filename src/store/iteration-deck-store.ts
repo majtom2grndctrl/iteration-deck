@@ -2,18 +2,18 @@ import { create } from 'zustand';
 
 export interface DeckInfo {
   id: string;
-  label?: string;
-  prompt?: string;
-  description?: string;
+  label: string | undefined;
+  prompt: string | undefined;
+  description: string | undefined;
   slides: SlideInfo[];
   activeSlideIndex: number;
 }
 
 export interface SlideInfo {
   label: string;
-  aiPrompt?: string;
-  notes?: string;
-  confidence?: number;
+  aiPrompt: string | undefined;
+  notes: string | undefined;
+  confidence: number | undefined;
 }
 
 export interface GlobalDeckState {

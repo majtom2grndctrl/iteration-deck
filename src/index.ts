@@ -8,5 +8,7 @@
  * to consume components of this package as outlined in the `README.md`.
  */
 
-export { format } from './utils/utils';
+export { detectEnvironment } from './utils/environment';
+export { useIterationDeckStore } from './store/iteration-deck-store';
+export type { DeckInfo, SlideInfo, GlobalDeckState } from './store/iteration-deck-store';
 export type * from './components.d.ts';

@@ -1,7 +1,13 @@
 import { Config } from '@stencil/core';
+import { vanillaExtractPlugin } from '@vanilla-extract/rollup-plugin';
 
 export const config: Config = {
   namespace: 'iteration-deck',
+  rollupPlugins: {
+    before: [
+      vanillaExtractPlugin()
+    ]
+  },
   outputTargets: [
     {
       type: 'dist',

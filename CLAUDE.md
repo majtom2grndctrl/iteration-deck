@@ -41,6 +41,7 @@ pnpm lint         # Lint TypeScript code
 ### Architecture Principles
 - **Global state management**: Use Zustand for a framework agnostic state library that works well with many frameworks
 - **CSS styling**: Use `vanilla-extract` to provide a `[component-name].css.ts` file per each component
+- **Design system centralization**: All design tokens (spacing, colors, typography, etc.) must be imported from `/src/styles/design-tokens.css.ts` - never redeclare tokens in component files
 
 ### Code Quality Standards
 - **Accessibility**: WCAG 2.2 AA compliance, proper ARIA attributes
@@ -55,10 +56,11 @@ pnpm lint         # Lint TypeScript code
 
 ### UI Design System Requirements
 - **Spacing**: 8px base grid system (4px, 8px, 12px, 16px, 24px, 32px, 40px, 48px, 56px, 64px progression)
-- **Colors**: Neutral gray scale with semantic variants ('50', '100', '200', '300', '400', '500', '600', '700', '800', '900')
+- **Colors**: Neutral gray scale with semantic variants ('gray50', 'gray100', 'gray200', 'gray300', 'gray400', 'gray500', 'gray600', 'gray700', 'gray800', 'gray900')
 - **Touch targets**: 44px minimum for interactive elements
 - **Typography**: System font stack matching OS/browser dev tools aesthetic
 
 
 
-**Implementation details:** @.claude/TECHNICAL_SPEC.md  
+**Implementation details:** @.claude/TECHNICAL_SPEC.md
+**Task tracking:** @.claude/TASK_TRACKING.md

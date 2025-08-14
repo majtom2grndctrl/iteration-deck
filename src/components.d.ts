@@ -6,6 +6,47 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
+    interface IterationDeck {
+        /**
+          * Currently active slide index
+          * @default 0
+         */
+        "activeIndex": number;
+        /**
+          * Unique identifier for this iteration deck
+         */
+        "deckId": string;
+        /**
+          * Additional context for stakeholder presentations
+         */
+        "description": string | undefined;
+        /**
+          * Label for this deck in the toolbar
+         */
+        "label": string | undefined;
+        /**
+          * Optional AI prompt context for generation tracking
+         */
+        "prompt": string | undefined;
+    }
+    interface IterationDeckSlide {
+        /**
+          * Optional AI prompt refinements for this specific variation
+         */
+        "aiPrompt": string | undefined;
+        /**
+          * AI generation confidence score (0-1, dev mode only)
+         */
+        "confidence": number | undefined;
+        /**
+          * Label for this slide/variation
+         */
+        "label": string;
+        /**
+          * Design rationale, AI feedback, or iteration insights
+         */
+        "notes": string | undefined;
+    }
     interface MyComponent {
         /**
           * The first name
@@ -22,6 +63,18 @@ export namespace Components {
     }
 }
 declare global {
+    interface HTMLIterationDeckElement extends Components.IterationDeck, HTMLStencilElement {
+    }
+    var HTMLIterationDeckElement: {
+        prototype: HTMLIterationDeckElement;
+        new (): HTMLIterationDeckElement;
+    };
+    interface HTMLIterationDeckSlideElement extends Components.IterationDeckSlide, HTMLStencilElement {
+    }
+    var HTMLIterationDeckSlideElement: {
+        prototype: HTMLIterationDeckSlideElement;
+        new (): HTMLIterationDeckSlideElement;
+    };
     interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
     }
     var HTMLMyComponentElement: {
@@ -29,10 +82,53 @@ declare global {
         new (): HTMLMyComponentElement;
     };
     interface HTMLElementTagNameMap {
+        "iteration-deck": HTMLIterationDeckElement;
+        "iteration-deck-slide": HTMLIterationDeckSlideElement;
         "my-component": HTMLMyComponentElement;
     }
 }
 declare namespace LocalJSX {
+    interface IterationDeck {
+        /**
+          * Currently active slide index
+          * @default 0
+         */
+        "activeIndex"?: number;
+        /**
+          * Unique identifier for this iteration deck
+         */
+        "deckId": string;
+        /**
+          * Additional context for stakeholder presentations
+         */
+        "description"?: string | undefined;
+        /**
+          * Label for this deck in the toolbar
+         */
+        "label"?: string | undefined;
+        /**
+          * Optional AI prompt context for generation tracking
+         */
+        "prompt"?: string | undefined;
+    }
+    interface IterationDeckSlide {
+        /**
+          * Optional AI prompt refinements for this specific variation
+         */
+        "aiPrompt"?: string | undefined;
+        /**
+          * AI generation confidence score (0-1, dev mode only)
+         */
+        "confidence"?: number | undefined;
+        /**
+          * Label for this slide/variation
+         */
+        "label": string;
+        /**
+          * Design rationale, AI feedback, or iteration insights
+         */
+        "notes"?: string | undefined;
+    }
     interface MyComponent {
         /**
           * The first name
@@ -48,6 +144,8 @@ declare namespace LocalJSX {
         "middle"?: string;
     }
     interface IntrinsicElements {
+        "iteration-deck": IterationDeck;
+        "iteration-deck-slide": IterationDeckSlide;
         "my-component": MyComponent;
     }
 }
@@ -55,6 +153,8 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
+            "iteration-deck": LocalJSX.IterationDeck & JSXBase.HTMLAttributes<HTMLIterationDeckElement>;
+            "iteration-deck-slide": LocalJSX.IterationDeckSlide & JSXBase.HTMLAttributes<HTMLIterationDeckSlideElement>;
             "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
         }
     }
