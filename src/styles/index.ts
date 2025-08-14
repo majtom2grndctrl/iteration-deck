@@ -7,6 +7,11 @@
 export { themeContract } from './theme.css';
 export { lightTheme, darkTheme, autoTheme } from './themes.css';
 
+// Component styles
+export * as iterationDeckStyles from './iteration-deck.css';
+export * as iterationDeckSlideStyles from './iteration-deck-slide.css';
+export * as iterationDeckToolbarStyles from './iteration-deck-toolbar.css';
+
 // Utility styles (from .css.ts files)
 export {
   responsive,

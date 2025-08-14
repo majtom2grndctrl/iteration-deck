@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Iteration Deck - React Components Demo</title>
+    <style>
+      body {
+        font-family: system-ui, -apple-system, sans-serif;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+        background: #f8f9fa;
+      }
+      
+      .navigation {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+      
+      .navigation a {
+        display: inline-block;
+        padding: 0.75rem 1.5rem;
+        margin: 0 0.5rem;
+        background: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        transition: background-color 0.2s;
+      }
+      
+      .navigation a:hover {
+        background: #0056b3;
+      }
+      
+      .navigation a.current {
+        background: #6c757d;
+      }
+      
+      .placeholder {
+        background: white;
+        border-radius: 8px;
+        padding: 3rem;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+      
+      .placeholder h2 {
+        color: #666;
+        margin-bottom: 1rem;
+      }
+      
+      .placeholder p {
+        color: #888;
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.6;
+      }
+    </style>
+    
+    <!-- Import global CSS and theme styles -->
+    <link rel="stylesheet" href="/src/styles/global.css" />
+    
+    <!-- Apply theme to document -->
+    <script type="module">
+      import { lightTheme } from '/src/styles/themes.css.ts';
+      document.documentElement.className = lightTheme;
+    </script>
+  </head>
+  <body>
+    <header>
+      <h1>Iteration Deck - React Components Demo</h1>
+      <p>React wrapper components for seamless integration</p>
+    </header>
+
+    <nav class="navigation">
+      <a href="/">← Home</a>
+      <a href="/lit.html">Lit Components</a>
+      <a href="/react.html" class="current">React Components</a>
+    </nav>
+
+    <main>
+      <div class="placeholder">
+        <h2>React Components Coming Soon</h2>
+        <p>
+          This page will demonstrate the React wrapper components that provide seamless integration 
+          with React applications. The components will offer the same functionality as the Lit components 
+          but with React-specific APIs and TypeScript integration.
+        </p>
+        <p>
+          <strong>Features will include:</strong>
+          • React wrapper components with proper JSX syntax<br>
+          • Zustand integration for state management<br>
+          • TypeScript definitions for props and events<br>
+          • Same multi-deck functionality as Lit components
+        </p>
+      </div>
+    </main>
+
+    <footer style="text-align: center; margin-top: 4rem; padding: 2rem; color: #666;">
+      <p>Iteration Deck - AI-First Prototyping Components</p>
+      <p>Built with React • <a href="/lit.html">View Lit Components Demo</a></p>
+    </footer>
+  </body>
+</html>

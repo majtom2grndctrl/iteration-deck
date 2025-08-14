@@ -13,6 +13,24 @@
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
     "noEmit": true,
+    "declaration": true,
+    "declarationMap": true,
+    "outDir": "./dist",
+
+    /* Path mapping */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@/lit/*": ["src/lit/*"],
+      "@/react/*": ["src/react/*"],
+      "@/styles/*": ["src/styles/*"],
+      "@/store/*": ["src/store/*"],
+      "@/tokens": ["src/tokens.ts"]
+    },
+
+    /* React JSX */
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
 
     /* Linting */
     "strict": true,
@@ -22,5 +40,17 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src"]
+  "include": [
+    "src",
+    "src/**/*",
+    "vite.config.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "src/**/*.spec.ts",
+    "src/**/*.spec.tsx"
+  ]
 }

@@ -1,9 +1,49 @@
 /**
- * Design Tokens for Iteration Deck Components
- * Following 8px base grid system and neutral color palette
+ * Design Tokens for Iteration Deck
+ * Central design system tokens used throughout the component library
  */
 
-// Spacing tokens (8px base grid)
+// Color System - Neutral gray scale with semantic variants
+export const colors = {
+  gray: {
+    50: '#fafafa',
+    100: '#f5f5f5',
+    200: '#e5e5e5',
+    300: '#d4d4d4',
+    400: '#a3a3a3',
+    500: '#737373',
+    600: '#525252',
+    700: '#404040',
+    800: '#262626',
+    900: '#171717',
+  },
+  // Semantic colors for theme system
+  background: {
+    primary: '#ffffff',
+    secondary: '#f9fafb',
+    overlay: 'rgba(255, 255, 255, 0.95)',
+    overlayDark: 'rgba(28, 28, 30, 0.95)',
+  },
+  border: {
+    light: 'rgba(0, 0, 0, 0.1)',
+    medium: 'rgba(0, 0, 0, 0.2)',
+    dark: 'rgba(255, 255, 255, 0.2)',
+    darkMedium: 'rgba(255, 255, 255, 0.3)',
+  },
+  text: {
+    primary: '#171717',
+    secondary: '#525252',
+    disabled: '#a3a3a3',
+    inverse: '#ffffff',
+  },
+  interactive: {
+    hover: 'rgba(0, 0, 0, 0.05)',
+    hoverDark: 'rgba(255, 255, 255, 0.1)',
+    disabled: '0.4',
+  },
+} as const;
+
+// Spacing System - 8px base grid
 export const spacing = {
   xs: '4px',
   sm: '8px',
@@ -14,129 +54,102 @@ export const spacing = {
   '3xl': '40px',
   '4xl': '48px',
   '5xl': '56px',
-  '6xl': '64px'
-} as const
+  '6xl': '64px',
+} as const;
 
-// Color primitives (internal use only - not exported)
-const colorPrimitives = {
-  gray50: '#fafafa',
-  gray100: '#f5f5f5',
-  gray200: '#e5e5e5',
-  gray300: '#d4d4d4',
-  gray400: '#a3a3a3',
-  gray500: '#737373',
-  gray600: '#525252',
-  gray700: '#404040',
-  gray800: '#262626',
-  gray900: '#171717',
-  white: '#ffffff',
-  black: '#000000',
-  darkOverlay: '#1c1c1e'
-} as const
-
-// Semantic color mappings (references primitives)
-export const colors = {
-  background: {
-    primary: colorPrimitives.gray50,
-    secondary: colorPrimitives.gray100,
-    overlay: `${colorPrimitives.white}f2`, // 95% opacity
-    overlayDark: `${colorPrimitives.darkOverlay}f2` // 95% opacity
-  },
-  border: {
-    light: `${colorPrimitives.black}1a`, // 10% opacity
-    medium: `${colorPrimitives.black}33`, // 20% opacity
-    dark: `${colorPrimitives.white}33`, // 20% opacity
-    darkMedium: `${colorPrimitives.white}4d` // 30% opacity
-  },
-  text: {
-    primary: colorPrimitives.gray900,
-    secondary: colorPrimitives.gray600,
-    disabled: colorPrimitives.gray400,
-    inverse: colorPrimitives.white
-  },
-  interactive: {
-    hover: `${colorPrimitives.black}0d`, // 5% opacity
-    hoverDark: `${colorPrimitives.white}1a`, // 10% opacity
-    disabled: '0.4'
-  }
-} as const
-
-// Typography tokens
+// Typography System - System font stack
 export const typography = {
-  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif',
+  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
   fontSize: {
-    xs: '12px',
-    sm: '14px',
-    md: '16px',
-    lg: '18px'
+    xs: '0.75rem',    // 12px
+    sm: '0.875rem',   // 14px
+    md: '1rem',       // 16px - renamed from 'base' to match theme contract
+    lg: '1.125rem',   // 18px
   },
   fontWeight: {
     normal: '400',
     medium: '500',
-    semibold: '600'
+    semibold: '600',
   },
   lineHeight: {
-    tight: '1.2',
+    tight: '1.25',
     normal: '1.5',
-    relaxed: '1.6'
-  }
-} as const
+    relaxed: '1.625',
+  },
+} as const;
 
 // Component-specific tokens
 export const components = {
   toolbar: {
-    borderRadius: '64px',
-    minHeight: '44px',
+    borderRadius: '64px', // Pill-shaped
+    minHeight: '48px',
     backdropFilter: 'blur(8px)',
     boxShadow: '0 4px 24px rgba(0, 0, 0, 0.15)',
-    zIndex: '10000'
+    zIndex: '100',
   },
   button: {
-    borderRadius: '16px',
-    minTouchTarget: '44px',
+    borderRadius: '8px',
+    minTouchTarget: '44px', // WCAG 2.2 AA requirement
     size: {
       sm: '32px',
-      md: '44px'
-    }
+      md: '40px',
+    },
   },
   divider: {
     width: '1px',
-    height: '24px'
-  }
-} as const
+    height: '20px',
+  },
+} as const;
 
 // Animation tokens
 export const animation = {
   duration: {
-    fast: '0.2s',
-    normal: '0.3s',
-    slow: '0.5s'
+    fast: '150ms',
+    normal: '300ms',
+    slow: '500ms',
   },
   easing: {
-    ease: 'ease',
-    easeIn: 'ease-in',
-    easeOut: 'ease-out',
-    easeInOut: 'ease-in-out'
-  }
-} as const
+    ease: 'cubic-bezier(0.4, 0.0, 0.2, 1)',
+    easeIn: 'cubic-bezier(0.4, 0.0, 1, 1)',
+    easeOut: 'cubic-bezier(0.0, 0.0, 0.2, 1)',
+    easeInOut: 'cubic-bezier(0.4, 0.0, 0.2, 1)',
+  },
+} as const;
 
-// Z-index scale
+// Z-Index Scale
 export const zIndex = {
-  base: '1',
-  dropdown: '1000',
-  sticky: '1020',
-  fixed: '1030',
-  modal: '1040',
-  popover: '1050',
-  tooltip: '1060',
-  toast: '1070',
-  toolbar: '10000'
-} as const
+  base: '0',
+  dropdown: '10',
+  sticky: '20',
+  fixed: '30',
+  modal: '40',
+  popover: '50',
+  tooltip: '60',
+  toast: '70',
+  toolbar: '100', // Iteration deck toolbar
+} as const;
 
 // Breakpoints for responsive design
 export const breakpoints = {
   sm: '640px',
   md: '768px',
   lg: '1024px',
-  xl: '1280px'
-} as const
+  xl: '1280px',
+} as const;
+
+// Legacy tokens object for backward compatibility
+export const tokens = {
+  colors,
+  spacing,
+  typography,
+  components,
+  animation,
+  zIndex,
+  breakpoints,
+} as const;
+
+// Type exports for TypeScript
+export type ColorToken = keyof typeof tokens.colors;
+export type SpacingToken = keyof typeof tokens.spacing;
+export type FontSizeToken = keyof typeof tokens.typography.fontSize;
+export type FontWeightToken = keyof typeof tokens.typography.fontWeight;

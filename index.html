@@ -4,13 +4,121 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + Lit + TS</title>
-    <link rel="stylesheet" href="./src/index.css" />
-    <script type="module" src="/src/my-element.ts"></script>
+    <title>Iteration Deck - Development Server</title>
+    <style>
+      body {
+        font-family: system-ui, -apple-system, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem;
+        background: #f8f9fa;
+      }
+      
+      .welcome {
+        background: white;
+        border-radius: 8px;
+        padding: 3rem;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+      }
+      
+      .demo-links {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-top: 2rem;
+      }
+      
+      .demo-card {
+        background: white;
+        border-radius: 8px;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        text-decoration: none;
+        color: inherit;
+        transition: transform 0.2s;
+      }
+      
+      .demo-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+      }
+      
+      .demo-card h3 {
+        color: #007bff;
+        margin-bottom: 1rem;
+      }
+      
+      .demo-card p {
+        color: #666;
+        margin: 0;
+        line-height: 1.5;
+      }
+      
+      .features {
+        background: white;
+        border-radius: 8px;
+        padding: 2rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+      
+      .features h2 {
+        color: #333;
+        margin-bottom: 1rem;
+      }
+      
+      .features ul {
+        color: #666;
+        line-height: 1.6;
+      }
+    </style>
+    
+    <!-- Import global CSS and theme styles -->
+    <link rel="stylesheet" href="/src/styles/global.css" />
+    
+    <!-- Apply theme to document -->
+    <script type="module">
+      import { lightTheme } from '/src/styles/themes.css.ts';
+      document.documentElement.className = lightTheme;
+    </script>
   </head>
   <body>
-    <my-element>
-      <h1>Vite + Lit</h1>
-    </my-element>
+    <div class="welcome">
+      <h1>Iteration Deck</h1>
+      <p>AI-First Prototyping Components</p>
+      <p style="color: #666; margin-top: 1rem;">
+        Universal web components for comparing AI-generated UI variations
+      </p>
+    </div>
+
+    <div class="demo-links">
+      <a href="/lit.html" class="demo-card">
+        <h3>🔥 Lit Components</h3>
+        <p>Native web components built with Lit. Universal compatibility with any framework or vanilla HTML.</p>
+      </a>
+      
+      <a href="/react.html" class="demo-card">
+        <h3>⚛️ React Components</h3>
+        <p>React wrapper components with JSX syntax, TypeScript integration, and Zustand state management.</p>
+      </a>
+    </div>
+
+    <div class="features">
+      <h2>Core Features</h2>
+      <ul>
+        <li><strong>Multi-deck Support:</strong> Multiple iteration decks on the same page</li>
+        <li><strong>Development Toolbar:</strong> Interactive controls for switching between variations</li>
+        <li><strong>Keyboard Navigation:</strong> Ctrl/Cmd + Arrow keys for quick switching</li>
+        <li><strong>Production Mode:</strong> Renders only first slide in production builds</li>
+        <li><strong>AI Integration:</strong> Support for prompts, confidence scores, and generation metadata</li>
+        <li><strong>Universal Compatibility:</strong> Works with React, Vue, Angular, Astro, and vanilla HTML</li>
+      </ul>
+    </div>
+
+    <footer style="text-align: center; margin-top: 3rem; padding: 2rem; color: #888;">
+      <p>Built with Lit, React, Zustand, and @vanilla-extract/css</p>
+    </footer>
   </body>
 </html>

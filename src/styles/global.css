@@ -52,6 +52,32 @@ iteration-deck-toolbar * {
   box-sizing: border-box;
 }
 
+/* Host element styles for Lit web components */
+iteration-deck {
+  display: block;
+  width: 100%;
+}
+
+iteration-deck-slide {
+  display: block;
+  width: 100%;
+}
+
+iteration-deck-toolbar {
+  position: fixed;
+  bottom: var(--spacing-xl);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10000;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  font-size: 14px;
+}
+
+/* Hide toolbar in production builds */
+iteration-deck-toolbar[hidden] {
+  display: none !important;
+}
+
 /* Focus management for accessibility */
 iteration-deck:focus,
 iteration-deck-slide:focus,
