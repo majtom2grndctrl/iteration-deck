@@ -14,7 +14,6 @@ export const iterationDeck = style({
   minHeight: '200px',
   background: 'transparent',
   borderRadius: '8px',
-  overflow: 'hidden',
   fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
   fontSize: '14px',
   lineHeight: '1.5',

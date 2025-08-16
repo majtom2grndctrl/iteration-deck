@@ -158,7 +158,6 @@ export const deckSelector = style({
 
 // Deck selector button
 export const deckSelectorButton = style({
-  backgroundColor: 'red',
   display: 'flex',
   alignItems: 'center',
   gap: tokens.spacing.xs,
@@ -489,32 +488,35 @@ export const separator = style({
   },
 });
 
-// Deck glow animation keyframes
+// Deck glow animation keyframes - stable size, only glow intensity changes
 const deckGlowPulse = keyframes({
   '0%': {
-    boxShadow: '0 0 0 0 rgba(0, 122, 255, 0.4)',
-    transform: 'scale(1)',
+    boxShadow: '0 0 0 3px rgba(236, 72, 153, 0.2), 0 0 25px rgba(236, 72, 153, 0.1)',
+    outline: '2px solid rgba(236, 72, 153, 0.2)',
   },
   '50%': {
-    boxShadow: '0 0 0 20px rgba(0, 122, 255, 0.1)',
-    transform: 'scale(1.02)',
+    boxShadow: '0 0 0 3px rgba(236, 72, 153, 0.4), 0 0 25px rgba(236, 72, 153, 0.3)',
+    outline: '2px solid rgba(236, 72, 153, 0.6)',
   },
   '100%': {
-    boxShadow: '0 0 0 0 rgba(0, 122, 255, 0)',
-    transform: 'scale(1)',
+    boxShadow: '0 0 0 3px rgba(236, 72, 153, 0.2), 0 0 25px rgba(236, 72, 153, 0.1)',
+    outline: '2px solid rgba(236, 72, 153, 0)',
   },
 });
 
 // Deck glow effect for highlighting selected decks
 export const deckGlow = style({
-  animation: `${deckGlowPulse} 2s ease-in-out`,
-  borderRadius: '12px',
-  transition: 'all 0.3s ease',
+  borderRadius: tokens.spacing.sm,
+  position: 'relative',
+  
+  // Use direct box-shadow for outer glow effect
+  animation: `${deckGlowPulse} 0.5s ease-in`,
   
   '@media': {
     '(prefers-reduced-motion: reduce)': {
       animation: 'none',
-      boxShadow: '0 0 0 2px rgba(0, 122, 255, 0.3)',
+      border: '2px solid rgba(236, 72, 153, 0.6)',
+      boxShadow: '0 0 0 3px rgba(236, 72, 153, 0.3), 0 0 25px rgba(236, 72, 153, 0.2)',
     },
   },
 });

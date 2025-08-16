@@ -15,7 +15,7 @@
  * - Dynamic deck registration/unregistration handling
  */
 
-import { LitElement, html, nothing, css, unsafeCSS } from 'lit';
+import { LitElement, html, nothing, css } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { ref, createRef, type Ref } from 'lit/directives/ref.js';
 import { when } from 'lit/directives/when.js';
@@ -34,6 +34,7 @@ import {
   type NavigationDirection
 } from '../../core/utilities.js';
 import type { DeckRegistration } from '../../core/types.js';
+import { deckGlow } from './iteration-deck-toolbar.css.js';
 
 // Note: Using Lit static styles instead of Vanilla Extract for shadow DOM compatibility
 
@@ -355,40 +356,87 @@ export class IterationDeckToolbar extends LitElement {
       debugLog(`Deck element not found: ${deckId}`);
       return;
     }
+    
+    // Find the actual visible content within the deck to highlight
+    const contentElement = deckElement.querySelector('.demo-content') as HTMLElement;
+    const elementToHighlight = contentElement || deckElement;
 
-    // Calculate scroll position to put deck in upper half of window
+    // Calculate scroll position to put deck near the top of window
     const rect = deckElement.getBoundingClientRect();
     const currentScrollY = window.scrollY;
     const elementTop = rect.top + currentScrollY;
-    const targetScrollY = elementTop - (window.innerHeight * 0.25); // Upper quarter
+    const targetScrollY = elementTop - (window.innerHeight * 0.15); // Near top (15% from top)
 
     // Smooth scroll to position
+    const finalScrollY = Math.max(0, targetScrollY);
     window.scrollTo({
-      top: Math.max(0, targetScrollY),
+      top: finalScrollY,
       behavior: 'smooth'
     });
 
-    // Add glow effect
-    this.addGlowEffect(deckElement);
+    // Add glow effect after scroll animation actually completes
+    this.waitForScrollComplete(finalScrollY, () => {
+      this.addGlowEffect(elementToHighlight);
+    });
+  }
+
+  /**
+   * Wait for scroll animation to complete and then execute callback
+   */
+  private waitForScrollComplete(targetY: number, callback: () => void) {
+    let scrollTimeout: number;
+    let maxWaitTimeout: number;
+    
+    const onScroll = () => {
+      clearTimeout(scrollTimeout);
+      
+      // Check if we're close enough to the target (within 5px tolerance)
+      scrollTimeout = window.setTimeout(() => {
+        const currentY = window.scrollY;
+        const tolerance = 5;
+        
+        if (Math.abs(currentY - targetY) <= tolerance) {
+          // Scroll has stopped at the target position
+          window.removeEventListener('scroll', onScroll);
+          clearTimeout(maxWaitTimeout);
+          callback();
+          debugLog(`Scroll completed at ${currentY}, target was ${targetY}`);
+        }
+      }, 150); // Wait 150ms of no scroll movement to consider it "stopped"
+    };
+    
+    // Safety timeout - trigger after 3 seconds maximum, even if scroll detection fails
+    maxWaitTimeout = window.setTimeout(() => {
+      window.removeEventListener('scroll', onScroll);
+      clearTimeout(scrollTimeout);
+      callback();
+      debugLog('Scroll completion detected via safety timeout');
+    }, 3000);
+    
+    // Start listening for scroll events
+    window.addEventListener('scroll', onScroll);
+    
+    // Also trigger immediately if we're already at the target position
+    const currentY = window.scrollY;
+    if (Math.abs(currentY - targetY) <= 5) {
+      window.removeEventListener('scroll', onScroll);
+      clearTimeout(maxWaitTimeout);
+      setTimeout(callback, 100); // Small delay to ensure DOM is settled
+      debugLog('Already at target scroll position');
+    }
   }
 
   /**
    * Add temporary glow effect to deck element
    */
   private addGlowEffect(deckElement: HTMLElement) {
-    // Add inline glow effect since we're not using Vanilla Extract
-    const originalBoxShadow = deckElement.style.boxShadow;
-    const originalTransition = deckElement.style.transition;
+    // Apply the glow CSS class from Vanilla Extract
+    deckElement.classList.add(deckGlow);
     
-    // Add glow effect
-    deckElement.style.transition = 'box-shadow 0.3s ease';
-    deckElement.style.boxShadow = '0 0 20px rgba(59, 130, 246, 0.5)';
-    
-    // Remove glow after animation completes
+    // Remove glow class after animation completes (1s duration + buffer)
     setTimeout(() => {
-      deckElement.style.boxShadow = originalBoxShadow;
-      deckElement.style.transition = originalTransition;
-    }, 2000);
+      deckElement.classList.remove(deckGlow);
+    }, 1300);
   }
 
   /**
