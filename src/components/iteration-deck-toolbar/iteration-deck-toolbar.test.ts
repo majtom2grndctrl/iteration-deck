@@ -112,7 +112,7 @@ describe('IterationDeckToolbar Component', () => {
       vi.mocked(isDevelopmentMode).mockReturnValue(true);
       
       // Add some decks to store
-      mockStore.activeDecks['deck1'] = 'slide1';
+      mockStore.registerDeck('deck1', ['slide1'], 'Deck 1');
       mockStore.notifyListeners();
       
       toolbar = await createLitElement<IterationDeckToolbar>('iteration-deck-toolbar', {});
@@ -162,8 +162,8 @@ describe('IterationDeckToolbar Component', () => {
     it('should update when store changes', async () => {
       toolbar = await createLitElement<IterationDeckToolbar>('iteration-deck-toolbar', {});
       
-      // Add deck to store
-      mockStore.activeDecks['test-deck'] = 'slide1';
+      // Add deck to store with metadata
+      mockStore.registerDeck('test-deck', ['slide1', 'slide2'], 'Test Deck');
       mockStore.notifyListeners();
       
       await waitForLitElement(toolbar);
@@ -175,9 +175,9 @@ describe('IterationDeckToolbar Component', () => {
     it('should auto-select first deck when none selected', async () => {
       toolbar = await createLitElement<IterationDeckToolbar>('iteration-deck-toolbar', {});
       
-      // Add multiple decks
-      mockStore.activeDecks['deck1'] = 'slide1';
-      mockStore.activeDecks['deck2'] = 'slide2';
+      // Add multiple decks with metadata
+      mockStore.registerDeck('deck1', ['slide1'], 'Deck 1');
+      mockStore.registerDeck('deck2', ['slide2'], 'Deck 2');
       mockStore.notifyListeners();
       
       await waitForLitElement(toolbar);
@@ -204,7 +204,7 @@ describe('IterationDeckToolbar Component', () => {
       vi.mocked(isDevelopmentMode).mockReturnValue(true);
       
       // Setup deck with multiple slides
-      mockStore.activeDecks['test-deck'] = 'slide1';
+      mockStore.registerDeck('test-deck', ['slide1', 'slide2', 'slide3'], 'Test Deck');
       mockStore.selectedDeckId = 'test-deck';
       
       toolbar = await createLitElement<IterationDeckToolbar>('iteration-deck-toolbar', {});
@@ -215,7 +215,7 @@ describe('IterationDeckToolbar Component', () => {
       const addEventListenerSpy = vi.spyOn(document, 'addEventListener');
       
       // Add some decks to store so toolbar renders
-      mockStore.activeDecks['deck1'] = 'slide1';
+      mockStore.registerDeck('deck1', ['slide1'], 'Deck 1');
       mockStore.notifyListeners();
       
       // Create new toolbar to trigger addEventListener
@@ -285,7 +285,7 @@ describe('IterationDeckToolbar Component', () => {
     });
 
     it('should not render dropdown for single deck', async () => {
-      mockStore.activeDecks['single-deck'] = 'slide1';
+      mockStore.registerDeck('single-deck', ['slide1'], 'Single Deck');
       mockStore.notifyListeners();
       
       await waitForLitElement(toolbar);
@@ -296,8 +296,8 @@ describe('IterationDeckToolbar Component', () => {
     });
 
     it('should render dropdown for multiple decks', async () => {
-      mockStore.activeDecks['deck1'] = 'slide1';
-      mockStore.activeDecks['deck2'] = 'slide2';
+      mockStore.registerDeck('deck1', ['slide1'], 'Deck 1');
+      mockStore.registerDeck('deck2', ['slide2'], 'Deck 2');
       mockStore.notifyListeners();
       
       await waitForLitElement(toolbar);
@@ -308,8 +308,8 @@ describe('IterationDeckToolbar Component', () => {
     });
 
     it('should handle deck selection from dropdown', async () => {
-      mockStore.activeDecks['deck1'] = 'slide1';
-      mockStore.activeDecks['deck2'] = 'slide2';
+      mockStore.registerDeck('deck1', ['slide1'], 'Deck 1');
+      mockStore.registerDeck('deck2', ['slide2'], 'Deck 2');
       mockStore.notifyListeners();
       
       await waitForLitElement(toolbar);
@@ -325,8 +325,8 @@ describe('IterationDeckToolbar Component', () => {
     });
 
     it('should show deck labels in dropdown options', async () => {
-      mockStore.activeDecks['deck1'] = 'slide1';
-      mockStore.activeDecks['deck2'] = 'slide2';
+      mockStore.registerDeck('deck1', ['slide1'], 'Deck 1');
+      mockStore.registerDeck('deck2', ['slide2'], 'Deck 2');
       mockStore.notifyListeners();
       
       await waitForLitElement(toolbar);
@@ -345,7 +345,7 @@ describe('IterationDeckToolbar Component', () => {
       const { isDevelopmentMode } = await import('../../store/iteration-store.js');
       vi.mocked(isDevelopmentMode).mockReturnValue(true);
       
-      mockStore.activeDecks['nav-deck'] = 'slide1';
+      mockStore.registerDeck('nav-deck', ['slide1', 'slide2', 'slide3'], 'Navigation Test Deck');
       mockStore.selectedDeckId = 'nav-deck';
       
       toolbar = await createLitElement<IterationDeckToolbar>('iteration-deck-toolbar', {});
@@ -392,17 +392,18 @@ describe('IterationDeckToolbar Component', () => {
 
     it('should show current slide label', async () => {
       const shadowRoot = toolbar.shadowRoot;
-      const slideLabel = shadowRoot?.querySelector('[class*="slideLabel"]');
+      const slideLabel = shadowRoot?.querySelector('.slide-label');
       
       expect(slideLabel?.textContent).toContain('slide1');
     });
 
     it('should show keyboard hints', async () => {
       const shadowRoot = toolbar.shadowRoot;
-      const keyboardHint = shadowRoot?.querySelector('[class*="keyboardHint"]');
+      const prevButton = shadowRoot?.querySelector('button[aria-label*="Previous"]');
+      const nextButton = shadowRoot?.querySelector('button[aria-label*="Next"]');
       
-      expect(keyboardHint).toBeTruthy();
-      expect(keyboardHint?.textContent).toContain('⌘');
+      expect(prevButton?.getAttribute('title')).toContain('Ctrl/Cmd');
+      expect(nextButton?.getAttribute('title')).toContain('Ctrl/Cmd');
     });
   });
 
@@ -411,7 +412,7 @@ describe('IterationDeckToolbar Component', () => {
       const { isDevelopmentMode } = await import('../../store/iteration-store.js');
       vi.mocked(isDevelopmentMode).mockReturnValue(true);
       
-      mockStore.activeDecks['a11y-deck'] = 'slide1';
+      mockStore.registerDeck('a11y-deck', ['slide1', 'slide2'], 'A11y Deck');
       toolbar = await createLitElement<IterationDeckToolbar>('iteration-deck-toolbar', {});
       await waitForLitElement(toolbar);
     });
@@ -426,7 +427,7 @@ describe('IterationDeckToolbar Component', () => {
     });
 
     it('should have proper ARIA label on deck selector', async () => {
-      mockStore.activeDecks['deck2'] = 'slide2'; // Add second deck
+      mockStore.registerDeck('deck2', ['slide2'], 'Deck 2'); // Add second deck
       mockStore.notifyListeners();
       await waitForLitElement(toolbar);
       
@@ -448,7 +449,7 @@ describe('IterationDeckToolbar Component', () => {
     it('should disable buttons when navigation is not possible', async () => {
       // Mock single slide deck to test disabled state
       const deckId = 'single-slide-deck';
-      mockStore.activeDecks[deckId] = 'slide1';
+      mockStore.registerDeck(deckId, ['slide1'], 'Single Slide Deck');
       
       // Mock getCurrentDeck to return a deck with only one slide
       const getCurrentDeckSpy = vi.spyOn(toolbar as any, 'getCurrentDeck').mockReturnValue({
@@ -530,6 +531,7 @@ describe('IterationDeckToolbar Component', () => {
         
         // Mock empty store
         mockStore.activeDecks = {};
+        mockStore.deckMetadata = {};
         
         cleanupToolbarIfEmpty();
         
@@ -545,7 +547,7 @@ describe('IterationDeckToolbar Component', () => {
         document.body.appendChild(toolbarElement);
         
         // Mock store with decks
-        mockStore.activeDecks['remaining-deck'] = 'slide1';
+        mockStore.registerDeck('remaining-deck', ['slide1'], 'Remaining Deck');
         
         cleanupToolbarIfEmpty();
         
@@ -567,6 +569,7 @@ describe('IterationDeckToolbar Component', () => {
       
       // No decks in store
       mockStore.activeDecks = {};
+      mockStore.deckMetadata = {};
       mockStore.selectedDeckId = 'non-existent-deck';
       mockStore.notifyListeners();
       
@@ -595,7 +598,7 @@ describe('IterationDeckToolbar Component', () => {
       vi.mocked(isDevelopmentMode).mockReturnValue(true);
       
       // Create toolbar with active deck so buttons render
-      mockStore.activeDecks['error-test-deck'] = 'slide1';
+      mockStore.registerDeck('error-test-deck', ['slide1', 'slide2'], 'Error Test Deck');
       mockStore.selectedDeckId = 'error-test-deck';
       mockStore.notifyListeners();
       
@@ -629,9 +632,9 @@ describe('IterationDeckToolbar Component', () => {
       const requestUpdateSpy = vi.spyOn(toolbar, 'requestUpdate');
       
       // Trigger multiple store changes
-      mockStore.activeDecks['deck1'] = 'slide1';
+      mockStore.registerDeck('deck1', ['slide1'], 'Deck 1');
       mockStore.notifyListeners();
-      mockStore.activeDecks['deck2'] = 'slide2';
+      mockStore.registerDeck('deck2', ['slide2'], 'Deck 2');
       mockStore.notifyListeners();
       
       expect(requestUpdateSpy).toHaveBeenCalled();

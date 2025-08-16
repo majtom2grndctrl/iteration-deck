@@ -17,6 +17,7 @@ beforeEach(() => {
   // Mock console methods that might be noisy during testing
   vi.spyOn(console, 'debug').mockImplementation(() => {});
   vi.spyOn(console, 'warn').mockImplementation(() => {});
+  vi.spyOn(console, 'log').mockImplementation(() => {}); // Suppress debug/validation logs during testing
   
   // Reset document body
   document.body.innerHTML = '';

@@ -195,7 +195,8 @@ export class IterationDeckToolbar extends LitElement {
       // Auto-select first deck if none selected and we have decks
       const deckIds = state.getRegisteredDecks();
       if (deckIds.length > 0 && !state.selectedDeckId) {
-        state.setSelectedDeck(deckIds[0]);
+        const store = getIterationStoreState();
+        store.setSelectedDeck(deckIds[0]);
       }
     });
 
@@ -289,7 +290,8 @@ export class IterationDeckToolbar extends LitElement {
 
     const newSlideId = deck.slideIds[newSlideIndex];
     if (newSlideId) {
-      this.storeState.setActiveSlide(selectedDeckId, newSlideId);
+      const store = getIterationStoreState();
+      store.setActiveSlide(selectedDeckId, newSlideId);
       debugLog(`Navigated deck ${selectedDeckId} to slide ${newSlideId} (${direction})`);
     }
   }
@@ -315,7 +317,8 @@ export class IterationDeckToolbar extends LitElement {
   private getCurrentDeck(deckId?: string): DeckRegistration | null {
     if (!deckId) return null;
     
-    const metadata = this.storeState.getDeckMetadata(deckId);
+    const store = getIterationStoreState();
+    const metadata = store.getDeckMetadata(deckId);
     if (!metadata) {
       return null;
     }
@@ -337,7 +340,8 @@ export class IterationDeckToolbar extends LitElement {
     const deckId = select.value;
     
     if (deckId) {
-      this.storeState.setSelectedDeck(deckId);
+      const store = getIterationStoreState();
+      store.setSelectedDeck(deckId);
       debugLog(`Selected deck: ${deckId}`);
       
       // Auto-scroll to deck and highlight it
@@ -465,7 +469,8 @@ export class IterationDeckToolbar extends LitElement {
    * Get display label for a deck
    */
   private getDeckLabel(deckId: string): string {
-    const metadata = this.storeState.getDeckMetadata(deckId);
+    const store = getIterationStoreState();
+    const metadata = store.getDeckMetadata(deckId);
     return metadata?.label || deckId;
   }
 
@@ -478,7 +483,8 @@ export class IterationDeckToolbar extends LitElement {
       return 'No deck selected';
     }
 
-    const metadata = this.storeState.getDeckMetadata(selectedDeckId);
+    const store = getIterationStoreState();
+    const metadata = store.getDeckMetadata(selectedDeckId);
     if (!metadata || !metadata.activeSlideId) {
       return 'No slide active';
     }

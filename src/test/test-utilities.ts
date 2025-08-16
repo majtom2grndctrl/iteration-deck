@@ -75,17 +75,42 @@ export function mockEnvironmentUtils(isDev: boolean = true) {
 export function createMockStore() {
   const store = {
     activeDecks: {} as Record<string, string>,
+    deckMetadata: {} as Record<string, any>,
     isProduction: false,
     selectedDeckId: undefined as string | undefined,
     listeners: new Set<(state: any) => void>(),
     
     setActiveSlide: vi.fn((deckId: string, slideId: string) => {
       store.activeDecks[deckId] = slideId;
+      // Update metadata if it exists
+      if (store.deckMetadata[deckId]) {
+        store.deckMetadata[deckId].activeSlideId = slideId;
+      }
+      store.notifyListeners();
+    }),
+    
+    registerDeck: vi.fn((deckId: string, slideIds: string[], label?: string) => {
+      // Store deck metadata
+      store.deckMetadata[deckId] = {
+        slideIds: [...slideIds],
+        activeSlideId: slideIds[0] || '',
+        label
+      };
+      
+      // Set active slide (use existing if valid, otherwise first slide)
+      const currentActive = store.activeDecks[deckId];
+      const validActiveSlide = slideIds.includes(currentActive) ? currentActive : slideIds[0];
+      store.activeDecks[deckId] = validActiveSlide;
+      
+      // Update metadata with actual active slide
+      store.deckMetadata[deckId].activeSlideId = validActiveSlide;
+      
       store.notifyListeners();
     }),
     
     removeDeck: vi.fn((deckId: string) => {
       delete store.activeDecks[deckId];
+      delete store.deckMetadata[deckId];
       if (store.selectedDeckId === deckId) {
         const remainingDecks = Object.keys(store.activeDecks);
         store.selectedDeckId = remainingDecks.length > 0 ? remainingDecks[0] : undefined;
@@ -95,6 +120,14 @@ export function createMockStore() {
     
     getActiveSlide: vi.fn((deckId: string) => {
       return store.activeDecks[deckId];
+    }),
+    
+    getDeckSlides: vi.fn((deckId: string) => {
+      return store.deckMetadata[deckId]?.slideIds || [];
+    }),
+    
+    getDeckMetadata: vi.fn((deckId: string) => {
+      return store.deckMetadata[deckId];
     }),
     
     getRegisteredDecks: vi.fn(() => {

@@ -26,6 +26,33 @@ export const detectEnvironment = (): Environment => {
 };
 
 /**
+ * Check if we're currently in a test environment
+ */
+export const isTestEnvironment = (): boolean => {
+  // Check for common test environment indicators
+  if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'test') {
+    return true;
+  }
+  
+  // Check for Vitest environment
+  if (typeof globalThis !== 'undefined' && 'vi' in globalThis) {
+    return true;
+  }
+  
+  // Check for Jest environment
+  if (typeof globalThis !== 'undefined' && 'expect' in globalThis && 'test' in globalThis) {
+    return true;
+  }
+  
+  // Check for other test runners
+  if (typeof window !== 'undefined' && window.location?.href?.includes('test')) {
+    return true;
+  }
+  
+  return false;
+};
+
+/**
  * Check if we're currently in production mode
  */
 export const isProduction = (): boolean => {
@@ -65,9 +92,21 @@ export const debugLog = (message: string, data?: any): void => {
 };
 
 /**
- * Error logging
+ * Error logging (quieter during testing)
  */
 export const errorLog = (message: string, error?: any): void => {
+  // In test environments, use debug logging for validation errors to reduce noise
+  if (isTestEnvironment() && message.includes('not inside an iteration-deck element')) {
+    debugLog(`VALIDATION: ${message}`, error);
+    return;
+  }
+  
+  if (isTestEnvironment() && message.includes('Cannot activate slide: no parent deck found')) {
+    debugLog(`VALIDATION: ${message}`, error);
+    return;
+  }
+  
+  // For all other errors or non-test environments, log normally
   console.error(`[IterationDeck ERROR] ${message}`, error || '');
 };
 

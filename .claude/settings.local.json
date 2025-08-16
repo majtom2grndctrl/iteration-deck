@@ -8,7 +8,8 @@
       "Bash(npx tsc:*)",
       "Bash(pnpm add:*)",
       "Bash(npm run build:*)",
-      "Bash(pnpm build:*)"
+      "Bash(pnpm build:*)",
+      "Bash(pnpm test:*)"
     ],
     "defaultMode": "acceptEdits"
   }
