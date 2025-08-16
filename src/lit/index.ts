@@ -1,12 +1,17 @@
 /**
  * Lit Web Components Entry Point
- * Exports all Lit-based web components
+ * 
+ * Exports all Lit web components for use in any framework.
+ * Import from this module to register all web components.
  */
 
-// Core Lit components
-export { IterationDeck } from './iteration-deck.js';
-export { IterationDeckSlide } from './iteration-deck-slide.js';
-export { IterationDeckToolbar } from './iteration-deck-toolbar.js';
+// Re-export components from main module to avoid duplication
+export * from '../components';
 
-// Re-export types for component props
-export type { IterationDeckProps, IterationDeckSlideProps } from '../core/types.js';
+// Re-export core types for convenience
+export type {
+  IterationDeckProps,
+  IterationDeckSlideProps,
+  SlideChangeEvent,
+  DeckRegistrationEvent
+} from '../core/types.js';

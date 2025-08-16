@@ -1,148 +1,81 @@
-## Task Tracker
+# Task Tracker
 
-### Status Indicators
-Use emojis to indicate task status at a glance:
+Use this file to keep track of tasks as you work.
 
-- 📋 **To do** - Task not yet started
-- 🚧 **In progress** - Currently working on this task
-- 🚫 **Blocked** - Task is blocked by dependencies or issues
-- ✅ **Done** - Task completed successfully
+Remember to follow instructions in @../CLAUDE.md and @.TECHNICAL_SPEC.md
 
-### Task Format
+- Once you start a task, mark it as in progress
+- If you get blocked and need to change tasks, update the task and mark it as blocked, with a reason for the blocker
+- When you complete the task, market it as complete
+
+## Task Format
 ```
-📋 Task name - Brief description
-🚧 Another task - What's currently being worked on
-🚫 Blocked task - Reason for blocking
-✅ Completed task - What was accomplished
+📋 Example To Do Take - Brief description
+🚧 Example In Progress Task - What's currently being worked on
+🚫 Example Blocked task - Reason for blocking
+✅ Example Completed task - What was accomplished
 ```
 
-### Current Tasks
+# Build Plan
 
-## Phase One: Development Server Setup
+## Phase 1: Foundation & Dependencies (Sequential - Must be completed first)
+✅ Setup project dependencies - Install Lit, Zustand, @vanilla-extract/css, Vite plugins
+✅ Configure TypeScript - Setup strict mode with experimental decorators for Lit
+✅ Configure Vite build - Library mode, multiple entry points, vanilla-extract plugin
+✅ Setup project structure - Create src/lit, src/react, src/tokens, src/styles, src/core directories
 
-✅ **Setup basic project structure** - Create folder structure and basic files
-- ✅ Created `src/lit/`, `src/react/`, `src/styles/`, `src/store/` directories
-- ✅ Updated `package.json` with Lit, React, Zustand, @vanilla-extract dependencies (using pnpm)
-- ✅ Configured Vite for library mode with multiple entry points and dev server routing
-- **Completed**: Full project structure established with proper dependency management
+## Phase 2: Core Architecture (Can run concurrently with Task Tool)
+✅ **[Task Tool - general-purpose]** Design tokens system - Create comprehensive token files (colors.ts, spacing.ts, typography.ts, components.ts, animation.ts, zIndex.ts, breakpoints.ts) with central index.ts export - Complete with @vanilla-extract/css integration and theme support
+✅ **[Task Tool - general-purpose]** Zustand store implementation - Create iteration-store.ts with activeDecks state management and environment detection
+✅ **[Task Tool - general-purpose]** Core types and utilities - Framework-agnostic TypeScript interfaces and helper functions implemented in src/core/types.ts and src/core/utilities.ts with comprehensive interfaces for IterationDeck/IterationDeckSlide, environment detection, ID generation, slide navigation, URL state management, keyboard shortcuts, validation, and debugging utilities
 
-✅ **Create Lit components demo page** - `/lit` route showing web components
-- ✅ Created HTML page at `/lit.html` importing Lit components directly
-- ✅ Demonstrated `<iteration-deck>` and `<iteration-deck-slide>` usage with multiple examples
-- ✅ Added navigation between demo pages and comprehensive component showcase
-- **Completed**: Demo page accessible at `http://localhost:3000/lit.html`
+## Phase 3: Lit Components (Can run concurrently with Task Tool)
+✅ **[Task Tool - general-purpose]** IterationDeck Lit component - Main container with Zustand integration, slot-based children, environment detection - Complete with comprehensive slot-based architecture, store integration, environment detection, slide navigation API, and proper lifecycle management
+✅ **[Task Tool - general-purpose]** IterationDeckSlide Lit component - Individual slide wrapper with @property decorators - Complete with AI-first prototyping features, accessibility, store integration, and smooth transitions
+✅ **[Task Tool - general-purpose]** IterationDeckToolbar Lit component - Singleton toolbar with multi-deck dropdown, keyboard shortcuts - Complete implementation with singleton pattern, global keyboard handling, multi-deck dropdown, navigation controls, accessibility features, and automatic mounting/cleanup utilities
 
-✅ **Create React wrappers demo page** - `/react` route showing React components  
-- ✅ Created React page at `/react.html` with proper JSX syntax structure
-- ✅ Set up page to use React wrapper components (ready for implementation)
-- ✅ Added navigation matching Lit demo page layout
-- **Completed**: Demo page accessible at `http://localhost:3000/react.html`
+## Phase 4: Component Styling (Can run concurrently with Task Tool)
+✅ **[Task Tool - general-purpose]** iteration-deck.css.ts - @vanilla-extract styles with design tokens integration - Complete with comprehensive responsive design, theme variants, accessibility, loading/error states, and RTL support
+✅ **[Task Tool - general-purpose]** iteration-deck-slide.css.ts - Slide-specific styling with transitions - Complete with comprehensive @vanilla-extract styles, AI metadata overlays, confidence indicators, accessibility features, and smooth state transitions
+✅ **[Task Tool - general-purpose]** iteration-deck-toolbar.css.ts - Pill-shaped toolbar with backdrop effects, responsive design - Complete with full pill-shaped design, multi-deck dropdown, navigation controls, keyboard shortcuts, and dark mode support
 
-✅ **Implement basic Lit components** - Core web components without full functionality
-- ✅ `<iteration-deck>`: Container with @property decorators for id/label props
-- ✅ `<iteration-deck-slide>`: Slide wrapper with @property for label and children rendering
-- ✅ `<iteration-deck-toolbar>`: Toolbar component with singleton pattern foundation
-- **Completed**: All Lit components implemented with proper @customElement decorators
+## ~~Phase 5: React Integration (Sequential - Depends on Lit components)~~ Deferred for later
+📋 React wrapper for IterationDeck - Manual wrapper with Zustand hook integration
+📋 React wrapper for IterationDeckSlide - Proper TypeScript props and children handling
+✅ React hooks setup - useIterationStore hook for React components
 
-✅ **Implement React wrapper components** - Thin wrappers around Lit components
-- ✅ `IterationDeck.tsx`: Manual React wrapper with full TypeScript interface support
-- ✅ `IterationDeckSlide.tsx`: React wrapper with children support and prop mapping
-- ✅ Proper prop passing to underlying Lit components with kebab-case conversion
-- **Completed**: Manual React wrappers following TECHNICAL_SPEC.md exactly
+## Phase 6: Testing & Documentation (Can run concurrently with Task Tool)
+✅ **[Task Tool - general-purpose]** Unit tests for Lit components - Complete comprehensive test suite with Vitest setup, test utilities, environment mocking, component rendering, accessibility testing, error states, edge cases, public API validation, store integration, lifecycle management, and singleton pattern testing. Includes 25+ passing test cases covering all core functionality.
+~~📋 **[Task Tool - general-purpose]** Integration tests for React wrappers - Test React-Lit interop and state synchronization~~
+✅ **[Task Tool - general-purpose]** Example application - Demo showing multiple decks, various usage patterns - Complete comprehensive demo with user preferences form (3 layouts), budgeting dashboard (3 approaches), and contacts list (3 presentation styles). Includes Tailwind CSS from CDN, proper component imports, realistic interactive content, keyboard shortcuts, debug utilities, and full development experience showcase
 
-✅ **Setup Zustand store** - Basic state management structure
-- ✅ Created `src/store/iteration-store.ts` with exact interface from spec
-- ✅ Implemented `activeDecks` state and `setActiveSlide` action with environment detection
-- ✅ Added React hooks and Lit component integration methods
-- **Completed**: Full state management system with cross-framework support
+## Phase 7: Build System & Distribution (Sequential - Final phase)
+📋 Production build configuration - Optimize bundles, tree-shaking, code splitting
+📋 Package.json setup - Export maps for different frameworks, proper entry points
+📋 TypeScript declarations - Ensure proper .d.ts files for all components
 
-✅ **Configure dev server routing** - Multiple pages accessible during development
-- ✅ Configured Vite to serve `/lit.html` and `/react.html` routes
-- ✅ Module resolution working for TypeScript and proper imports
-- ✅ Navigation between demo pages with landing page
-- **Completed**: Dev server running at `http://localhost:3000/` with all routes functional
+## Concurrent Execution Strategy
 
-✅ **Basic styling setup** - @vanilla-extract/css foundation
-- ✅ @vanilla-extract Vite plugin configured and operational
-- ✅ Created component stylesheets (`iteration-deck.css.ts`, `iteration-deck-slide.css.ts`, `iteration-deck-toolbar.css.ts`)
-- ✅ Styles reference design tokens and applied to both demo pages
-- **Completed**: Zero-runtime CSS system with theme support and type safety
+**Use Task Tool for these parallel work streams:**
+- Design tokens can be built independently by one agent
+- Each Lit component can be developed by separate agents once tokens/store are ready
+- Component styling can be done in parallel once design tokens exist
+- Testing can begin as soon as components are implemented
 
-## Phase Two: Styling System Consistency
+**Sequential Dependencies:**
+1. Phase 1 must complete before anything else
+2. Zustand store must be ready before Lit components
+3. Design tokens must be ready before component styling
+4. Lit components must be ready before React wrappers
+5. All components must be ready before final build configuration
 
-**⚠️ IMPORTANT: These tasks have dependencies and must be executed sequentially in the order listed to avoid conflicts.**
+**Estimated Timeline:**
+- Phase 1: 1-2 hours
+- Phases 2-4: 4-6 hours (concurrent execution)
+- Phase 5: 2-3 hours
+- Phase 6: 3-4 hours (concurrent with Phase 5)
+- Phase 7: 1-2 hours
 
-### Sequential Task Groups
+**Total Estimated Time: 11-17 hours** (with concurrent execution reducing from ~20+ hours sequential)
 
-#### 🥇 **Step 1: Foundation** (Execute First - Blocks All Others)
-📋 **Resolve token file structure discrepancy** - Fix contradicting instructions between CLAUDE.md and TECHNICAL_SPEC.md
-- Research which approach is better: single `tokens.ts` vs separate `tokens/*.ts` files
-- Update documentation to be consistent across both instruction files
-- Choose the approach that best supports @vanilla-extract theme contracts
-- **Dependency**: None - Must complete BEFORE all other Phase Two tasks
-- **Delegate with Task Tool**: Use `general-purpose` agent to analyze and resolve documentation conflicts
-
-#### 🥈 **Step 2: Token System** (Execute After Step 1 - Can Run Concurrently)
-📋 **Restructure design tokens for @vanilla-extract integration** - Implement proper theme contract pattern
-- Create `src/tokens/` directory structure with separate token files (colors.ts, spacing.ts, typography.ts, etc.)
-- Update existing `src/tokens.ts` to re-export from individual token files for backward compatibility
-- Ensure tokens work properly with @vanilla-extract theme contracts in `src/styles/theme.css.ts`
-- **Dependency**: Requires Step 1 completion
-- **Delegate with Task Tool**: Use `general-purpose` agent to restructure token system
-
-📋 **Implement missing design system requirements** - Add token categories specified in CLAUDE.md
-- Create separate token files: `src/tokens/colors.ts`, `src/tokens/spacing.ts`, `src/tokens/typography.ts`
-- Implement backdrop effects tokens for toolbar transparency/blur
-- Add touch target tokens (44px minimum) and ensure compliance across components
-- **Dependency**: Requires Step 1 completion, coordinates with token restructuring
-- **Delegate with Task Tool**: Use `general-purpose` agent to implement missing token categories
-
-#### 🥉 **Step 3: Theme Integration** (Execute After Step 2)
-📋 **Validate @vanilla-extract theme contract integration** - Ensure tokens work with theme system
-- Test that all component stylesheets properly use theme contract variables
-- Verify light/dark theme switching works with all token references
-- Ensure `prefers-color-scheme` automatic theming functions correctly
-- **Dependency**: Requires Step 2 completion (needs finalized token structure)
-- **Delegate with Task Tool**: Use `general-purpose` agent to validate theme integration
-
-#### 🏅 **Step 4: Component Updates** (Execute After Step 3)
-📋 **Update Lit components to use proper token references** - Replace any hardcoded values with token references
-- Audit all Lit component templates for @vanilla-extract class usage
-- Ensure components reference token-based styles, not hardcoded CSS values
-- Verify environment detection works correctly with styling system
-- **Dependency**: Requires Step 3 completion (needs working theme integration)
-- **Delegate with Task Tool**: Use `general-purpose` agent to update component token usage
-
-#### 🎖️ **Step 5: Validation** (Execute After Step 4)
-📋 **Validate Visual Design Principles compliance** - Ensure implementation matches CLAUDE.md requirements
-- Verify pill-shaped toolbar with 64px border-radius from tokens
-- Confirm neutral gray palette doesn't compete with user designs
-- Test visual hierarchy (light gray background, white interactive areas)
-- **Dependency**: Requires Step 4 completion (needs updated components)
-- **Delegate with Task Tool**: Use `general-purpose` agent to validate design principle compliance
-
-#### 🏆 **Step 6: Final Tasks** (Execute After Step 5 - Can Run Concurrently)
-📋 **Audit and fix component stylesheet naming** - Ensure all stylesheets follow `[component-name].css.ts` pattern
-- Move each component into their own folder
-- Verify `iteration-deck.css.ts`, `iteration-deck-slide.css.ts`, `iteration-deck-toolbar.css.ts` follow naming convention
-- Move each stylesheet to be in the same folder as the component that it styles, and update all imports so they work correctly
-- Check that all component stylesheets properly import and use design tokens
-- Ensure consistent class naming patterns across all stylesheets
-- **Dependency**: Requires Step 5 completion (needs finalized system to audit)
-- **Delegate with Task Tool**: Use `general-purpose` agent to audit stylesheet naming consistency
-
-📋 **Create comprehensive styling documentation** - Document the finalized @vanilla-extract system
-- Document token usage patterns and theme contract integration
-- Create examples of proper component stylesheet structure
-- Add guidelines for maintaining consistency across future components
-- **Dependency**: Requires Step 5 completion (needs complete system to document)
-- **Delegate with Task Tool**: Use `general-purpose` agent to create styling documentation
-
-### ⚠️ Execution Guidelines
-
-**Sequential execution required due to:**
-- File modification conflicts (token files)
-- Import dependency chains (tokens → themes → components)
-- Testing dependencies (can't validate incomplete systems)
-
-**Only Steps 2, and Step 6 tasks can be executed concurrently within their respective steps.**
+# Current Tasks

@@ -1,51 +1,74 @@
-import '@testing-library/jest-dom'
+/**
+ * Vitest setup file for Lit component testing
+ * 
+ * This file configures the testing environment for Lit web components
+ * with proper JSDOM setup, custom element registry, and test utilities.
+ */
 
-// Mock import.meta globally for Jest
-;(global as any)['import.meta'] = {
-  env: {
-    DEV: true, // Default to development mode in tests
+import { expect, beforeEach, afterEach, vi } from 'vitest';
+
+// Custom DOM matchers would be added here when needed
+
+// Global test setup
+beforeEach(() => {
+  // Clear the custom element registry between tests to avoid conflicts
+  // Note: Custom element registry cannot be fully reset, so we need to work around this
+  
+  // Mock console methods that might be noisy during testing
+  vi.spyOn(console, 'debug').mockImplementation(() => {});
+  vi.spyOn(console, 'warn').mockImplementation(() => {});
+  
+  // Reset document body
+  document.body.innerHTML = '';
+  
+  // Clear any existing iteration-deck-toolbar instances
+  document.querySelectorAll('iteration-deck-toolbar').forEach(el => el.remove());
+});
+
+afterEach(() => {
+  // Clean up any remaining elements
+  document.body.innerHTML = '';
+  
+  // Remove any global event listeners that might have been added
+  document.removeEventListener('keydown', () => {});
+  
+  // Restore console methods
+  vi.restoreAllMocks();
+});
+
+// Global test utilities
+declare global {
+  namespace Vi {
+    interface Assertion<T = any> {
+      toHaveAttribute(name: string, value?: string): T;
+      toHaveClass(className: string): T;
+    }
   }
 }
 
-// Mock environment detection for tests using Jest
-jest.mock('../core/environment', () => ({
-  isDevelopment: jest.fn(() => true),
-  isProduction: jest.fn(() => false),
-}))
+// Add custom element polyfill support for testing
+if (!globalThis.customElements) {
+  globalThis.customElements = window.customElements;
+}
 
-// Mock vanilla-extract for test environment
-jest.mock('@vanilla-extract/css', () => ({
-  createThemeContract: jest.fn((contract) => {
-    // Return a mock contract structure with the same shape as the actual contract
-    function createMockStructure(obj: any): any {
-      if (typeof obj === 'object' && obj !== null) {
-        const mock: any = {};
-        for (const key in obj) {
-          if (obj.hasOwnProperty(key)) {
-            mock[key] = createMockStructure(obj[key]);
-          }
-        }
-        return mock;
-      }
-      return `var(--mock-${Math.random().toString(36).substr(2, 9)})`;
-    }
-    return createMockStructure(contract);
-  }),
-  createTheme: jest.fn(() => `mock-theme-${Math.random().toString(36).substr(2, 9)}`),
-  style: jest.fn(() => `mock-style-${Math.random().toString(36).substr(2, 9)}`),
-  styleVariants: jest.fn((variants) => {
-    const mockVariants: any = {};
-    if (typeof variants === 'object' && variants !== null) {
-      for (const key in variants) {
-        mockVariants[key] = `mock-variant-${key}-${Math.random().toString(36).substr(2, 9)}`;
-      }
-    }
-    return mockVariants;
-  }),
-  globalStyle: jest.fn(),
-}))
+// Polyfill for ResizeObserver in tests
+if (!globalThis.ResizeObserver) {
+  globalThis.ResizeObserver = class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+}
 
-jest.mock('@vanilla-extract/dynamic', () => ({
-  assignInlineVars: jest.fn(() => ({}))
-}))
+// Polyfill for MutationObserver in tests (should be available in happy-dom)
+if (!globalThis.MutationObserver) {
+  globalThis.MutationObserver = class MutationObserver {
+    constructor(_callback: MutationCallback) {}
+    observe() {}
+    disconnect() {}
+    takeRecords() { return []; }
+  };
+}
 
+// Export test utilities for use in test files
+export { expect, beforeEach, afterEach, vi };

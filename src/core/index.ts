@@ -1,7 +1,37 @@
 /**
- * Core utilities for Iteration Deck
- * Framework-agnostic types and helper functions
+ * Core framework-agnostic types and utilities for iteration-deck
+ * 
+ * This module provides the foundational TypeScript interfaces and helper functions
+ * that are shared across all framework implementations (Lit, React, etc.)
  */
 
-export * from './types.js'
-export * from './utilities.js'
+// Export all types that actually exist
+export type {
+  IterationDeckProps,
+  IterationDeckSlideProps,
+  SlideChangeEvent,
+  DeckRegistrationEvent,
+} from './types.js';
+
+// Export all utilities that actually exist
+export {
+  // Environment detection
+  detectEnvironment,
+  isDevelopment,
+  
+  // ID generation and validation
+  generateSlideId,
+  validateDeckId,
+  
+  // Keyboard shortcuts
+  isNavigationShortcut,
+  
+  // Performance utilities
+  debounce,
+  throttle,
+  
+  // Debugging
+  debugLog,
+  warnLog,
+  errorLog,
+} from './utilities.js';

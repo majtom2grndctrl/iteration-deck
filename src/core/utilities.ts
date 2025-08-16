@@ -1,183 +1,152 @@
 /**
- * Utility types and helpers for common IterationDeck patterns
- * These make it easier for AI agents to generate correct implementations
+ * Core utility functions for iteration-deck components
+ * Framework-agnostic helpers for deck/slide management, environment detection, and more
  */
 
-import { ReactElement } from 'react'
-
-/**
- * Helper type for common UI component variations
- * Use this when creating variations of the same component with different props
- * 
- * @example
- * ```tsx
- * // AI can generate this pattern easily
- * const buttonVariations: ComponentVariation<ButtonProps>[] = [
- *   { label: 'Primary', props: { variant: 'primary' } },
- *   { label: 'Secondary', props: { variant: 'secondary' } },
- * ]
- * ```
- */
-export interface ComponentVariation<T = Record<string, any>> {
-  /** Human-readable label for this variation */
-  label: string
-  /** Props to pass to the component */
-  props: T
-  /** Optional AI metadata */
-  aiPrompt?: string
-  notes?: string
-  confidence?: number
-}
+// Simple types for utilities
+export type Environment = 'development' | 'production';
+export type NavigationDirection = 'prev' | 'next' | 'first' | 'last';
 
 /**
- * Helper type for layout variations
- * Common pattern when comparing different layouts of the same content
+ * Environment detection utilities
  */
-export interface LayoutVariation {
-  /** Name of the layout */
-  label: string
-  /** CSS class or style object for the layout */
-  className?: string
-  style?: React.CSSProperties
-  /** Layout-specific props */
-  layoutProps?: Record<string, any>
-  /** AI metadata */
-  aiPrompt?: string
-  notes?: string
-}
+export const detectEnvironment = (): Environment => {
+  // Check for common production environment indicators
+  if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'production') {
+    return 'production';
+  }
+  
+  // Check for Vite development mode
+  if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+    return 'development';
+  }
+  
+  // Fallback: assume development if we can't determine
+  return 'development';
+};
 
 /**
- * Helper type for state variations
- * Common pattern when showing the same component in different states
+ * Check if we're currently in production mode
  */
-export interface StateVariation<T = Record<string, any>> {
-  /** State name (Loading, Error, Success, etc.) */
-  label: string
-  /** State-specific props */
-  state: T
-  /** AI metadata */
-  aiPrompt?: string
-  notes?: string
-}
+export const isProduction = (): boolean => {
+  return detectEnvironment() === 'production';
+};
 
 /**
- * Utility function to create IterationDeckSlide from ComponentVariation
- * Makes it easier for AI agents to generate slides from variation data
- * 
- * @example
- * ```tsx
- * const variations: ComponentVariation<ButtonProps>[] = [
- *   { label: 'Primary', props: { variant: 'primary' } },
- *   { label: 'Secondary', props: { variant: 'secondary' } },
- * ]
- * 
- * // AI can generate this pattern
- * <IterationDeck id="buttons" label="Button Variations">
- *   {variations.map(variation => 
- *     createSlideFromVariation(variation, (props) => <Button {...props}>Click me</Button>)
- *   )}
- * </IterationDeck>
- * ```
+ * Check if we're currently in development mode
  */
-export function createSlideFromVariation<T>(
-  variation: ComponentVariation<T>,
-  renderComponent: (props: T) => ReactElement
-): ReactElement {
-  const { props } = variation
-  
-  return renderComponent(props)
-}
+export const isDevelopment = (): boolean => {
+  return detectEnvironment() === 'development';
+};
 
 /**
- * Common component patterns that AI agents should recognize
+ * Generate a unique slide ID based on deck ID and label
  */
-export const COMMON_VARIATION_PATTERNS = {
-  /** Button variations */
-  BUTTONS: {
-    variants: ['primary', 'secondary', 'outline', 'ghost', 'destructive'],
-    sizes: ['sm', 'md', 'lg', 'xl'],
-    states: ['default', 'loading', 'disabled'],
-  },
-  
-  /** Card variations */
-  CARDS: {
-    layouts: ['default', 'horizontal', 'compact', 'expanded'],
-    elevations: ['none', 'sm', 'md', 'lg', 'xl'],
-    borders: ['none', 'subtle', 'strong'],
-  },
-  
-  /** Form variations */
-  FORMS: {
-    layouts: ['vertical', 'horizontal', 'inline'],
-    states: ['default', 'loading', 'error', 'success'],
-    sizes: ['sm', 'md', 'lg'],
-  },
-  
-  /** Navigation variations */
-  NAVIGATION: {
-    orientations: ['horizontal', 'vertical'],
-    styles: ['tabs', 'pills', 'underline', 'sidebar'],
-    positions: ['top', 'bottom', 'left', 'right'],
-  },
-  
-  /** Modal variations */
-  MODALS: {
-    sizes: ['sm', 'md', 'lg', 'xl', 'fullscreen'],
-    positions: ['center', 'top', 'bottom'],
-    animations: ['fade', 'slide', 'zoom'],
-  },
-} as const
+export const generateSlideId = (deckId: string, label: string): string => {
+  const safeLabel = label || 'slide';
+  const sanitizedLabel = safeLabel.toLowerCase().replace(/[^a-z0-9]/g, '-');
+  return `${deckId}-${sanitizedLabel}`;
+};
 
 /**
- * Helper to generate variation labels
- * Useful for AI agents to create consistent naming
+ * Validate deck ID format
  */
-export const generateVariationLabel = (
-  componentName: string,
-  _variationType: string,
-  variationValue: string
-): string => {
-  const formatted = variationValue.charAt(0).toUpperCase() + variationValue.slice(1)
-  return `${formatted} ${componentName}`
-}
+export const validateDeckId = (id: string): boolean => {
+  return /^[a-z0-9-_]+$/i.test(id);
+};
 
 /**
- * AI-friendly preset for common comparison scenarios
- * AI agents can use these presets to quickly generate appropriate IterationDecks
+ * Debug logging (only in development)
  */
-export const AI_PRESETS = {
-  /** Compare different visual styles of the same component */
-  STYLE_VARIATIONS: {
-    suggestedId: (component: string) => `${component.toLowerCase()}-styles`,
-    suggestedLabel: (component: string) => `${component} Style Variations`,
-    commonLabels: ['Default', 'Primary', 'Secondary', 'Accent', 'Muted'],
-  },
+export const debugLog = (message: string, data?: any): void => {
+  if (isDevelopment()) {
+    console.log(`[IterationDeck] ${message}`, data || '');
+  }
+};
+
+/**
+ * Error logging
+ */
+export const errorLog = (message: string, error?: any): void => {
+  console.error(`[IterationDeck ERROR] ${message}`, error || '');
+};
+
+/**
+ * Warning logging
+ */
+export const warnLog = (message: string, data?: any): void => {
+  console.warn(`[IterationDeck WARN] ${message}`, data || '');
+};
+
+/**
+ * Throttle function to limit how often a function can be called
+ */
+export const throttle = <T extends (...args: any[]) => any>(
+  func: T,
+  delay: number
+): ((...args: Parameters<T>) => void) => {
+  let timeoutId: ReturnType<typeof setTimeout> | null = null;
+  let lastExecTime = 0;
   
-  /** Compare different sizes of the same component */
-  SIZE_VARIATIONS: {
-    suggestedId: (component: string) => `${component.toLowerCase()}-sizes`,
-    suggestedLabel: (component: string) => `${component} Size Variations`,
-    commonLabels: ['Small', 'Medium', 'Large', 'Extra Large'],
-  },
+  return (...args: Parameters<T>) => {
+    const currentTime = Date.now();
+    
+    if (currentTime - lastExecTime > delay) {
+      func(...args);
+      lastExecTime = currentTime;
+    } else {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+      
+      timeoutId = setTimeout(() => {
+        func(...args);
+        lastExecTime = Date.now();
+      }, delay - (currentTime - lastExecTime));
+    }
+  };
+};
+
+/**
+ * Check if a keyboard event is a navigation shortcut
+ */
+export const isNavigationShortcut = (event: KeyboardEvent): NavigationDirection | null => {
+  const { key, metaKey, ctrlKey } = event;
+  const isModified = metaKey || ctrlKey;
   
-  /** Compare different states of the same component */
-  STATE_VARIATIONS: {
-    suggestedId: (component: string) => `${component.toLowerCase()}-states`,
-    suggestedLabel: (component: string) => `${component} State Variations`,
-    commonLabels: ['Default', 'Loading', 'Success', 'Error', 'Disabled'],
-  },
+  if (!isModified) return null;
   
-  /** Compare different layouts */
-  LAYOUT_VARIATIONS: {
-    suggestedId: (context: string) => `${context.toLowerCase()}-layouts`,
-    suggestedLabel: (context: string) => `${context} Layout Options`,
-    commonLabels: ['Centered', 'Split', 'Grid', 'Stack', 'Sidebar'],
-  },
+  switch (key) {
+    case 'ArrowLeft':
+      return 'prev';
+    case 'ArrowRight':
+      return 'next';
+    case 'Home':
+      return 'first';
+    case 'End':
+      return 'last';
+    default:
+      return null;
+  }
+};
+
+/**
+ * Simple debounce function
+ */
+export const debounce = <T extends (...args: any[]) => any>(
+  func: T,
+  delay: number
+): ((...args: Parameters<T>) => void) => {
+  let timeoutId: ReturnType<typeof setTimeout> | null = null;
   
-  /** Compare responsive breakpoints */
-  RESPONSIVE_VARIATIONS: {
-    suggestedId: (component: string) => `${component.toLowerCase()}-responsive`,
-    suggestedLabel: (component: string) => `${component} Responsive Layouts`,
-    commonLabels: ['Mobile', 'Tablet', 'Desktop', 'Large Screen'],
-  },
-} as const
+  return (...args: Parameters<T>) => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+    
+    timeoutId = setTimeout(() => {
+      func(...args);
+    }, delay);
+  };
+};
+

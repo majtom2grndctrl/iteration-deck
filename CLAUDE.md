@@ -38,6 +38,7 @@ pnpm lint         # Lint TypeScript code
 - **Zustand State Management**: Global state management with Zustand for cross-component reactivity
 - **Universal Compatibility**: Works with React, Astro, Vue, Angular, vanilla HTML, and any framework
 - **Zero-Runtime CSS**: @vanilla-extract/css generates static CSS at build time with design tokens
+  - **Do not use Lit for CSS**: Avoid Lit’s tagged template leterals for CSS—use @vanilla-extract/css for all styling
 
 ### Code Quality Standards
 - **Accessibility**: WCAG 2.2 AA compliance, proper ARIA attributes
@@ -60,7 +61,7 @@ Use Design Tokens defined as TypeScript files in `src/tokens/` and integrated wi
 - **Typography**: System font stack matching OS/browser dev tools aesthetic
 - **Backdrop effects**: Modern blur and transparency effects for toolbar
 - **Theme Variables**: vanilla-extract contract for consistent theming across components
-- **Token Files**: Central design tokens in `src/tokens/*.ts` files (colors.ts, spacing.ts, typography.ts, etc.)
+- **Token Files**: Central design tokens organized by category in `src/tokens/` directory (colors.ts, spacing.ts, typography.ts, components.ts, animation.ts, zIndex.ts, breakpoints.ts) with central export via index.ts
 
 ### File Organization
 ```

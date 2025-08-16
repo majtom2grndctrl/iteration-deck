@@ -1,14 +1,12 @@
-/**
- * React Components Entry Point
- * Exports React wrapper components around Lit web components
- */
+// React integration is deferred - placeholder file
+// React wrapper components and hooks will be implemented later
 
-// React wrapper components
-export { IterationDeck } from './IterationDeck.js';
-export { IterationDeckSlide } from './IterationDeckSlide.js';
+// Basic store utilities for React integration (when needed)
+export {
+  isDevelopmentMode,
+  getIterationStoreState
+} from './hooks';
 
-// React-specific hooks and utilities
-export { useIterationStore } from '../store/react-hooks.js';
-
-// Re-export types for component props
-export type { IterationDeckProps, IterationDeckSlideProps } from '../core/types.js';
+// Core types
+export type * from '../core/types';
+export type { IterationStore } from '../store/iteration-store';

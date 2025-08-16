@@ -1,112 +1,170 @@
 /**
- * Zustand Store for Iteration Deck State Management
+ * Simplified Iteration Deck Store
  * 
- * This store provides state management for iteration decks and slides,
- * supporting both React components (via hooks) and Lit components (via subscriptions).
- * 
- * Architecture:
- * - Uses Zustand for reactive state management
- * - Environment detection for production vs development modes
- * - Cross-framework compatibility with subscription methods
+ * Basic state management for iteration decks and their active slides.
  */
 
-import { create } from 'zustand';
+import { isDevelopment } from '../core/utilities.js';
 
 /**
- * Core store interface matching TECHNICAL_SPEC.md requirements
+ * Deck metadata for store management
  */
-export interface IterationStore {
-  /** Map of deckId to active slideId for each registered deck */
-  activeDecks: Record<string, string>;
-  
-  /** Action to set the active slide for a specific deck */
-  setActiveSlide: (deckId: string, slideId: string) => void;
-  
-  /** Environment detection - true in production, false in development */
-  isProduction: boolean;
+export interface DeckMetadata {
+  /** All slide IDs in this deck */
+  slideIds: string[];
+  /** Currently active slide ID */
+  activeSlideId: string;
+  /** Optional deck label */
+  label?: string;
 }
 
 /**
- * Environment detection utility
- * Uses Vite's built-in environment detection
+ * Iteration Deck Store Interface
  */
-function getIsProduction(): boolean {
-  // Vite provides import.meta.env.PROD at build time
-  // For development/build compatibility, we use a safer check
-  try {
-    // @ts-ignore - Vite provides this at build time
-    return import.meta.env?.PROD === true;
-  } catch {
-    // Fallback for environments where import.meta is not available
-    return false;
+export interface IterationStore {
+  /** Record mapping deck IDs to their currently active slide IDs */
+  activeDecks: Record<string, string>;
+  
+  /** Record mapping deck IDs to their metadata (slide IDs, labels, etc.) */
+  deckMetadata: Record<string, DeckMetadata>;
+  
+  /** Sets the active slide for a specific deck */
+  setActiveSlide: (deckId: string, slideId: string) => void;
+  
+  /** Registers a deck with all its slides */
+  registerDeck: (deckId: string, slideIds: string[], label?: string) => void;
+  
+  /** Removes a deck from the store */
+  removeDeck: (deckId: string) => void;
+  
+  /** Gets the active slide ID for a specific deck */
+  getActiveSlide: (deckId: string) => string | undefined;
+  
+  /** Gets all slide IDs for a specific deck */
+  getDeckSlides: (deckId: string) => string[];
+  
+  /** Gets deck metadata (slides, active slide, label) */
+  getDeckMetadata: (deckId: string) => DeckMetadata | undefined;
+  
+  /** Gets all registered deck IDs */
+  getRegisteredDecks: () => string[];
+  
+  /** Environment flag - true in production builds, false in development */
+  isProduction: boolean;
+  
+  /** Currently selected deck for toolbar navigation */
+  selectedDeckId?: string;
+  
+  /** Sets the selected deck for toolbar navigation */
+  setSelectedDeck: (deckId: string) => void;
+}
+
+// Simple store implementation
+class SimpleStore implements IterationStore {
+  activeDecks: Record<string, string> = {};
+  deckMetadata: Record<string, DeckMetadata> = {};
+  isProduction = !isDevelopment();
+  selectedDeckId?: string;
+  
+  private listeners: Set<(state: IterationStore) => void> = new Set();
+  
+  registerDeck(deckId: string, slideIds: string[], label?: string): void {
+    // Store deck metadata
+    this.deckMetadata[deckId] = {
+      slideIds: [...slideIds],
+      activeSlideId: slideIds[0] || '',
+      label
+    };
+    
+    // Set active slide (use existing if valid, otherwise first slide)
+    const currentActive = this.activeDecks[deckId];
+    const validActiveSlide = slideIds.includes(currentActive) ? currentActive : slideIds[0];
+    this.activeDecks[deckId] = validActiveSlide;
+    
+    // Update metadata with actual active slide
+    this.deckMetadata[deckId].activeSlideId = validActiveSlide;
+    
+    this.notifyListeners();
+  }
+  
+  setActiveSlide(deckId: string, slideId: string): void {
+    this.activeDecks[deckId] = slideId;
+    
+    // Update metadata if it exists
+    if (this.deckMetadata[deckId]) {
+      this.deckMetadata[deckId].activeSlideId = slideId;
+    }
+    
+    this.notifyListeners();
+  }
+  
+  removeDeck(deckId: string): void {
+    delete this.activeDecks[deckId];
+    delete this.deckMetadata[deckId];
+    
+    if (this.selectedDeckId === deckId) {
+      const remainingDecks = this.getRegisteredDecks();
+      this.selectedDeckId = remainingDecks.length > 0 ? remainingDecks[0] : undefined;
+    }
+    this.notifyListeners();
+  }
+  
+  getActiveSlide(deckId: string): string | undefined {
+    return this.activeDecks[deckId];
+  }
+  
+  getDeckSlides(deckId: string): string[] {
+    return this.deckMetadata[deckId]?.slideIds || [];
+  }
+  
+  getDeckMetadata(deckId: string): DeckMetadata | undefined {
+    return this.deckMetadata[deckId];
+  }
+  
+  getRegisteredDecks(): string[] {
+    return Object.keys(this.activeDecks);
+  }
+  
+  setSelectedDeck(deckId: string): void {
+    this.selectedDeckId = deckId;
+    this.notifyListeners();
+  }
+  
+  // Subscription management
+  subscribe(listener: (state: IterationStore) => void): () => void {
+    this.listeners.add(listener);
+    return () => {
+      this.listeners.delete(listener);
+    };
+  }
+  
+  private notifyListeners(): void {
+    this.listeners.forEach(listener => listener(this));
   }
 }
 
-/**
- * Zustand store instance
- * Provides reactive state management with actions for managing active slides per deck
- */
-export const useIterationStore = create<IterationStore>((set, get) => ({
-  // Initial state
-  activeDecks: {},
-  isProduction: getIsProduction(),
-  
-  // Actions
-  setActiveSlide: (deckId: string, slideId: string) => {
-    set((state) => ({
-      activeDecks: {
-        ...state.activeDecks,
-        [deckId]: slideId,
-      },
-    }));
-  },
-}));
+// Global store instance
+const store = new SimpleStore();
 
 /**
- * Direct store instance for non-React usage (Lit components)
- * Provides access to the store state and subscription methods
+ * Subscribe to store changes
  */
-export const iterationStore = {
-  /**
-   * Get current store state
-   */
-  getState: () => useIterationStore.getState(),
-  
-  /**
-   * Subscribe to store changes for Lit components
-   * Returns unsubscribe function
-   */
-  subscribe: (listener: (state: IterationStore) => void) => {
-    return useIterationStore.subscribe(listener);
-  },
-  
-  /**
-   * Set active slide (convenience method for non-React usage)
-   */
-  setActiveSlide: (deckId: string, slideId: string) => {
-    useIterationStore.getState().setActiveSlide(deckId, slideId);
-  },
-  
-  /**
-   * Get active slide ID for a specific deck
-   */
-  getActiveSlide: (deckId: string): string | undefined => {
-    return useIterationStore.getState().activeDecks[deckId];
-  },
-  
-  /**
-   * Check if we're in production mode
-   */
-  get isProduction() {
-    return useIterationStore.getState().isProduction;
-  },
-  
-  /**
-   * Get all active decks
-   */
-  get activeDecks() {
-    return useIterationStore.getState().activeDecks;
-  },
+export const subscribeToIterationStore = (
+  listener: (state: IterationStore) => void
+): (() => void) => {
+  return store.subscribe(listener);
 };
 
-// Note: IterationStore interface is already exported above
+/**
+ * Get current store state
+ */
+export const getIterationStoreState = (): IterationStore => {
+  return store;
+};
+
+/**
+ * Check if we're in development mode
+ */
+export const isDevelopmentMode = (): boolean => {
+  return !store.isProduction;
+};
