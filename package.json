@@ -1,94 +1,35 @@
 {
-  "name": "iteration-deck",
-  "version": "0.1.0",
-  "description": "React components for AI-first prototyping workflows that enable designers and PMs to compare AI-generated UI variations interactively",
+  "name": "vite-ts-lit",
+  "private": true,
+  "version": "0.0.0",
   "type": "module",
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    },
-    "./styles": "./dist/style.css"
-  },
-  "files": [
-    "dist"
-  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "build:lib": "tsc --project tsconfig.lib.json && vite build --mode library",
-    "lint": "eslint .",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "test:watch": "vitest",
     "preview": "vite preview",
-    "prepublishOnly": "npm run build:lib"
-  },
-  "keywords": [
-    "react",
-    "typescript",
-    "ai",
-    "prototyping",
-    "design",
-    "components",
-    "ui",
-    "variations",
-    "iteration",
-    "ai-first",
-    "design-tools",
-    "ui-variations",
-    "component-comparison",
-    "design-iteration",
-    "ai-generated-ui",
-    "prototype-comparison",
-    "design-system",
-    "ui-prototyping",
-    "variation-testing",
-    "ab-testing",
-    "ui-testing",
-    "design-workflow",
-    "ai-coding-agent",
-    "ai-assistant",
-    "claude",
-    "chatgpt",
-    "cursor",
-    "copilot"
-  ],
-  "author": "Your Name",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/yourusername/iteration-deck.git"
-  },
-  "peerDependencies": {
-    "react": ">=18.0.0",
-    "react-dom": ">=18.0.0"
+    "test": "vitest",
+    "test.watch": "vitest --watch",
+    "test.ui": "vitest --ui",
+    "test.coverage": "vitest --coverage",
+    "test.run": "vitest run"
   },
   "dependencies": {
-    "zustand": "^5.0.2"
+    "@vanilla-extract/css": "^1.17.4",
+    "@vanilla-extract/vite-plugin": "^5.1.1",
+    "lit": "^3.3.1",
+    "zustand": "^5.0.7"
   },
   "devDependencies": {
-    "@eslint/js": "^9.33.0",
-    "@testing-library/jest-dom": "^6.6.4",
-    "@testing-library/react": "^16.3.0",
-    "@testing-library/user-event": "^14.6.1",
+    "@open-wc/testing-helpers": "^3.0.1",
+    "@types/jsdom": "^21.1.7",
+    "@types/node": "^24.3.0",
     "@types/react": "^19.1.10",
-    "@types/react-dom": "^19.1.7",
-    "@vitejs/plugin-react": "^5.0.0",
-    "eslint": "^9.33.0",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-react-refresh": "^0.4.20",
-    "globals": "^16.3.0",
+    "@vitest/ui": "^3.2.4",
+    "happy-dom": "^18.0.1",
     "jsdom": "^26.1.0",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1",
     "typescript": "~5.8.3",
-    "typescript-eslint": "^8.39.1",
     "vite": "^7.1.2",
-    "vite-plugin-dts": "^4.3.0",
     "vitest": "^3.2.4"
   }
 }

@@ -2,9 +2,57 @@
 
 ## Overview
 
-React TypeScript components for **AI-first prototyping workflows** that enable designers and PMs to compare AI-generated UI variations interactively. Uses a slide deck metaphor where each AI-generated variation is a "slide" in the deck.
+Universal web components built with Lit for **AI-first prototyping workflows** that enable designers and PMs to compare AI-generated UI variations interactively. Uses a slide deck metaphor where each AI-generated variation is a "slide" in the deck.
 
 **Core Philosophy:** Provide the "duplicate frame" equivalent for AI-generated code variations, allowing live comparison of interactive prototypes directly in product context.
+
+**Architecture:** Lit web components with manual React wrappers, Zustand for state management, and @vanilla-extract/css for zero-runtime, type-safe styling. Works with any framework (React, Vue, Angular, Astro, vanilla HTML).
+
+## Architecture Deep Dive
+
+### Lit Web Components Foundation
+The core functionality is implemented as Lit components with excellent performance and developer experience:
+- `<iteration-deck>`: Main container component with Zustand state integration
+- `<iteration-deck-slide>`: Individual slide wrapper with Lit @property decorators
+- `<iteration-deck-toolbar>`: Development toolbar (singleton) with Zustand state
+
+### @vanilla-extract/css Styling System
+Zero-runtime, type-safe CSS with design token integration:
+- **Design Tokens**: Categorized token files in `src/design-system/tokens.ts` directory exported via central index.ts
+- **Component Styles**: Individual `[component-name].css.ts` files in component folder
+- **Build-time Generation**: All CSS generated at build time, no runtime overhead
+
+### Zustand State Management
+```typescript
+interface IterationStore {
+  activeDecks: Record<string, string>; // deckId -> activeSlideId
+  setActiveSlide: (deckId: string, slideId: string) => void;
+  isProduction: boolean;
+}
+```
+- Lit components subscribe via `store.subscribe()`
+- React components use `useIterationStore()` hook
+
+### Manual React Wrapper Components
+Thin React wrapper components for seamless integration:
+```tsx
+// Manual React wrapper around Lit component
+import { IterationDeck } from '@iteration-deck/react';
+
+// Direct web component usage for other frameworks
+import '@iteration-deck/core';
+
+// Astro integration
+import { IterationDeck } from '@iteration-deck/astro';
+```
+
+### Universal Framework Support
+- **React**: Manual React wrapper components with Zustand integration and proper TypeScript types
+- **Vue**: Direct web component usage with reactive property binding
+- **Angular**: Direct web component usage with proper change detection
+- **Astro**: Custom Astro integration with SSR support
+- **Vanilla HTML**: Import and use web components directly
+- **Other frameworks**: Web components work universally with Lit optimizations
 
 ## Component API
 
@@ -137,6 +185,7 @@ Single global toolbar (singleton pattern) with intelligent multi-deck support:
 - Previous/Next navigation for the currently active deck
 - Current slide label display for active deck
 - Keyboard shortcuts (Ctrl/Cmd + Arrow keys) operate on active deck only
+- **Zero-runtime styling** via @vanilla-extract/css
 
 ### Multi-Deck Behavior
 - Single toolbar instance shared across all IterationDecks
@@ -144,7 +193,24 @@ Single global toolbar (singleton pattern) with intelligent multi-deck support:
 - Active deck highlighted in selector and responds to keyboard shortcuts
 - Automatic cleanup when decks are unmounted
 
-The toolbar accesses the `IterationDeckContext` directly and uses `setActiveIndex` and `setActiveDeck` for navigation.
+### Component Structure
+```
+src/
+├── design/
+│   └── tokens.ts
+├── lit/
+│   ├── iteration-deck.ts
+│   ├── iteration-deck.css.ts
+│   ├── iteration-deck-slide.ts  
+│   ├── iteration-deck-slide.css.ts
+│   ├── iteration-deck-toolbar.ts
+│   └── iteration-deck-toolbar.css.ts
+├── react/
+│   ├── IterationDeck.tsx
+│   └── IterationDeckSlide.tsx
+└── store/
+    └── iteration-store.ts
+```
 
 ## Production Behavior
 
@@ -166,42 +232,50 @@ In production builds, render only the first child by default:
 </IterationDeck>
 ```
 
-## Testing
+## Core Implementation Requirements
 
-### Component Tests
-- Basic rendering with variations
-- Context state management
-- Navigation between variations
-- Production vs development behavior
+### Environment Detection
+```typescript
+const isProduction = process.env.NODE_ENV === 'production';
+// Production: render only first slide
+// Development: show toolbar + all slides
+```
 
-### Integration Tests  
-- Toolbar interaction
-- Keyboard shortcuts
-- Multiple iteration groups
+### Lit Component Patterns
+```typescript
+@customElement('iteration-deck')
+export class IterationDeck extends LitElement {
+  @property() id!: string;
+  @property() label?: string;
+  @state() private activeSlideId = '';
+  
+  connectedCallback() {
+    super.connectedCallback();
+    // Subscribe to Zustand store
+  }
+}
+```
 
-## Bundle Configuration
-
-### Build Targets
-- **TypeScript declarations**: Full type safety
-- **Dual builds**: ESM and CommonJS support
-
-### Build Tools
-- **Vite**: Library mode with multiple entry points
-- **TypeScript**: Strict mode compilation
-- **CSS Modules**: Component-scoped styling
 
 ## Installation & Usage
 
 ### Installation
 ```bash
-pnpm add iteration-deck
+# Framework-specific packages
+pnpm add @iteration-deck/react     # For React projects (manual wrappers)
+pnpm add @iteration-deck/astro     # For Astro projects with SSR support
+
+# Universal web components package
+pnpm add @iteration-deck/core      # For vanilla HTML and other frameworks
 ```
 
 ### Import and Usage
-```tsx
-import { IterationDeck, IterationDeckSlide } from 'iteration-deck';
 
-// Basic usage
+#### React Usage (Manual Wrappers)
+```tsx
+import { IterationDeck, IterationDeckSlide } from '@iteration-deck/react';
+
+// Manual React wrapper components with Zustand integration
 <IterationDeck id="hero-layouts" label="Hero Sections">
   <IterationDeckSlide label="Layout 1">
     <HeroLayout1 />
@@ -215,32 +289,78 @@ import { IterationDeck, IterationDeckSlide } from 'iteration-deck';
 </IterationDeck>
 ```
 
-## Bundle Configuration
+#### Astro Usage (Custom Integration)
+```astro
+---
+// Component script - runs on the server
+import { IterationDeck, IterationDeckSlide } from '@iteration-deck/astro';
+---
 
-### Build Requirements
-- TypeScript compilation with declaration files
-- Rollup bundling for optimal tree-shaking
-- Development vs production behavior detection
+<!-- SSR with client hydration for interactivity -->
+<IterationDeck id="hero-layouts" label="Hero Sections" client:load>
+  <IterationDeckSlide label="Layout 1">
+    <MyHeroLayout variant="1" />
+  </IterationDeckSlide>
+  <IterationDeckSlide label="Layout 2">
+    <MyHeroLayout variant="2" />
+  </IterationDeckSlide>
+  <IterationDeckSlide label="Layout 3">
+    <MyHeroLayout variant="3" />
+  </IterationDeckSlide>
+</IterationDeck>
+
+<style>
+  /* Astro scoped styles work seamlessly */
+  iteration-deck {
+    margin: 2rem 0;
+  }
+</style>
+```
+
+#### Vanilla HTML Usage
+```html
+<!-- Direct web component usage in vanilla HTML -->
+<script type="module">
+  import '@iteration-deck/core';
+</script>
+
+<iteration-deck id="components" label="Component Variations">
+  <iteration-deck-slide label="Version 1">
+    <div class="my-component variant-1">Content 1</div>
+  </iteration-deck-slide>
+  <iteration-deck-slide label="Version 2">
+    <div class="my-component variant-2">Content 2</div>
+  </iteration-deck-slide>
+</iteration-deck>
+```
+
+## Build Configuration
+- **Vite**: Library mode with multiple entry points
+- **TypeScript**: Strict mode with experimental decorators
+- **@vanilla-extract/css**: Vite plugin for CSS extraction
 
 ## Environment-Specific Behavior
 
 ### Development Mode
-- **Global toolbar**: Single toolbar for all IterationDeck instances
+- **Global toolbar**: Single Lit toolbar component for all IterationDeck instances
 - **Multi-deck support**: Dropdown selector when multiple decks present
-- **Keyboard shortcuts**: Ctrl/Cmd + Arrow keys for navigation
-- **All slides visible**: Shows active slide based on state
+- **Keyboard shortcuts**: Ctrl/Cmd + Arrow keys for navigation via Lit event listeners
+- **All slides visible**: Shows active slide based on Zustand state store
+- **MutationObserver**: Automatically detects dynamically added slides
+- **Hot reload support**: Vite development server with instant updates
 
 ### Production Mode
-- **First slide only**: Renders `children[0]` automatically
-- **No toolbar**: Environment detection prevents mounting
-- **Zero overhead**: Minimal runtime footprint
+- **First slide only**: Lit components render first child only
+- **No toolbar**: Toolbar mounting prevented in production
+- **Zero CSS overhead**: All styles pre-generated by @vanilla-extract/css
+- **Optimized bundles**: Tree-shaken, minified output with code splitting
+- **Framework-specific optimizations**: Each package optimized for its target framework
 
 ## AI-First Features
 
 ### Design Collaboration
 - **Shareable URLs**: Preserve exact deck/slide state for stakeholder reviews
 - **Presentation mode**: Clean interface hiding AI metadata during presentations
-- **Bookmarkable sessions**: Designers can bookmark specific iteration states
 
 ### URL Parameters
 ```javascript
@@ -251,45 +371,10 @@ https://myapp.com/dashboard?iteration-deck=button-variations&slide=hover-state
 https://myapp.com/page?iteration-deck=cards&slide=modern&prompt=make-it-more-minimal
 ```
 
-## Testing Requirements
+## Key Behaviors
+1. **Single toolbar** globally across all decks (singleton pattern)
+2. **Production mode** renders only first slide per deck
+3. **Development mode** shows toolbar + slide navigation
+4. **Keyboard shortcuts** (Ctrl/Cmd + Arrow keys) for active deck
+5. **Multi-deck support** via dropdown when >1 deck present
 
-### Critical Test Cases
-1. **Environment detection**: Production vs development rendering
-2. **Toolbar singleton**: Only one toolbar exists with multiple decks
-3. **Global state**: Cross-component state synchronization
-4. **URL synchronization**: State persists across page reloads
-5. **Keyboard shortcuts**: Navigation works on active deck only
-
-## Implementation Plan
-
-### Phase 1: NPM Module Setup
-
-#### Post-Scaffolding Tasks
-- [ ] Review and adjust generated configuration files for npm library distribution
-- [ ] Update package.json with proper package fields and library-specific scripts
-- [ ] Configure Vite for library bundling instead of app bundling
-- [ ] Install any additional dependencies required for iteration-deck components
-- [ ] Update tsconfig.json for library builds if needed
-
-### Phase 2: Core Development (Can run 2 agents concurrently)
-**Agent A:** Core Components  
-- [ ] IterationDeck component with context
-- [ ] IterationDeckSlide wrapper component
-- [ ] Development environment detection logic
-- [ ] Component test suite
-
-**Agent B:** Development Toolbar
-- [ ] Toolbar UI component
-- [ ] Keyboard navigation logic
-- [ ] Toolbar styling
-
-### Phase 3: Distribution & Demo (Can run 2 agents concurrently) 
-**Agent A:** Build & Publishing
-- [ ] Connect toolbar to component context
-- [ ] Build pipeline testing
-- [ ] NPM publishing workflow
-
-**Agent B:** Example Application
-- [ ] Demo app consuming the pnpm package
-- [ ] Usage documentation and README
-- [ ] Installation testing

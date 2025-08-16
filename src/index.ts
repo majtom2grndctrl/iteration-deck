@@ -1,23 +1,4 @@
-// Main exports for the iteration-deck library
-export { IterationDeck } from './react/IterationDeck'
-export { IterationDeckSlide } from './react/IterationDeckSlide'
-
-// Export types for TypeScript users
-export type { 
-  IterationDeckProps, 
-  IterationDeckSlideProps 
-} from './core/types'
-
-// Export utility types and helpers for AI agents
-export type {
-  ComponentVariation,
-  LayoutVariation, 
-  StateVariation
-} from './core/utilities'
-
-export {
-  createSlideFromVariation,
-  COMMON_VARIATION_PATTERNS,
-  generateVariationLabel,
-  AI_PRESETS
-} from './core/utilities'
+// Core web components entry point
+export * from './components';
+export * from './store/iteration-store';
+export * from './core/types';

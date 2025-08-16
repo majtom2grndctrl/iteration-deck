@@ -1,34 +1,33 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import { resolve } from 'path'
+import { defineConfig } from 'vite';
+import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin';
+import { resolve } from 'path';
 
-// https://vite.dev/config/
-export default defineConfig(({ mode }) => {
-  const isLibraryMode = mode === 'library'
-  
-  return {
-    plugins: [
-      react()
-    ],
-    ...(isLibraryMode ? {
-      build: {
-        lib: {
-          entry: resolve(__dirname, 'src/index.ts'),
-          name: 'IterationDeck',
-          formats: ['es'],
-          fileName: 'index'
-        },
-        rollupOptions: {
-          external: ['react', 'react-dom'],
-          output: {
-            globals: {
-              react: 'React',
-              'react-dom': 'ReactDOM'
-            }
-          }
-        },
-        cssCodeSplit: false
+export default defineConfig({
+  plugins: [vanillaExtractPlugin()],
+  build: {
+    lib: {
+      entry: {
+        core: resolve(__dirname, 'src/index.ts'),
+        react: resolve(__dirname, 'src/react/index.tsx'),
+      },
+      name: 'IterationDeck',
+      formats: ['es', 'cjs']
+    },
+    rollupOptions: {
+      external: ['react', 'react-dom', 'lit', 'zustand'],
+      output: {
+        globals: {
+          react: 'React',
+          'react-dom': 'ReactDOM',
+          lit: 'lit',
+          zustand: 'zustand'
+        }
       }
-    } : {})
-  }
-})
+    }
+  },
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, './src'),
+    },
+  },
+});
