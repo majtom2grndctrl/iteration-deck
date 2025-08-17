@@ -10,12 +10,7 @@ export default defineConfig({
         core: resolve(__dirname, 'src/index.ts'),
         react: resolve(__dirname, 'src/react/index.tsx'),
       },
-      name: 'IterationDeck',
-      formats: ['es', 'cjs'],
-      fileName: (format, entryName) => {
-        const ext = format === 'es' ? 'js' : 'cjs';
-        return `${entryName}.${ext}`;
-      }
+      name: 'IterationDeck'
     },
     rollupOptions: {
       external: ['react', 'react-dom', 'lit', 'zustand'],
@@ -23,6 +18,13 @@ export default defineConfig({
         {
           format: 'es',
           entryFileNames: '[name].js',
+          chunkFileNames: 'chunks/[name]-[hash].js',
+          assetFileNames: (assetInfo) => {
+            if (assetInfo.name?.endsWith('.css')) {
+              return 'style.css';
+            }
+            return 'assets/[name]-[hash][extname]';
+          },
           globals: {
             react: 'React',
             'react-dom': 'ReactDOM',
@@ -33,6 +35,13 @@ export default defineConfig({
         {
           format: 'cjs',
           entryFileNames: '[name].cjs',
+          chunkFileNames: 'chunks/[name]-[hash].cjs',
+          assetFileNames: (assetInfo) => {
+            if (assetInfo.name?.endsWith('.css')) {
+              return 'style.css';
+            }
+            return 'assets/[name]-[hash][extname]';
+          },
           globals: {
             react: 'React',
             'react-dom': 'ReactDOM',
@@ -40,15 +49,43 @@ export default defineConfig({
             zustand: 'zustand'
           }
         }
-      ]
+      ],
+      // Enable tree-shaking optimizations
+      treeshake: {
+        moduleSideEffects: false,
+        propertyReadSideEffects: false,
+        tryCatchDeoptimization: false
+      }
     },
     cssCodeSplit: false,
     outDir: 'dist',
-    emptyOutDir: true
+    emptyOutDir: true,
+    // Production optimizations
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+        pure_funcs: ['console.log', 'console.debug']
+      },
+      mangle: {
+        safari10: true
+      }
+    },
+    // Source maps for debugging
+    sourcemap: true,
+    // Report bundle size
+    reportCompressedSize: true,
+    // Chunk size warnings
+    chunkSizeWarningLimit: 1000
   },
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
     },
   },
+  // Optimization for production builds
+  define: {
+    __DEV__: JSON.stringify(process.env.NODE_ENV !== 'production')
+  }
 });

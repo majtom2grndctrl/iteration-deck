@@ -26,7 +26,7 @@ import { useIterationStore, useActiveSlide } from './hooks';
  */
 export interface IterationDeckProps extends CoreIterationDeckProps {
   /** React children - should be IterationDeckSlide components */
-  children: ReactElement<IterationDeckSlideProps> | ReactElement<IterationDeckSlideProps>[];
+  children?: ReactElement<IterationDeckSlideProps> | ReactElement<IterationDeckSlideProps>[];
   /** Optional className for styling */
   className?: string;
   /** Optional style object */

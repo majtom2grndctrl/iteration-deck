@@ -5,8 +5,8 @@
  * children/slot handling, and ref forwarding as requested.
  */
 
-import React, { createRef, useState, useEffect } from 'react';
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { createRef, useState, useEffect } from 'react';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { render, cleanup, waitFor, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 

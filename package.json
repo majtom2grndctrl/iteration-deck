@@ -1,29 +1,44 @@
 {
   "name": "@iteration-deck/core",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "AI-first prototyping web components for comparing interactive UI variations",
+  "homepage": "https://github.com/dhiester/iteration-deck",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dhiester/iteration-deck.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dhiester/iteration-deck/issues"
+  },
+  "author": {
+    "name": "David Hiester",
+    "email": "your-email@example.com"
+  },
+  "license": "MIT",
   "type": "module",
+  "sideEffects": false,
   "main": "./dist/core.cjs",
   "module": "./dist/core.js",
-  "types": "./dist/core.d.ts",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/core.d.ts",
+      "types": "./dist/index.d.ts",
       "import": "./dist/core.js",
       "require": "./dist/core.cjs"
     },
     "./react": {
-      "types": "./dist/react.d.ts",
+      "types": "./dist/react/index.d.ts",
       "import": "./dist/react.js",
       "require": "./dist/react.cjs"
     },
-    "./styles": {
-      "import": "./dist/styles.css"
-    }
+    "./styles": "./dist/style.css",
+    "./package.json": "./package.json"
   },
   "files": [
-    "dist",
-    "README.md"
+    "dist/**/*",
+    "LICENSE",
+    "README.md",
+    "CHANGELOG.md"
   ],
   "keywords": [
     "web-components",
@@ -32,11 +47,22 @@
     "ai-prototyping",
     "design-systems",
     "ui-variations",
-    "design-tools"
+    "design-tools",
+    "prototyping",
+    "frontend",
+    "component-library",
+    "typescript",
+    "vanilla-extract",
+    "zustand",
+    "custom-elements"
   ],
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "clean": "rm -rf dist",
+    "prebuild": "pnpm run clean",
+    "build": "vite build && tsc --project tsconfig.build.json",
+    "prebuild:dist": "pnpm run clean",
+    "build:dist": "vite build && tsc --project tsconfig.build.json && cp dist/index.d.ts dist/core.d.ts && cp dist/react/index.d.ts dist/react.d.ts",
     "build.watch": "vite build --watch",
     "preview": "vite preview",
     "test": "vitest",
@@ -45,7 +71,11 @@
     "test.coverage": "vitest --coverage",
     "test.run": "vitest run",
     "lint": "tsc --noEmit",
-    "prepublishOnly": "npm run build"
+    "prepack": "pnpm run build:dist",
+    "prepublishOnly": "pnpm run build:dist && pnpm run test.run"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   },
   "dependencies": {
     "lit": "^3.3.1",
@@ -64,8 +94,6 @@
     }
   },
   "devDependencies": {
-    "@vanilla-extract/css": "^1.17.4",
-    "@vanilla-extract/vite-plugin": "^5.1.1",
     "@open-wc/testing-helpers": "^3.0.1",
     "@testing-library/jest-dom": "^6.7.0",
     "@testing-library/react": "^16.3.0",
@@ -73,10 +101,13 @@
     "@types/jsdom": "^21.1.7",
     "@types/node": "^24.3.0",
     "@types/react": "^19.1.10",
+    "@vanilla-extract/css": "^1.17.4",
+    "@vanilla-extract/vite-plugin": "^5.1.1",
     "@vitest/ui": "^3.2.4",
     "happy-dom": "^18.0.1",
     "jsdom": "^26.1.0",
     "react": "^19.1.1",
+    "terser": "^5.43.1",
     "typescript": "~5.8.3",
     "vite": "^7.1.2",
     "vitest": "^3.2.4"
