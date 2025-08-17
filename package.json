@@ -1,26 +1,75 @@
 {
-  "name": "vite-ts-lit",
-  "private": true,
-  "version": "0.0.0",
+  "name": "@iteration-deck/core",
+  "version": "1.0.0",
+  "description": "AI-first prototyping web components for comparing interactive UI variations",
   "type": "module",
+  "main": "./dist/core.cjs",
+  "module": "./dist/core.js",
+  "types": "./dist/core.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/core.d.ts",
+      "import": "./dist/core.js",
+      "require": "./dist/core.cjs"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.js",
+      "require": "./dist/react.cjs"
+    },
+    "./styles": {
+      "import": "./dist/styles.css"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "keywords": [
+    "web-components",
+    "lit",
+    "react",
+    "ai-prototyping",
+    "design-systems",
+    "ui-variations",
+    "design-tools"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build.watch": "vite build --watch",
     "preview": "vite preview",
     "test": "vitest",
     "test.watch": "vitest --watch",
     "test.ui": "vitest --ui",
     "test.coverage": "vitest --coverage",
-    "test.run": "vitest run"
+    "test.run": "vitest run",
+    "lint": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@vanilla-extract/css": "^1.17.4",
-    "@vanilla-extract/vite-plugin": "^5.1.1",
     "lit": "^3.3.1",
     "zustand": "^5.0.7"
   },
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
+  },
   "devDependencies": {
+    "@vanilla-extract/css": "^1.17.4",
+    "@vanilla-extract/vite-plugin": "^5.1.1",
     "@open-wc/testing-helpers": "^3.0.1",
+    "@testing-library/jest-dom": "^6.7.0",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/jsdom": "^21.1.7",
     "@types/node": "^24.3.0",
     "@types/react": "^19.1.10",

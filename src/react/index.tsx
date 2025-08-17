@@ -1,8 +1,30 @@
-// React integration is deferred - placeholder file
-// React wrapper components and hooks will be implemented later
+/**
+ * React integration for iteration-deck components
+ * Provides React wrapper components and hooks for seamless integration
+ */
 
-// Basic store utilities for React integration (when needed)
+// React wrapper components
+export { IterationDeck } from './IterationDeck';
+export type { IterationDeckProps, IterationDeckHandle } from './IterationDeck';
+
+export { 
+  IterationDeckSlide,
+  default as IterationDeckSlideDefault 
+} from './IterationDeckSlide';
+export type { 
+  ReactIterationDeckSlideProps,
+  IterationDeckSlideRef 
+} from './IterationDeckSlide';
+
+// React hooks for store integration
 export {
+  useIterationStore,
+  useActiveSlide,
+  useDeckMetadata,
+  useDeckNavigation,
+  useRegisterDeck,
+  useIsDevelopment,
+  useIterationStoreSnapshot,
   isDevelopmentMode,
   getIterationStoreState
 } from './hooks';

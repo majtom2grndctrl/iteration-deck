@@ -39,10 +39,10 @@ Remember to follow instructions in @../CLAUDE.md and @.TECHNICAL_SPEC.md
 ✅ **[Task Tool - general-purpose]** iteration-deck-slide.css.ts - Slide-specific styling with transitions - Complete with comprehensive @vanilla-extract styles, AI metadata overlays, confidence indicators, accessibility features, and smooth state transitions
 ✅ **[Task Tool - general-purpose]** iteration-deck-toolbar.css.ts - Pill-shaped toolbar with backdrop effects, responsive design - Complete with full pill-shaped design, multi-deck dropdown, navigation controls, keyboard shortcuts, and dark mode support
 
-## ~~Phase 5: React Integration (Sequential - Depends on Lit components)~~ Deferred for later
-📋 React wrapper for IterationDeck - Manual wrapper with Zustand hook integration
-📋 React wrapper for IterationDeckSlide - Proper TypeScript props and children handling
-✅ React hooks setup - useIterationStore hook for React components
+## Phase 5: React Integration (Sequential - Depends on Lit components) **Do this next!**
+✅ React wrapper for IterationDeck - Manual wrapper with Zustand hook integration - Complete with React.forwardRef, proper TypeScript types, Zustand integration, event handling, and imperative API exposure
+✅ React wrapper for IterationDeckSlide - Proper TypeScript props and children handling - Complete with React.forwardRef, comprehensive TypeScript types, prop mapping to web component attributes, children handling, imperative API exposure, and seamless integration with underlying Lit component
+✅ React hooks setup - useIterationStore hook for React components - Complete with comprehensive React integration including useIterationStore, useActiveSlide, useDeckMetadata, useDeckNavigation, useRegisterDeck, and useIsDevelopment hooks
 
 ## Phase 6: Testing & Documentation (Can run concurrently with Task Tool)
 ✅ **[Task Tool - general-purpose]** Unit tests for Lit components - Complete comprehensive test suite with Vitest setup, test utilities, environment mocking, component rendering, accessibility testing, error states, edge cases, public API validation, store integration, lifecycle management, and singleton pattern testing. Includes 25+ passing test cases covering all core functionality.

@@ -11,19 +11,40 @@ export default defineConfig({
         react: resolve(__dirname, 'src/react/index.tsx'),
       },
       name: 'IterationDeck',
-      formats: ['es', 'cjs']
+      formats: ['es', 'cjs'],
+      fileName: (format, entryName) => {
+        const ext = format === 'es' ? 'js' : 'cjs';
+        return `${entryName}.${ext}`;
+      }
     },
     rollupOptions: {
       external: ['react', 'react-dom', 'lit', 'zustand'],
-      output: {
-        globals: {
-          react: 'React',
-          'react-dom': 'ReactDOM',
-          lit: 'lit',
-          zustand: 'zustand'
+      output: [
+        {
+          format: 'es',
+          entryFileNames: '[name].js',
+          globals: {
+            react: 'React',
+            'react-dom': 'ReactDOM',
+            lit: 'lit',
+            zustand: 'zustand'
+          }
+        },
+        {
+          format: 'cjs',
+          entryFileNames: '[name].cjs',
+          globals: {
+            react: 'React',
+            'react-dom': 'ReactDOM',
+            lit: 'lit',
+            zustand: 'zustand'
+          }
         }
-      }
-    }
+      ]
+    },
+    cssCodeSplit: false,
+    outDir: 'dist',
+    emptyOutDir: true
   },
   resolve: {
     alias: {

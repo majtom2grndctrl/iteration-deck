@@ -6,8 +6,9 @@
  */
 
 import { expect, beforeEach, afterEach, vi } from 'vitest';
+import '@testing-library/jest-dom';
 
-// Custom DOM matchers would be added here when needed
+// Custom DOM matchers are now available via @testing-library/jest-dom
 
 // Global test setup
 beforeEach(() => {
