@@ -1,18 +1,17 @@
 {
   "name": "@iteration-deck/core",
   "version": "0.0.0",
-  "description": "AI-first prototyping web components for comparing interactive UI variations",
-  "homepage": "https://github.com/dhiester/iteration-deck",
+  "description": "AI-first prototyping web components for comparing interactive UI variations. Perfect for AI coding agents to create multiple design variations and A/B test prototypes.",
+  "homepage": "https://github.com/MajTom2GrndCtrl/iteration-deck",
   "repository": {
     "type": "git",
-    "url": "https://github.com/dhiester/iteration-deck.git"
+    "url": "https://github.com/MajTom2GrndCtrl/iteration-deck.git"
   },
   "bugs": {
-    "url": "https://github.com/dhiester/iteration-deck/issues"
+    "url": "https://github.com/MajTom2GrndCtrl/iteration-deck/issues"
   },
   "author": {
-    "name": "David Hiester",
-    "email": "your-email@example.com"
+    "name": "Dan Hiester",
   },
   "license": "MIT",
   "type": "module",
@@ -38,19 +37,34 @@
     "dist/**/*",
     "LICENSE",
     "README.md",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "AI_INSTRUCTIONS.md",
+    "AI_EXAMPLES.md",
+    "AI_QUICK_REFERENCE.md"
   ],
   "keywords": [
     "web-components",
     "lit",
     "react",
     "ai-prototyping",
-    "design-systems",
+    "ai-coding-agents",
     "ui-variations",
-    "design-tools",
+    "design-variations",
+    "multiple-versions",
+    "compare-components",
+    "a-b-testing",
     "prototyping",
+    "design-iteration",
+    "component-variations",
+    "ai-generated-ui",
+    "design-systems",
+    "design-tools",
     "frontend",
     "component-library",
+    "interactive-prototypes",
+    "claude-code",
+    "chatgpt-ui",
+    "ai-development",
     "typescript",
     "vanilla-extract",
     "zustand",
