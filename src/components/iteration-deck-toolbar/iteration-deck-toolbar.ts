@@ -17,8 +17,6 @@
 
 import { LitElement, html, nothing, css } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { ref, createRef, type Ref } from 'lit/directives/ref.js';
-import { when } from 'lit/directives/when.js';
 import { 
   subscribeToIterationStore, 
   getIterationStoreState, 
@@ -59,10 +57,6 @@ export class IterationDeckToolbar extends LitElement {
 
   // Note: Dropdown functionality will be implemented in future iterations
 
-  /**
-   * Reference to the dropdown select element for focus management
-   */
-  private dropdownRef: Ref<HTMLSelectElement> = createRef();
 
   /**
    * Store unsubscribe function
@@ -569,10 +563,9 @@ export class IterationDeckToolbar extends LitElement {
     }
 
     return html`
-      ${when(hasMultipleDecks, () => html`
+      ${hasMultipleDecks ? html`
         <div class="deck-selector">
           <select 
-            ${ref(this.dropdownRef)}
             @change=${this.handleDeckSelection}
             .value=${selectedDeckId || ''}
             aria-label="Select iteration deck"
@@ -588,7 +581,7 @@ export class IterationDeckToolbar extends LitElement {
           </select>
         </div>
         <div class="separator"></div>
-      `)}
+      ` : ''}
       
       <div class="navigation">
         <button 

@@ -16,7 +16,6 @@
 
 import { LitElement, html, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { classMap } from 'lit/directives/class-map.js';
 
 // Import core types and utilities
 import type { 
@@ -386,13 +385,12 @@ export class IterationDeck extends LitElement {
       return html`<slot></slot>`;
     }
 
-    // Determine container classes based on mode
-    const containerClasses = classMap({
-      [iterationDeckStyles.base]: true,
-      [iterationDeckStyles.production]: this._isProduction,
-      [iterationDeckStyles.development]: !this._isProduction,
-      [iterationDeckStyles.animated]: true
-    });
+    // Determine container classes based on mode (manual class building instead of classMap)
+    const containerClasses = [
+      iterationDeckStyles.base,
+      this._isProduction ? iterationDeckStyles.production : iterationDeckStyles.development,
+      iterationDeckStyles.animated
+    ].join(' ');
 
     // Simply render the default slot - the slide components will handle their own visibility
     return html`

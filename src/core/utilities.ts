@@ -83,11 +83,24 @@ export const validateDeckId = (id: string): boolean => {
 };
 
 /**
- * Debug logging (only in development)
+ * Debug logging (only in development, and only for important messages)
  */
 export const debugLog = (message: string, data?: any): void => {
   if (isDevelopment()) {
-    console.log(`[IterationDeck] ${message}`, data || '');
+    // Only log important debug messages to reduce console noise
+    const importantKeywords = [
+      'ERROR', 'WARN', 'VALIDATION', 
+      'registered successfully', 'web components registered',
+      'failed', 'not found', 'missing'
+    ];
+    
+    const isImportant = importantKeywords.some(keyword => 
+      message.toLowerCase().includes(keyword.toLowerCase())
+    );
+    
+    if (isImportant) {
+      console.log(`[IterationDeck] ${message}`, data || '');
+    }
   }
 };
 
