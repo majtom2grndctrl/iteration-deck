@@ -6,7 +6,7 @@ Universal web components built with Lit for **AI-first prototyping workflows** t
 
 **Core Philosophy:** Provide the "duplicate frame" equivalent for AI-generated code variations, allowing live comparison of interactive prototypes directly in product context.
 
-**Architecture:** Lit web components with manual React wrappers, Zustand for state management, and @vanilla-extract/css for zero-runtime, type-safe styling. Works with any framework (React, Vue, Angular, Astro, vanilla HTML).
+**Architecture:** Lit web components with manual React wrappers, Zustand for state management, and ShadowDOM-encapsulated CSS using Lit's tagged template literals with design tokens. Works with any framework (React, Vue, Angular, Astro, vanilla HTML).
 
 ## Architecture Deep Dive
 
@@ -16,11 +16,12 @@ The core functionality is implemented as Lit components with excellent performan
 - `<iteration-deck-slide>`: Individual slide wrapper with Lit @property decorators
 - `<iteration-deck-toolbar>`: Development toolbar (singleton) with Zustand state
 
-### @vanilla-extract/css Styling System
-Zero-runtime, type-safe CSS with design token integration:
-- **Design Tokens**: Categorized token files in `src/design-system/tokens.ts` directory exported via central index.ts
-- **Component Styles**: Individual `[component-name].css.ts` files in component folder
-- **Build-time Generation**: All CSS generated at build time, no runtime overhead
+### ShadowDOM Styling System
+ShadowDOM-encapsulated CSS using Lit's tagged template literals with design token integration:
+- **Design Tokens**: TypeScript constants for static values (colors, spacing, typography scales) in `src/util/tokens/`
+- **CSS Custom Properties**: Runtime-dynamic values (theme switching, user preferences) defined within components
+- **ShadowDOM Encapsulation**: All styles isolated within component shadow roots for universal compatibility
+- **Embedded Styles**: CSS defined within Lit components using `css` tagged template literals
 
 ### Zustand State Management
 ```typescript
@@ -185,7 +186,7 @@ Single global toolbar (singleton pattern) with intelligent multi-deck support:
 - Previous/Next navigation for the currently active deck
 - Current slide label display for active deck
 - Keyboard shortcuts (Ctrl/Cmd + Arrow keys) operate on active deck only
-- **Zero-runtime styling** via @vanilla-extract/css
+- **ShadowDOM-encapsulated styling** via Lit CSS tagged template literals
 
 ### Multi-Deck Behavior
 - Single toolbar instance shared across all IterationDecks
@@ -196,20 +197,23 @@ Single global toolbar (singleton pattern) with intelligent multi-deck support:
 ### Component Structure
 ```
 src/
-├── design/
-│   └── tokens.ts
 ├── lit/
-│   ├── iteration-deck.ts
-│   ├── iteration-deck.css.ts
-│   ├── iteration-deck-slide.ts  
-│   ├── iteration-deck-slide.css.ts
-│   ├── iteration-deck-toolbar.ts
-│   └── iteration-deck-toolbar.css.ts
+│   ├── iteration-deck.ts           # Lit component with embedded CSS
+│   ├── iteration-deck-slide.ts     # Lit component with embedded CSS
+│   └── iteration-deck-toolbar.ts   # Lit component with embedded CSS
 ├── react/
 │   ├── IterationDeck.tsx
 │   └── IterationDeckSlide.tsx
-└── store/
-    └── iteration-store.ts
+├── util/
+│   ├── tokens/
+│   │   ├── index.ts
+│   │   ├── colors.ts
+│   │   ├── spacing.ts
+│   │   └── typography.ts
+│   └── store/
+│       └── iteration-store.ts
+└── example/
+    └── demo.html
 ```
 
 ## Production Behavior
@@ -243,11 +247,24 @@ const isProduction = process.env.NODE_ENV === 'production';
 
 ### Lit Component Patterns
 ```typescript
+import { LitElement, html, css } from 'lit';
+import { customElement, property, state } from 'lit/decorators.js';
+import { colors, spacing } from '../util/tokens/index.js';
+
 @customElement('iteration-deck')
 export class IterationDeck extends LitElement {
   @property() id!: string;
   @property() label?: string;
   @state() private activeSlideId = '';
+  
+  static styles = css`
+    :host {
+      display: block;
+      background-color: ${colors.gray[50]};
+      border-radius: ${spacing.md};
+      --theme-primary: var(--iteration-deck-primary, ${colors.blue[600]});
+    }
+  `;
   
   connectedCallback() {
     super.connectedCallback();
@@ -336,8 +353,8 @@ import { IterationDeck, IterationDeckSlide } from '@iteration-deck/astro';
 
 ## Build Configuration
 - **Vite**: Library mode with multiple entry points
-- **TypeScript**: Strict mode with experimental decorators
-- **@vanilla-extract/css**: Vite plugin for CSS extraction
+- **TypeScript**: Strict mode with experimental decorators for Lit
+- **ShadowDOM**: Built-in CSS encapsulation, no build-time CSS processing needed
 
 ## Environment-Specific Behavior
 
@@ -352,7 +369,7 @@ import { IterationDeck, IterationDeckSlide } from '@iteration-deck/astro';
 ### Production Mode
 - **First slide only**: Lit components render first child only
 - **No toolbar**: Toolbar mounting prevented in production
-- **Zero CSS overhead**: All styles pre-generated by @vanilla-extract/css
+- **ShadowDOM encapsulation**: All styles isolated within component shadow roots
 - **Optimized bundles**: Tree-shaken, minified output with code splitting
 - **Framework-specific optimizations**: Each package optimized for its target framework
 
