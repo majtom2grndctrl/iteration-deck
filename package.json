@@ -1,5 +1,5 @@
 {
-  "name": "@iteration-deck/core",
+  "name": "iteration-deck",
   "version": "0.0.0",
   "description": "AI-first prototyping web components for comparing interactive UI variations. Perfect for AI coding agents to create multiple design variations and A/B test prototypes.",
   "homepage": "https://github.com/MajTom2GrndCtrl/iteration-deck",

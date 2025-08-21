@@ -52,7 +52,12 @@ export default defineConfig({
       ],
       // Enable tree-shaking optimizations
       treeshake: {
-        moduleSideEffects: false,
+        moduleSideEffects: (id) => {
+          // Preserve side effects for Lit component registration
+          return id.includes('components/iteration-deck') || 
+                 id.includes('src/lit/') ||
+                 id.includes('src/components/');
+        },
         propertyReadSideEffects: false,
         tryCatchDeoptimization: false
       }

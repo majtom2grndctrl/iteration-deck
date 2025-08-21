@@ -1,0 +1,935 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>React Iteration Deck Demo - AI-First Prototyping</title>
+    
+    <!-- Tailwind CSS from CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Configure Tailwind with design system colors -->
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: {
+                50: '#f0f9ff',
+                100: '#e0f2fe',
+                200: '#bae6fd',
+                300: '#7dd3fc',
+                400: '#38bdf8',
+                500: '#0ea5e9',
+                600: '#0284c7',
+                700: '#0369a1',
+                800: '#075985',
+                900: '#0c4a6e'
+              }
+            }
+          }
+        }
+      }
+    </script>
+    
+    <!-- React and ReactDOM from CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Import iteration-deck styles -->
+    <link rel="stylesheet" href="/dist/style.css">
+    
+    <!-- Import the core iteration-deck components -->
+    <script type="module">
+      // Import core components for custom element registration
+      import '/dist/core.js';
+    </script>
+    
+    <style>
+      /* Additional custom styles */
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      }
+      
+      /* Demo specific styling */
+      .demo-section {
+        margin: 2rem 0;
+        padding: 2rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        background: #fafafa;
+      }
+      
+      .demo-content {
+        background: white;
+        border-radius: 0.375rem;
+        padding: 1.5rem;
+        margin: 1rem 0;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+      }
+      
+      /* Form styling */
+      .form-container {
+        max-width: 400px;
+      }
+      
+      /* Dashboard styling */
+      .dashboard-container {
+        max-width: 800px;
+      }
+      
+      /* Contacts styling */
+      .contacts-container {
+        max-width: 600px;
+      }
+      
+      /* Budget chart placeholder */
+      .chart-placeholder {
+        height: 200px;
+        background: linear-gradient(45deg, #f3f4f6, #e5e7eb);
+        border-radius: 0.375rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6b7280;
+        font-size: 0.875rem;
+      }
+      
+      /* Contact avatar */
+      .contact-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, #3b82f6, #1d4ed8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 0.875rem;
+      }
+      
+      /* Demo badges */
+      .demo-badge {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        background: #dbeafe;
+        color: #1e40af;
+        border-radius: 0.25rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        margin-right: 0.5rem;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 min-h-screen">
+    <div id="react-root"></div>
+    
+    <script type="text/babel">
+      const { useState, useEffect, useCallback } = React;
+      
+      // React wrapper components with proper prop passing
+      const IterationDeck = React.forwardRef(({ children, id, label, prompt, description, onSlideChange, onDeckRegistered, ...otherProps }, ref) => {
+        const elementRef = React.useRef(null);
+        
+        if (!id) {
+          console.error('IterationDeck requires an id prop');
+          return null;
+        }
+        
+        React.useImperativeHandle(ref, () => ({
+          getElement: () => elementRef.current
+        }), []);
+        
+        React.useEffect(() => {
+          const element = elementRef.current;
+          if (!element) return;
+          
+          // Set properties immediately after ref is set
+          const setProperties = () => {
+            try {
+              element.id = id;
+              if (label) element.label = label;
+              if (prompt) element.prompt = prompt;
+              if (description) element.description = description;
+            } catch (error) {
+              console.warn('Error setting properties on IterationDeck:', error);
+            }
+          };
+          
+          // Set properties immediately
+          setProperties();
+          
+          // Also set after a small delay to ensure web component is ready
+          setTimeout(setProperties, 0);
+        }, [id, label, prompt, description]);
+        
+        React.useEffect(() => {
+          const element = elementRef.current;
+          if (!element) return;
+          
+          const handleSlideChange = (event) => onSlideChange?.(event);
+          const handleDeckRegistered = (event) => onDeckRegistered?.(event);
+          
+          if (onSlideChange) element.addEventListener('slide-change', handleSlideChange);
+          if (onDeckRegistered) element.addEventListener('deck-registered', handleDeckRegistered);
+          
+          return () => {
+            if (onSlideChange) element.removeEventListener('slide-change', handleSlideChange);
+            if (onDeckRegistered) element.removeEventListener('deck-registered', handleDeckRegistered);
+          };
+        }, [onSlideChange, onDeckRegistered]);
+        
+        // Create element with essential properties
+        const props = {
+          ref: elementRef,
+          id: id
+        };
+        
+        // Add optional props as attributes (kebab-case for HTML)
+        if (label) props.label = label;
+        if (prompt) props.prompt = prompt;  
+        if (description) props.description = description;
+        
+        return React.createElement('iteration-deck', props, children);
+      });
+      
+      const IterationDeckSlide = React.forwardRef(({ children, label, aiPrompt, notes, confidence, slideId, ...otherProps }, ref) => {
+        const elementRef = React.useRef(null);
+        
+        React.useImperativeHandle(ref, () => ({
+          getElement: () => elementRef.current
+        }), []);
+        
+        React.useEffect(() => {
+          const element = elementRef.current;
+          if (!element) return;
+          
+          const setProperties = () => {
+            try {
+              if (label) element.label = label;
+              if (aiPrompt) element.aiPrompt = aiPrompt;
+              if (notes) element.notes = notes;
+              if (confidence !== undefined) element.confidence = confidence;
+              if (slideId) element.slideId = slideId;
+            } catch (error) {
+              console.warn('Error setting properties on IterationDeckSlide:', error);
+            }
+          };
+          
+          // Set properties immediately
+          setProperties();
+          
+          // Also set after a small delay to ensure web component is ready
+          setTimeout(setProperties, 0);
+        }, [label, aiPrompt, notes, confidence, slideId]);
+        
+        // Create element with properties
+        const props = {
+          ref: elementRef
+        };
+        
+        // Add properties as attributes when they exist
+        if (label) props.label = label;
+        if (aiPrompt) props['ai-prompt'] = aiPrompt;
+        if (notes) props.notes = notes;
+        if (confidence !== undefined) props.confidence = confidence;
+        if (slideId) props['slide-id'] = slideId;
+        
+        return React.createElement('iteration-deck-slide', props, children);
+      });
+
+      // React Components for different form variations
+      const UserPreferencesVertical = () => (
+        <div className="demo-content form-container">
+          <h3 className="text-lg font-semibold mb-4">Account Preferences</h3>
+          <form className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+              <input 
+                type="text" 
+                defaultValue="Sarah Johnson" 
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Email Notifications</label>
+              <div className="space-y-2">
+                <label className="flex items-center">
+                  <input type="checkbox" defaultChecked className="mr-2" />
+                  <span className="text-sm">Product updates</span>
+                </label>
+                <label className="flex items-center">
+                  <input type="checkbox" className="mr-2" />
+                  <span className="text-sm">Marketing emails</span>
+                </label>
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Theme Preference</label>
+              <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option>Light</option>
+                <option>Dark</option>
+                <option>System</option>
+              </select>
+            </div>
+            <button 
+              type="submit" 
+              className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
+            >
+              Save Preferences
+            </button>
+          </form>
+        </div>
+      );
+
+      const UserPreferencesHorizontal = () => (
+        <div className="demo-content">
+          <h3 className="text-lg font-semibold mb-4">Account Preferences</h3>
+          <form className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                <input 
+                  type="text" 
+                  defaultValue="Sarah Johnson" 
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Theme Preference</label>
+                <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <option>Light</option>
+                  <option>Dark</option>
+                  <option>System</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Email Notifications</label>
+              <div className="grid grid-cols-2 gap-4">
+                <label className="flex items-center">
+                  <input type="checkbox" defaultChecked className="mr-2" />
+                  <span className="text-sm">Product updates</span>
+                </label>
+                <label className="flex items-center">
+                  <input type="checkbox" className="mr-2" />
+                  <span className="text-sm">Marketing emails</span>
+                </label>
+              </div>
+            </div>
+            <div className="flex justify-end">
+              <button 
+                type="submit" 
+                className="bg-blue-600 text-white py-2 px-6 rounded-md hover:bg-blue-700 transition-colors"
+              >
+                Save Preferences
+              </button>
+            </div>
+          </form>
+        </div>
+      );
+
+      const UserPreferencesCard = () => (
+        <div className="demo-content space-y-4">
+          <h3 className="text-lg font-semibold mb-4">Account Preferences</h3>
+          
+          {/* Profile Card */}
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <h4 className="font-medium mb-3">Profile Information</h4>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+              <input 
+                type="text" 
+                defaultValue="Sarah Johnson" 
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+
+          {/* Notifications Card */}
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <h4 className="font-medium mb-3">Email Notifications</h4>
+            <div className="space-y-2">
+              <label className="flex items-center">
+                <input type="checkbox" defaultChecked className="mr-2" />
+                <span className="text-sm">Product updates</span>
+              </label>
+              <label className="flex items-center">
+                <input type="checkbox" className="mr-2" />
+                <span className="text-sm">Marketing emails</span>
+              </label>
+            </div>
+          </div>
+
+          {/* Appearance Card */}
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <h4 className="font-medium mb-3">Appearance</h4>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Theme Preference</label>
+              <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option>Light</option>
+                <option>Dark</option>
+                <option>System</option>
+              </select>
+            </div>
+          </div>
+
+          <button 
+            type="submit" 
+            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
+          >
+            Save All Preferences
+          </button>
+        </div>
+      );
+
+      // Budget Dashboard Components
+      const BudgetSummary = () => (
+        <div className="demo-content dashboard-container">
+          <h3 className="text-lg font-semibold mb-4">Budget Overview</h3>
+          
+          <div className="grid grid-cols-3 gap-4 mb-6">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-600">$2,847</div>
+              <div className="text-sm text-gray-500">Income</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-red-600">$2,156</div>
+              <div className="text-sm text-gray-500">Expenses</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-blue-600">$691</div>
+              <div className="text-sm text-gray-500">Remaining</div>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex justify-between items-center">
+              <span>Housing</span>
+              <span className="font-medium">$1,200</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span>Food</span>
+              <span className="font-medium">$450</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span>Transportation</span>
+              <span className="font-medium">$320</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span>Other</span>
+              <span className="font-medium">$186</span>
+            </div>
+          </div>
+        </div>
+      );
+
+      const BudgetDetailed = () => (
+        <div className="demo-content dashboard-container">
+          <h3 className="text-lg font-semibold mb-4">Budget Breakdown</h3>
+          
+          {/* Summary Cards */}
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="bg-green-50 p-4 rounded-lg">
+              <div className="text-sm text-green-600">Total Income</div>
+              <div className="text-xl font-bold text-green-700">$2,847</div>
+            </div>
+            <div className="bg-red-50 p-4 rounded-lg">
+              <div className="text-sm text-red-600">Total Expenses</div>
+              <div className="text-xl font-bold text-red-700">$2,156</div>
+            </div>
+          </div>
+
+          {/* Category Breakdown */}
+          <div className="space-y-4">
+            <div>
+              <div className="flex justify-between items-center mb-1">
+                <span className="font-medium">Housing</span>
+                <span className="text-sm text-gray-500">$1,200 / $1,300</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="bg-blue-600 h-2 rounded-full" style={{width: '92%'}}></div>
+              </div>
+            </div>
+            
+            <div>
+              <div className="flex justify-between items-center mb-1">
+                <span className="font-medium">Food & Dining</span>
+                <span className="text-sm text-gray-500">$450 / $500</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="bg-green-500 h-2 rounded-full" style={{width: '90%'}}></div>
+              </div>
+            </div>
+            
+            <div>
+              <div className="flex justify-between items-center mb-1">
+                <span className="font-medium">Transportation</span>
+                <span className="text-sm text-gray-500">$320 / $400</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="bg-yellow-500 h-2 rounded-full" style={{width: '80%'}}></div>
+              </div>
+            </div>
+            
+            <div>
+              <div className="flex justify-between items-center mb-1">
+                <span className="font-medium">Entertainment</span>
+                <span className="text-sm text-gray-500">$120 / $200</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="bg-purple-500 h-2 rounded-full" style={{width: '60%'}}></div>
+              </div>
+            </div>
+            
+            <div>
+              <div className="flex justify-between items-center mb-1">
+                <span className="font-medium">Utilities</span>
+                <span className="text-sm text-gray-500">$66 / $150</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="bg-indigo-500 h-2 rounded-full" style={{width: '44%'}}></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+
+      const BudgetVisual = () => (
+        <div className="demo-content dashboard-container">
+          <h3 className="text-lg font-semibold mb-4">Budget Visualization</h3>
+          
+          {/* Chart Placeholder */}
+          <div className="chart-placeholder mb-6">
+            📊 Interactive Budget Chart<br/>
+            <small>(Spending trends over time)</small>
+          </div>
+
+          {/* Quick Stats */}
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="text-center bg-gray-50 p-3 rounded">
+              <div className="text-lg font-bold text-green-600">24%</div>
+              <div className="text-xs text-gray-500">Savings Rate</div>
+            </div>
+            <div className="text-center bg-gray-50 p-3 rounded">
+              <div className="text-lg font-bold text-blue-600">76%</div>
+              <div className="text-xs text-gray-500">Budget Used</div>
+            </div>
+          </div>
+
+          {/* Visual Category List */}
+          <div className="space-y-2">
+            <div className="flex items-center">
+              <div className="w-4 h-4 bg-blue-500 rounded mr-3"></div>
+              <span className="flex-1">Housing</span>
+              <span className="font-medium">42%</span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-4 h-4 bg-green-500 rounded mr-3"></div>
+              <span className="flex-1">Food</span>
+              <span className="font-medium">21%</span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-4 h-4 bg-yellow-500 rounded mr-3"></div>
+              <span className="flex-1">Transport</span>
+              <span className="font-medium">15%</span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-4 h-4 bg-purple-500 rounded mr-3"></div>
+              <span className="flex-1">Other</span>
+              <span className="font-medium">22%</span>
+            </div>
+          </div>
+        </div>
+      );
+
+      // Contact List Components
+      const ContactItem = ({ initials, name, email, role }) => (
+        <div className="flex items-center py-2 px-3 hover:bg-gray-50 rounded">
+          <div className="contact-avatar mr-3">{initials}</div>
+          <div className="flex-1">
+            <div className="font-medium">{name}</div>
+            <div className="text-sm text-gray-500">{email}</div>
+          </div>
+          <div className="text-sm text-gray-400">{role}</div>
+        </div>
+      );
+
+      const ContactsCompact = () => (
+        <div className="demo-content contacts-container">
+          <h3 className="text-lg font-semibold mb-4">Contacts</h3>
+          
+          <div className="space-y-1">
+            <ContactItem initials="AJ" name="Alice Johnson" email="alice@company.com" role="Designer" />
+            <ContactItem initials="BS" name="Bob Smith" email="bob.smith@email.com" role="Developer" />
+            <ContactItem initials="CD" name="Carol Davis" email="carol.d@startup.io" role="PM" />
+            <ContactItem initials="DW" name="David Wilson" email="d.wilson@tech.com" role="Engineer" />
+            <ContactItem initials="EB" name="Emma Brown" email="emma@creative.agency" role="Creative" />
+          </div>
+        </div>
+      );
+
+      const ContactCard = ({ initials, name, title, email, phone }) => (
+        <div className="border border-gray-200 rounded-lg p-4">
+          <div className="flex items-start">
+            <div className="contact-avatar mr-4">{initials}</div>
+            <div className="flex-1">
+              <h4 className="font-medium">{name}</h4>
+              <p className="text-sm text-gray-600">{title}</p>
+              <p className="text-sm text-gray-500 mt-1">{email}</p>
+              <p className="text-sm text-gray-500">{phone}</p>
+              <div className="flex mt-3 space-x-2">
+                <button className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Email</button>
+                <button className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">Call</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+
+      const ContactsDetailed = () => (
+        <div className="demo-content contacts-container">
+          <h3 className="text-lg font-semibold mb-4">Contacts</h3>
+          
+          <div className="space-y-4">
+            <ContactCard 
+              initials="AJ" 
+              name="Alice Johnson" 
+              title="Senior Product Designer" 
+              email="alice@company.com" 
+              phone="+1 (555) 123-4567" 
+            />
+            <ContactCard 
+              initials="BS" 
+              name="Bob Smith" 
+              title="Full Stack Developer" 
+              email="bob.smith@email.com" 
+              phone="+1 (555) 987-6543" 
+            />
+            <ContactCard 
+              initials="CD" 
+              name="Carol Davis" 
+              title="Product Manager" 
+              email="carol.d@startup.io" 
+              phone="+1 (555) 456-7890" 
+            />
+          </div>
+        </div>
+      );
+
+      const ContactGridItem = ({ initials, name, role, email }) => (
+        <div className="text-center border border-gray-200 rounded-lg p-4">
+          <div className="contact-avatar mx-auto mb-3" style={{width: '60px', height: '60px', fontSize: '1.2rem'}}>
+            {initials}
+          </div>
+          <h4 className="font-medium">{name}</h4>
+          <p className="text-sm text-gray-600">{role}</p>
+          <p className="text-xs text-gray-500 mt-1">{email}</p>
+          <button className="mt-2 text-xs bg-blue-600 text-white px-3 py-1 rounded">Contact</button>
+        </div>
+      );
+
+      const ContactsGrid = () => (
+        <div className="demo-content contacts-container">
+          <h3 className="text-lg font-semibold mb-4">Team Directory</h3>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <ContactGridItem initials="AJ" name="Alice Johnson" role="Designer" email="alice@company.com" />
+            <ContactGridItem initials="BS" name="Bob Smith" role="Developer" email="bob.smith@email.com" />
+            <ContactGridItem initials="CD" name="Carol Davis" role="PM" email="carol.d@startup.io" />
+            <ContactGridItem initials="DW" name="David Wilson" role="Engineer" email="d.wilson@tech.com" />
+          </div>
+        </div>
+      );
+
+      // Main App Component
+      const App = () => {
+        const [debugInfo, setDebugInfo] = useState([]);
+
+        // Function to add debug messages
+        const addDebugMessage = useCallback((message) => {
+          setDebugInfo(prev => [...prev.slice(-4), `${new Date().toLocaleTimeString()}: ${message}`]);
+        }, []);
+
+        // Listen to iteration deck events
+        useEffect(() => {
+          const handleSlideChange = (event) => {
+            addDebugMessage(`Slide changed in deck "${event.detail.deckId}": ${event.detail.previousSlide} → ${event.detail.activeSlide}`);
+          };
+
+          const handleDeckRegistered = (event) => {
+            addDebugMessage(`Deck registered: "${event.detail.deckId}" with ${event.detail.slideCount} slides`);
+          };
+
+          // Add event listeners
+          document.addEventListener('slide-change', handleSlideChange);
+          document.addEventListener('deck-registered', handleDeckRegistered);
+
+          return () => {
+            document.removeEventListener('slide-change', handleSlideChange);
+            document.removeEventListener('deck-registered', handleDeckRegistered);
+          };
+        }, [addDebugMessage]);
+
+        return (
+          <div>
+            {/* Header */}
+            <header className="bg-white border-b border-gray-200 px-6 py-4">
+              <div className="max-w-6xl mx-auto">
+                <h1 className="text-2xl font-bold text-gray-900">React Iteration Deck Demo</h1>
+                <p className="text-gray-600 mt-1">AI-first prototyping with React wrapper components</p>
+                <div className="mt-2">
+                  <span className="demo-badge">⚛️ React Components</span>
+                  <span className="demo-badge">🎨 Design Variations</span>
+                  <span className="demo-badge">🤖 AI-Generated</span>
+                  <span className="demo-badge">⚡ Live Switching</span>
+                  <span className="demo-badge">🔄 Multi-Deck Support</span>
+                </div>
+              </div>
+            </header>
+
+            {/* Main Content */}
+            <main className="max-w-6xl mx-auto px-6 py-8">
+              
+              {/* Introduction */}
+              <section className="mb-8">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                  <h2 className="text-lg font-semibold text-blue-900 mb-2">React Integration Demo</h2>
+                  <p className="text-blue-800 mb-3">
+                    This demo shows the same iteration decks as the Lit example, but built entirely with React wrapper components.
+                    The IterationDeck and IterationDeckSlide components provide a native React API while using Lit web components under the hood.
+                  </p>
+                  <ul className="text-blue-800 text-sm space-y-1">
+                    <li>• <strong>React Components:</strong> Full React wrapper with hooks integration</li>
+                    <li>• <strong>TypeScript Support:</strong> Complete type safety for props and events</li>
+                    <li>• <strong>React Patterns:</strong> forwardRef, useImperativeHandle, custom hooks</li>
+                    <li>• <strong>Zustand Integration:</strong> React hooks for state management</li>
+                    <li>• <strong>Event Handling:</strong> Native React event props</li>
+                  </ul>
+                </div>
+              </section>
+
+              {/* Debug Info */}
+              {debugInfo.length > 0 && (
+                <section className="mb-8">
+                  <div className="bg-gray-900 text-green-400 p-4 rounded-lg text-sm font-mono">
+                    <h3 className="text-white mb-2">🐛 Debug Events</h3>
+                    {debugInfo.map((info, index) => (
+                      <div key={index} className="opacity-80">{info}</div>
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {/* Demo 1: User Preferences Form */}
+              <section className="demo-section">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">1. User Preferences Form (React)</h2>
+                <p className="text-gray-600 mb-4">Three different layout approaches built with React components inside IterationDeck wrapper.</p>
+                
+                <IterationDeck 
+                  id="react-user-preferences" 
+                  label="User Preferences (React)"
+                  prompt="Create a user preferences form with clean, modern styling and good UX"
+                  onSlideChange={(e) => addDebugMessage(`React: Form slide changed to ${e.detail.activeSlide}`)}
+                  onDeckRegistered={(e) => addDebugMessage(`React: Form deck registered with ${e.detail.slideCount} slides`)}
+                >
+                  <IterationDeckSlide 
+                    label="Vertical Layout"
+                    aiPrompt="Design a clean vertical form layout with good spacing"
+                    notes="Designer feedback: Good for mobile, clear hierarchy"
+                    confidence={0.92}
+                  >
+                    <UserPreferencesVertical />
+                  </IterationDeckSlide>
+
+                  <IterationDeckSlide 
+                    label="Horizontal Layout"
+                    aiPrompt="Create a horizontal layout with fields side by side for desktop"
+                    notes="Good for wide screens, efficient use of space"
+                    confidence={0.87}
+                  >
+                    <UserPreferencesHorizontal />
+                  </IterationDeckSlide>
+
+                  <IterationDeckSlide 
+                    label="Card Layout"
+                    aiPrompt="Design using separate cards for each preference section"
+                    notes="PM feedback: Easier to scan, good visual separation"
+                    confidence={0.95}
+                  >
+                    <UserPreferencesCard />
+                  </IterationDeckSlide>
+                </IterationDeck>
+              </section>
+
+              {/* Demo 2: Budgeting Dashboard */}
+              <section className="demo-section">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">2. Budgeting Dashboard (React)</h2>
+                <p className="text-gray-600 mb-4">Three different approaches to displaying budget information with React components.</p>
+                
+                <IterationDeck 
+                  id="react-budget-dashboard" 
+                  label="Budget Dashboard (React)"
+                  prompt="Design a personal budget dashboard that helps users understand their spending"
+                  onSlideChange={(e) => addDebugMessage(`React: Budget slide changed to ${e.detail.activeSlide}`)}
+                >
+                  <IterationDeckSlide 
+                    label="Simple Summary"
+                    aiPrompt="Create a clean, minimal dashboard focusing on key metrics"
+                    notes="Great for quick overview, less cognitive load"
+                    confidence={0.89}
+                  >
+                    <BudgetSummary />
+                  </IterationDeckSlide>
+
+                  <IterationDeckSlide 
+                    label="Detailed Breakdown"
+                    aiPrompt="Show more detailed spending categories with progress bars"
+                    notes="Power users like the detail, good for budget tracking"
+                    confidence={0.84}
+                  >
+                    <BudgetDetailed />
+                  </IterationDeckSlide>
+
+                  <IterationDeckSlide 
+                    label="Visual Chart Focus"
+                    aiPrompt="Emphasize visual representation with charts and graphs"
+                    notes="Great for visual learners, makes trends obvious"
+                    confidence={0.91}
+                  >
+                    <BudgetVisual />
+                  </IterationDeckSlide>
+                </IterationDeck>
+              </section>
+
+              {/* Demo 3: Contacts List */}
+              <section className="demo-section">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">3. Contacts List (React)</h2>
+                <p className="text-gray-600 mb-4">Three different ways to present contact information with React components.</p>
+                
+                <IterationDeck 
+                  id="react-contacts-list" 
+                  label="Contacts List (React)"
+                  prompt="Design a contacts list that's easy to scan and interact with"
+                  onSlideChange={(e) => addDebugMessage(`React: Contacts slide changed to ${e.detail.activeSlide}`)}
+                >
+                  <IterationDeckSlide 
+                    label="Compact List"
+                    aiPrompt="Create a dense, scannable list view for many contacts"
+                    notes="Efficient for large contact lists, quick scanning"
+                    confidence={0.88}
+                  >
+                    <ContactsCompact />
+                  </IterationDeckSlide>
+
+                  <IterationDeckSlide 
+                    label="Detailed Cards"
+                    aiPrompt="Show more information in card format with actions"
+                    notes="Good for CRM use case, shows more context"
+                    confidence={0.85}
+                  >
+                    <ContactsDetailed />
+                  </IterationDeckSlide>
+
+                  <IterationDeckSlide 
+                    label="Grid Layout"
+                    aiPrompt="Arrange contacts in a grid for visual browsing"
+                    notes="Visual approach, good for team directories"
+                    confidence={0.82}
+                  >
+                    <ContactsGrid />
+                  </IterationDeckSlide>
+                </IterationDeck>
+              </section>
+
+              {/* React-Specific Features */}
+              <section className="demo-section">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">React Integration Features</h2>
+                <div className="space-y-4">
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <h3 className="font-medium text-green-900 mb-2">⚛️ React Wrapper Benefits</h3>
+                    <ul className="text-green-800 text-sm space-y-1">
+                      <li>• <strong>Native React API:</strong> Components feel like regular React components</li>
+                      <li>• <strong>TypeScript Support:</strong> Full type safety for props and events</li>
+                      <li>• <strong>React Hooks:</strong> useIterationStore, useActiveSlide, useDeckNavigation</li>
+                      <li>• <strong>Event Handling:</strong> onSlideChange, onDeckRegistered props</li>
+                      <li>• <strong>Ref Support:</strong> forwardRef with imperative API access</li>
+                    </ul>
+                  </div>
+                  
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <h3 className="font-medium text-blue-900 mb-2">🎯 State Management</h3>
+                    <p className="text-blue-800 text-sm">
+                      The React wrappers integrate with Zustand for state management. Multiple decks share the same 
+                      store instance, enabling synchronized navigation and global toolbar functionality.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                    <h3 className="font-medium text-purple-900 mb-2">🔧 Web Components Under the Hood</h3>
+                    <p className="text-purple-800 text-sm">
+                      While you write React code, the underlying implementation uses Lit web components for 
+                      maximum performance and universal framework compatibility.
+                    </p>
+                  </div>
+                </div>
+              </section>
+
+            </main>
+
+            {/* Footer */}
+            <footer className="bg-white border-t border-gray-200 px-6 py-8 mt-12">
+              <div className="max-w-6xl mx-auto text-center">
+                <p className="text-gray-600">
+                  React wrappers built on top of <strong>Lit</strong> web components with <strong>Zustand</strong> state management.
+                </p>
+                <p className="text-sm text-gray-500 mt-2">
+                  Check the debug events above and browser console for detailed component interactions.
+                </p>
+              </div>
+            </footer>
+          </div>
+        );
+      };
+
+      // Wait for web components to be registered, then render the app
+      const renderApp = () => {
+        console.log('Rendering React app...');
+        const root = ReactDOM.createRoot(document.getElementById('react-root'));
+        root.render(React.createElement(App));
+      };
+      
+      // Wait for all custom elements to be defined
+      const waitForWebComponents = async () => {
+        console.log('Waiting for web components to register...');
+        
+        const checkRegistration = () => {
+          return customElements.get('iteration-deck') && 
+                 customElements.get('iteration-deck-slide') && 
+                 customElements.get('iteration-deck-toolbar');
+        };
+        
+        let attempts = 0;
+        const maxAttempts = 50; // 5 seconds max
+        
+        while (!checkRegistration() && attempts < maxAttempts) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+          attempts++;
+        }
+        
+        if (checkRegistration()) {
+          console.log('All web components registered successfully');
+          renderApp();
+        } else {
+          console.warn('Web components not fully registered, rendering anyway...');
+          renderApp();
+        }
+      };
+      
+      // Start the registration check
+      waitForWebComponents();
+    </script>
+  </body>
+</html>

@@ -8,7 +8,6 @@
 
 import { LitElement, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { classMap } from 'lit/directives/class-map.js';
 import type { IterationDeckSlideProps } from '../../core/types.js';
 import { 
   subscribeToIterationStore, 
@@ -189,20 +188,19 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
    * Render the slide content with metadata overlay in development
    */
   override render() {
-    const containerClasses = classMap({
-      [slideStyles.container]: true,
-      [slideStyles.states.active]: this.isActive,
-      [slideStyles.states.inactive]: !this.isActive,
-      [slideStyles.hover]: this.isDevelopment,
-      [slideStyles.production]: !this.isDevelopment,
-      [slideStyles.accessibility]: true
-    });
+    // Build classes manually instead of using classMap directive
+    const classes = [
+      slideStyles.container,
+      this.isActive ? slideStyles.states.active : slideStyles.states.inactive,
+      this.isDevelopment ? slideStyles.hover : slideStyles.production,
+      slideStyles.accessibility
+    ].join(' ');
 
     const confidenceLevel = this.getConfidenceLevel();
 
     return html`
       <div 
-        class="${containerClasses}" 
+        class="${classes}" 
         role="tabpanel" 
         aria-label="${this.label}"
         data-env="${this.isDevelopment ? 'development' : 'production'}"
