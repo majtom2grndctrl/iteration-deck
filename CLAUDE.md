@@ -7,7 +7,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **Always read these files when working on this project:**
 - @.claude/TECHNICAL_SPEC.md - Complete API specifications, architecture, and usage examples
 - @.claude/TASK_TRACKER.md - List of tasks to be accomplished and status of each task - **always update task status after completing each task.**
-- @package.json - Dependencies, scripts, and build configuration
+- @package.json - Dependencies, scripts, build configuration, and export maps
+- @vite.config.ts - Build system configuration with production optimizations
+- @tsconfig.build.json - TypeScript declaration generation settings
 
 ## Project Overview
 

@@ -6,11 +6,11 @@ Remember to follow instructions in @../CLAUDE.md and @.TECHNICAL_SPEC.md
 
 - Once you start a task, mark it as in progress
 - If you get blocked and need to change tasks, update the task and mark it as blocked, with a reason for the blocker
-- When you complete the task, market it as complete
+- When you complete the task, mark it as complete
 
 ## Task Format
 ```
-📋 Example To Do Take - Brief description
+📋 Example To Do Task - Brief description
 🚧 Example In Progress Task - What's currently being worked on
 🚫 Example Blocked task - Reason for blocking
 ✅ Example Completed task - What was accomplished
