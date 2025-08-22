@@ -399,7 +399,7 @@ export class IterationDeckToolbar extends LitElement {
     @media ${unsafeCSS(mediaQueries.lg)} {
       .slide-label {
         max-width: unset;
-        width: 25rem;
+        width: 20rem;
       }
     }
     
