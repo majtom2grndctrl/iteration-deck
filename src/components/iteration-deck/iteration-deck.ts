@@ -14,7 +14,7 @@
  * - Multi-deck support with automatic cleanup
  */
 
-import { LitElement, html, type PropertyValues } from 'lit';
+import { LitElement, html, css, unsafeCSS, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
 // Import core types and utilities
@@ -41,8 +41,18 @@ import {
 // Import toolbar integration
 import { ensureToolbarMounted, cleanupToolbarIfEmpty } from '../iteration-deck-toolbar';
 
-// Import component styles
-import { iterationDeckStyles } from './iteration-deck.css.js';
+// Import design tokens for type-safe styling
+import {
+  lightTheme,
+  darkTheme,
+  fontStacks,
+  fontSizes,
+  lineHeights,
+  spaceScale,
+  spacing,
+  dimensions,
+  breakpoints,
+} from '../../tokens/index.js';
 
 /**
  * Internal interface for slide element data extracted from slots
@@ -137,9 +147,242 @@ export class IterationDeck extends LitElement {
   private _slotObserver?: MutationObserver;
 
   /**
-   * No static styles - using @vanilla-extract/css
-   * Styles are imported from iteration-deck.css.ts
+   * ShadowDOM-encapsulated styles using Lit CSS tagged template literals
+   * with design tokens for type-safe styling
    */
+  static styles = css`
+    /* CSS custom properties for theme switching */
+    :host {
+      /* Light theme CSS custom properties */
+      --color-background-primary: ${unsafeCSS(lightTheme.background.primary)};
+      --color-background-secondary: ${unsafeCSS(lightTheme.background.secondary)};
+      --color-background-tertiary: ${unsafeCSS(lightTheme.background.tertiary)};
+      --color-background-elevated: ${unsafeCSS(lightTheme.background.elevated)};
+      --color-text-primary: ${unsafeCSS(lightTheme.text.primary)};
+      --color-text-secondary: ${unsafeCSS(lightTheme.text.secondary)};
+      --color-text-tertiary: ${unsafeCSS(lightTheme.text.tertiary)};
+      --color-text-disabled: ${unsafeCSS(lightTheme.text.disabled)};
+      --color-border-primary: ${unsafeCSS(lightTheme.border.primary)};
+      --color-border-secondary: ${unsafeCSS(lightTheme.border.secondary)};
+      --color-border-focus: ${unsafeCSS(lightTheme.border.focus)};
+      --color-interactive-hover: ${unsafeCSS(lightTheme.interactive.hover)};
+      --color-interactive-active: ${unsafeCSS(lightTheme.interactive.active)};
+      --color-interactive-selected: ${unsafeCSS(lightTheme.interactive.selected)};
+      --color-interactive-focus: ${unsafeCSS(lightTheme.interactive.focus)};
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      :host {
+        /* Dark theme CSS custom properties */
+        --color-background-primary: ${unsafeCSS(darkTheme.background.primary)};
+        --color-background-secondary: ${unsafeCSS(darkTheme.background.secondary)};
+        --color-background-tertiary: ${unsafeCSS(darkTheme.background.tertiary)};
+        --color-background-elevated: ${unsafeCSS(darkTheme.background.elevated)};
+        --color-text-primary: ${unsafeCSS(darkTheme.text.primary)};
+        --color-text-secondary: ${unsafeCSS(darkTheme.text.secondary)};
+        --color-text-tertiary: ${unsafeCSS(darkTheme.text.tertiary)};
+        --color-text-disabled: ${unsafeCSS(darkTheme.text.disabled)};
+        --color-border-primary: ${unsafeCSS(darkTheme.border.primary)};
+        --color-border-secondary: ${unsafeCSS(darkTheme.border.secondary)};
+        --color-border-focus: ${unsafeCSS(darkTheme.border.focus)};
+        --color-interactive-hover: ${unsafeCSS(darkTheme.interactive.hover)};
+        --color-interactive-active: ${unsafeCSS(darkTheme.interactive.active)};
+        --color-interactive-selected: ${unsafeCSS(darkTheme.interactive.selected)};
+        --color-interactive-focus: ${unsafeCSS(darkTheme.interactive.focus)};
+      }
+    }
+
+    /* Base component styles */
+    :host {
+      display: block;
+      position: relative;
+      width: 100%;
+      min-height: ${unsafeCSS(dimensions.slide.minHeight)};
+      background: transparent;
+      border-radius: ${unsafeCSS(spaceScale[3])};
+      font-family: ${unsafeCSS(fontStacks.system)};
+      font-size: ${unsafeCSS(fontSizes.base)};
+      line-height: ${unsafeCSS(lineHeights.normal)};
+      color: var(--color-text-primary);
+      transition: all 0.2s ease;
+      will-change: transform, opacity;
+      transform: translateZ(0);
+    }
+
+    .iteration-deck-container {
+      display: block;
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .iteration-deck-content {
+      display: block;
+      position: relative;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    /* Development mode styles */
+    .development {
+      position: relative;
+      margin-bottom: ${unsafeCSS(spaceScale[16])}; /* Space for toolbar */
+    }
+
+    .development::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border: ${unsafeCSS(spacing.border.thin)} dashed var(--color-border-secondary);
+      border-radius: inherit;
+      opacity: 0.3;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Production mode styles */
+    .production {
+      margin-bottom: 0;
+    }
+
+    .production::before {
+      display: none;
+    }
+
+    /* Animation states */
+    .animated {
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    /* Accessibility enhancements */
+    :host(:focus-visible) {
+      outline: ${unsafeCSS(spacing.focus.width)} solid var(--color-border-focus);
+      outline-offset: ${unsafeCSS(spacing.focus.offset)};
+    }
+
+    :host(:focus-within) {
+      outline: ${unsafeCSS(spacing.border.medium)} solid var(--color-border-focus);
+      outline-offset: ${unsafeCSS(spacing.focus.offset)};
+    }
+
+    /* High contrast mode support */
+    @media (prefers-contrast: high) {
+      :host {
+        border: ${unsafeCSS(spacing.border.medium)} solid var(--color-border-primary);
+      }
+    }
+
+    /* Reduced motion support */
+    @media (prefers-reduced-motion: reduce) {
+      :host {
+        will-change: auto;
+        transform: none;
+        transition: none;
+      }
+      
+      .animated {
+        transition: none;
+      }
+    }
+
+    /* Mobile-first responsive design */
+    /* Base styles (mobile) */
+    :host {
+      padding: ${unsafeCSS(spacing.sm)};
+      min-height: 150px;
+    }
+
+    /* Tablet and larger (768px+) */
+    @media (min-width: ${unsafeCSS(breakpoints.md)}) {
+      :host {
+        padding: ${unsafeCSS(spacing.lg)};
+        min-height: ${unsafeCSS(dimensions.slide.minHeight)};
+      }
+    }
+
+    /* Desktop and larger (1024px+) */
+    @media (min-width: ${unsafeCSS(breakpoints.lg)}) {
+      :host {
+        padding: ${unsafeCSS(spacing.xl)};
+      }
+    }
+
+    /* Loading state */
+    .loading {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .loading::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      animation: slideInRight 1.5s ease-in-out infinite;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .loading::after {
+        animation: none;
+        background: rgba(255, 255, 255, 0.1);
+        opacity: 0.5;
+      }
+    }
+
+    /* Error state */
+    .error {
+      border: 2px solid #ef4444;
+      background-color: rgba(239, 68, 68, 0.05);
+    }
+
+    .error::before {
+      border-color: #ef4444 !important;
+      border-style: solid;
+      opacity: 0.8;
+    }
+
+    /* Empty state */
+    .empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: ${unsafeCSS(dimensions.slide.minHeight)};
+      color: var(--color-text-tertiary);
+      font-style: italic;
+    }
+
+    .empty::before {
+      content: 'No slides available';
+      font-size: ${unsafeCSS(fontSizes.sm)};
+    }
+
+    /* RTL support */
+    :host([dir="rtl"]) {
+      direction: rtl;
+    }
+
+    /* Container queries for advanced responsive design */
+    .container-responsive {
+      container-type: inline-size;
+    }
+
+    /* Keyframes for loading animation */
+    @keyframes slideInRight {
+      from {
+        left: -100%;
+      }
+      to {
+        left: 100%;
+      }
+    }
+  `;
 
   /**
    * Component lifecycle: Initialize store subscription and register deck
@@ -385,17 +628,17 @@ export class IterationDeck extends LitElement {
       return html`<slot></slot>`;
     }
 
-    // Determine container classes based on mode (manual class building instead of classMap)
+    // Determine container classes based on mode
     const containerClasses = [
-      iterationDeckStyles.base,
-      this._isProduction ? iterationDeckStyles.production : iterationDeckStyles.development,
-      iterationDeckStyles.animated
+      'iteration-deck-container',
+      this._isProduction ? 'production' : 'development',
+      'animated'
     ].join(' ');
 
     // Simply render the default slot - the slide components will handle their own visibility
     return html`
       <div class="${containerClasses}">
-        <div class="${iterationDeckStyles.content}">
+        <div class="iteration-deck-content">
           <slot></slot>
         </div>
       </div>

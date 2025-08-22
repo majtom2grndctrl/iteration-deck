@@ -6,7 +6,7 @@
  * Fully integrated with Zustand store for cross-component reactivity.
  */
 
-import { LitElement, html } from 'lit';
+import { LitElement, html, css, unsafeCSS } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { IterationDeckSlideProps } from '../../core/types.js';
 import { 
@@ -19,9 +19,14 @@ import {
   debugLog, 
   errorLog 
 } from '../../core/utilities.js';
+import { 
+  spaceScale, 
+  spacing, 
+  dimensions,
+  mediaQueries 
+} from '../../tokens/index.js';
 
-// Import component styles
-import { slideStyles } from './iteration-deck-slide.css.js';
+// Design tokens imported and embedded directly in CSS for Lit compatibility
 
 /**
  * Custom element for individual iteration deck slides
@@ -38,9 +43,297 @@ import { slideStyles } from './iteration-deck-slide.css.js';
 export class IterationDeckSlide extends LitElement implements IterationDeckSlideProps {
   
   /**
-   * No static styles - using @vanilla-extract/css
-   * Styles are imported from iteration-deck-slide.css.ts
+   * ShadowDOM-encapsulated styles using Lit CSS tagged template literals
+   * with design tokens for consistent styling and theme support
    */
+  static styles = css`
+    :host {
+      display: block;
+      position: relative;
+      width: 100%;
+      min-height: 150px; /* Mobile-first: smaller minimum height */
+      border-radius: ${unsafeCSS(spaceScale[2])};
+      transition: opacity 0.2s ease-in-out;
+      isolation: isolate;
+      outline: none;
+      
+      /* CSS custom properties for theme switching */
+      --slide-bg-primary: #fafafa;
+      --slide-bg-secondary: #f4f4f5;
+      --slide-text-primary: #374151;
+      --slide-text-secondary: #52525b;
+      --slide-border: #d4d4d8;
+      --slide-hover-bg: #f4f4f5;
+      --slide-active-bg: #e4e4e7;
+      --slide-focus-outline: #52525b;
+    }
+    
+    /* Dark theme support */
+    @media (prefers-color-scheme: dark) {
+      :host {
+        --slide-bg-primary: #18181b;
+        --slide-bg-secondary: #27272a;
+        --slide-text-primary: #e4e4e7;
+        --slide-text-secondary: #d4d4d8;
+        --slide-border: #52525b;
+        --slide-hover-bg: #27272a;
+        --slide-active-bg: #374151;
+        --slide-focus-outline: #a1a1aa;
+      }
+    }
+    
+    .slide-container {
+      display: block;
+      position: relative;
+      width: 100%;
+      min-height: inherit;
+      border-radius: inherit;
+      background: transparent;
+      transition: all 0.15s ease-in-out;
+      isolation: isolate;
+      outline: none;
+    }
+    
+    /* Slide state variants */
+    .slide-container.active {
+      opacity: 1;
+      pointer-events: auto;
+      z-index: 1;
+    }
+    
+    .slide-container.inactive {
+      opacity: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+    
+    .slide-container.loading {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+    
+    .slide-container.error {
+      opacity: 0.4;
+      pointer-events: none;
+      border: 1px solid #ef4444;
+      background: rgba(239, 68, 68, 0.05);
+    }
+    
+    /* Slide content wrapper - mobile-first base styles */
+    .slide-content {
+      width: 100%;
+      min-height: inherit;
+      position: relative;
+      z-index: 1;
+      padding: ${unsafeCSS(spacing.md)}; /* 12px - mobile base */
+    }
+    
+    /* Development mode hover effects - REMOVED for better content interactivity */
+    /* TODO: Relocate metadata display (AI confidence, prompt, notes) to toolbar or other UI location */
+    /*
+    .slide-container.development:not(.active):hover {
+      background: var(--slide-hover-bg);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      cursor: pointer;
+    }
+    */
+    
+    /* AI confidence indicator - REMOVED, now available as standalone <iteration-confidence-bar> component */
+    /* TODO: Use <iteration-confidence-bar> component in toolbar or other UI location */
+    
+    /* AI metadata overlay system (development mode only) */
+    .metadata-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(4px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: ${unsafeCSS(spacing.lg)};
+      gap: ${unsafeCSS(spacing.md)};
+      border-radius: inherit;
+      border: 1px solid var(--slide-border);
+      text-align: center;
+      color: var(--slide-text-primary);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: visibility 0.15s ease-in-out, opacity 0.15s ease-in-out;
+      z-index: 10;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      .metadata-overlay {
+        background: rgba(39, 39, 42, 0.95);
+      }
+    }
+    
+    /* Metadata overlay hover - REMOVED, metadata needs new location */
+    /*
+    .slide-container.development:hover .metadata-overlay {
+      opacity: 1;
+      visibility: visible;
+    }
+    */
+    
+    .metadata-title {
+      font-size: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif;
+      font-weight: 500;
+      line-height: 1.375;
+      letter-spacing: 0;
+      color: var(--slide-text-primary);
+      margin: 0;
+      margin-bottom: ${unsafeCSS(spaceScale[2])};
+    }
+    
+    .metadata-prompt {
+      width: 100%;
+      max-width: 400px;
+      font-size: 14px;
+      font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif;
+      line-height: 1.5;
+      color: var(--slide-text-secondary);
+      background: var(--slide-bg-secondary);
+      padding: ${unsafeCSS(spacing.md)};
+      border-radius: ${unsafeCSS(spaceScale[2])};
+      border: 1px solid var(--slide-border);
+      margin: 0;
+      margin-bottom: ${unsafeCSS(spacing.md)};
+    }
+    
+    .metadata-notes {
+      width: 100%;
+      max-width: 400px;
+      font-size: 12px;
+      font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif;
+      line-height: 1.5;
+      color: var(--slide-text-secondary);
+      font-style: italic;
+      margin: 0;
+      opacity: 0.8;
+    }
+    
+    .metadata-score {
+      display: flex;
+      align-items: center;
+      gap: ${unsafeCSS(spaceScale[1])};
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--slide-text-secondary);
+      margin-top: ${unsafeCSS(spaceScale[2])};
+    }
+    
+    .score-label {
+      color: var(--slide-text-secondary);
+      opacity: 0.8;
+    }
+    
+    .score-value {
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+    
+    .score-value[data-score="high"] {
+      color: #10b981;
+    }
+    
+    .score-value[data-score="medium"] {
+      color: #f59e0b;
+    }
+    
+    .score-value[data-score="low"] {
+      color: #ef4444;
+    }
+    
+    /* Accessibility enhancements */
+    :host([aria-hidden="true"]) {
+      position: absolute;
+      left: -10000px;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+    }
+    
+    :host([tabindex="0"]:focus) {
+      outline: ${unsafeCSS(spacing.focus.width)} solid var(--slide-focus-outline);
+      outline-offset: ${unsafeCSS(spacing.focus.offset)};
+    }
+    
+    /* Production mode overrides */
+    .slide-container.production {
+      background: transparent;
+      transform: none;
+      box-shadow: none;
+      cursor: default;
+    }
+    
+    /* Confidence indicator production hiding - REMOVED with component extraction */
+    
+    .slide-container.production .metadata-overlay {
+      display: none;
+    }
+    
+    /* Mobile-first responsive design using design tokens */
+    /* Base styles above are mobile-first (xs: 0px+) */
+    
+    /* Small mobile devices and up (sm: 640px+) */
+    @media ${unsafeCSS(mediaQueries.sm)} {
+      .slide-content {
+        padding: ${unsafeCSS(spacing.lg)}; /* 16px */
+      }
+      
+      .metadata-overlay {
+        padding: ${unsafeCSS(spacing.lg)};
+        gap: ${unsafeCSS(spacing.md)}; /* 12px */
+      }
+    }
+    
+    /* Tablet devices and up (md: 768px+) */
+    @media ${unsafeCSS(mediaQueries.md)} {
+      .slide-container {
+        min-height: ${unsafeCSS(dimensions.slide.minHeight)}; /* 200px */
+      }
+      
+      .slide-content {
+        padding: ${unsafeCSS(spacing.lg)}; /* 16px */
+      }
+    }
+    
+    /* Desktop devices and up (lg: 1024px+) */
+    @media ${unsafeCSS(mediaQueries.lg)} {
+      .slide-content {
+        padding: ${unsafeCSS(spacing.xl)}; /* 24px */
+      }
+      
+      .metadata-overlay {
+        padding: ${unsafeCSS(spacing.xl)};
+        gap: ${unsafeCSS(spacing.lg)}; /* 16px */
+      }
+    }
+    
+    /* Reduced motion support */
+    @media (prefers-reduced-motion: reduce) {
+      .slide-container,
+      /* .confidence-indicator, .confidence-bar - REMOVED */,
+      .metadata-overlay {
+        transition: none;
+      }
+      
+      /* Reduced motion hover override - REMOVED with hover effects */
+      /*
+      .slide-container.development:hover {
+        transform: none;
+      }
+      */
+    }
+  `;
 
   // Public properties from IterationDeckSlideProps interface
   @property({ type: String, reflect: true })
@@ -188,66 +481,54 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
    * Render the slide content with metadata overlay in development
    */
   override render() {
-    // Build classes manually instead of using classMap directive
-    const classes = [
-      slideStyles.container,
-      this.isActive ? slideStyles.states.active : slideStyles.states.inactive,
-      this.isDevelopment ? slideStyles.hover : slideStyles.production,
-      slideStyles.accessibility
+    // Build classes for slide container
+    const containerClasses = [
+      'slide-container',
+      this.isActive ? 'active' : 'inactive',
+      this.isDevelopment ? 'development' : 'production'
     ].join(' ');
 
     const confidenceLevel = this.getConfidenceLevel();
 
     return html`
       <div 
-        class="${classes}" 
+        class="${containerClasses}" 
         role="tabpanel" 
         aria-label="${this.label}"
         data-env="${this.isDevelopment ? 'development' : 'production'}"
         style="display: ${this.isActive ? 'block' : 'none'}"
       >
         <!-- Main slide content wrapper -->
-        <div class="${slideStyles.content}">
+        <div class="slide-content">
           <slot></slot>
         </div>
         
-        <!-- AI confidence indicator (development only) -->
-        ${this.isDevelopment && confidenceLevel ? html`
-          <div class="${slideStyles.confidence.indicator}">
-            <div 
-              class="${slideStyles.confidence.bar} ${slideStyles.confidence.variants[confidenceLevel]}"
-              style="width: ${Math.round((this.confidence || 0) * 100)}%"
-            ></div>
-          </div>
-        ` : ''}
+        <!-- AI confidence indicator - REMOVED, use <iteration-confidence-bar> component instead -->
         
         <!-- Development mode metadata overlay -->
         ${this.isDevelopment ? html`
-          <div 
-            class="${slideStyles.metadata.overlay}" 
-            data-visible="false"
-          >
-            <h3 class="${slideStyles.metadata.title}">${this.label}</h3>
+          <div class="metadata-overlay">
+            <h3 class="metadata-title">${this.label}</h3>
             
             ${this.aiPrompt ? html`
-              <div class="${slideStyles.metadata.prompt}">
+              <div class="metadata-prompt">
                 <strong>AI Prompt:</strong><br>
                 ${this.aiPrompt}
               </div>
             ` : ''}
             
             ${this.notes ? html`
-              <div class="${slideStyles.metadata.notes}">
+              <div class="metadata-notes">
                 <strong>Notes:</strong><br>
                 ${this.notes}
               </div>
             ` : ''}
             
             ${this.confidence !== undefined ? html`
-              <div class="${slideStyles.metadata.score}">
-                <span class="${slideStyles.metadata.scoreLabel}">Confidence:</span>
+              <div class="metadata-score">
+                <span class="score-label">Confidence:</span>
                 <span 
-                  class="${slideStyles.metadata.scoreValue}" 
+                  class="score-value" 
                   data-score="${confidenceLevel}"
                 >
                   ${Math.round(this.confidence * 100)}%

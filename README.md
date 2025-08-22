@@ -5,20 +5,15 @@
 
 > **AI-first prototyping web components for comparing interactive UI variations**
 
-Iteration Deck enables designers and product managers to compare AI-generated UI variations side-by-side in live, interactive prototypes. Built with Lit web components and manual React wrappers, it works with any framework while providing excellent developer experience.
+One thing that Figma does really well is: It makes it easy to iterate quickly and non-dustrctively. When we design in code, we don’t had good ways to do that quite like in Figma.
 
-![Iteration Deck Demo](https://via.placeholder.com/800x400/6366f1/ffffff?text=Interactive+Prototype+Comparison)
+Iteration Deck changes that, enabling designers and product managers to compare AI-generated UI variations in live, interactive prototypes. Built with Lit web components and manual React wrappers, it works with any framework while providing excellent developer experience.
 
 ## Features
 
 - 🎯 **AI-First Design**: Built specifically for AI-generated UI variation workflows
 - 🔧 **Universal Framework Support**: Works with React, Vue, Angular, Astro, and vanilla HTML
-- ⚡ **Zero Runtime CSS**: Type-safe styling with @vanilla-extract/css
-- 🎨 **Designer-Friendly**: Clean, pill-shaped toolbar that doesn't compete with your designs
 - ⌨️ **Keyboard Navigation**: Cmd/Ctrl + Arrow keys for quick iteration switching
-- 🌙 **Auto Theming**: Built-in light/dark mode support via `prefers-color-scheme`
-- 📱 **Responsive**: Works seamlessly across desktop, tablet, and mobile
-- ♿ **Accessible**: WCAG 2.2 AA compliant with proper ARIA attributes
 
 ## Quick Start
 

@@ -16,26 +16,21 @@ Remember to follow instructions in @../CLAUDE.md and @.TECHNICAL_SPEC.md
 ✅ Example Completed task - What was accomplished
 ```
 
-## Project Status
+# Current Tasks
 
-✅ **Core iteration-deck library is complete and ready for use**
+*No active tasks. Add tasks here as they are identified or requested by the user.*
 
-All phases (1-7) of the initial build plan have been completed:
-- Lit web components with @vanilla-extract/css styling
-- React wrapper components with Zustand integration
-- Comprehensive test suite
-- Production build system with TypeScript declarations
-- Example application demonstrating all features
+## Task Guidelines
 
-## Adding New Tasks
+### Using Task Tool for Specialized Work
+- **design-system-engineer**: CSS styling, design tokens, visual design systems, @vanilla-extract/css work
+- **lit-component-engineer**: Lit web components, @vanilla-extract/css styling, Zustand integration
+- **react-wrapper-engineer**: React wrapper components, hooks, context patterns
+- **unit-test-specialist**: Unit tests for components and utilities
+- **accessibility-auditor**: ARIA attributes, semantic HTML, WCAG compliance
+- **npm-library-packager**: Package exports, build configuration, distribution
 
-When adding new tasks or features:
-
-1. **Use TodoWrite tool** to track progress during work
-2. **Add tasks here** for persistent tracking across sessions
-3. **Mark as ✅ completed** when fully implemented and tested
-4. **Reference related files** in task descriptions (e.g., "Update @src/lit/iteration-deck.ts")
-
-## Current Tasks
-
-_No active tasks - add new features or improvements as needed_
+### Concurrent Execution Strategy
+- Launch multiple specialized agents simultaneously for different components
+- Each agent focuses on one specific component or area
+- Parallel execution maximizes efficiency for multi-component tasks

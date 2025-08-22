@@ -3,10 +3,52 @@
  * 
  * Component-specific design tokens including 64px border-radius for pill-shaped toolbar,
  * 44px minimum touch targets, and other component-specific styling properties.
+ * Self-contained pure TypeScript constants compatible with Lit CSS tagged template literals.
  */
 
-import { spacing, dimensions } from './spacing';
-import { grayScale } from './colors';
+// Local constants to avoid imports (inline values for self-contained file)
+const localSpacing = {
+  xs: '4px',    // spacing.xs
+  sm: '8px',    // spacing.sm  
+  md: '12px',   // spacing.md
+  lg: '16px',   // spacing.lg
+  xl: '24px',   // spacing.xl
+  slide: {
+    padding: '16px',  // spacing.slide.padding
+  },
+  toolbar: {
+    padding: '12px',  // spacing.toolbar.padding
+    gap: '8px',       // spacing.toolbar.gap
+    margin: '16px',   // spacing.toolbar.margin
+  },
+} as const;
+
+const localDimensions = {
+  toolbar: {
+    height: '48px',      // dimensions.toolbar.height
+    minWidth: '240px',   // dimensions.toolbar.minWidth
+  },
+  button: {
+    minWidth: '44px',    // dimensions.button.minWidth
+  },
+  input: {
+    height: '40px',      // dimensions.input.height
+    minWidth: '120px',   // dimensions.input.minWidth
+  },
+} as const;
+
+const localGrayScale = {
+  50: '#fafafa',
+  100: '#f4f4f5',
+  200: '#e4e4e7',
+  300: '#d4d4d8',
+  400: '#a1a1aa',
+  500: '#71717a',
+  600: '#52525b',
+  700: '#374151',
+  800: '#27272a',
+  900: '#18181b',
+} as const;
 
 // Border radius tokens
 export const borderRadius = {
@@ -15,7 +57,7 @@ export const borderRadius = {
   md: '8px',      // Medium radius - cards, panels
   lg: '12px',     // Large radius - modals, large cards
   xl: '16px',     // Extra large radius
-  '2xl': '24px',  // Very large radius
+  xxl: '24px',  // Very large radius
   pill: '64px',   // Pill-shaped - toolbar, badges
   full: '9999px', // Fully rounded - avatars, icons
 } as const;
@@ -63,24 +105,24 @@ export const componentTokens = {
   // Iteration Deck Slide component
   iterationDeckSlide: {
     minHeight: '200px',
-    padding: spacing.slide.padding,
+    padding: localSpacing.slide.padding,
     borderRadius: borderRadius.md,
     transition: 'opacity 0.2s ease-in-out',
   },
   
   // Iteration Deck Toolbar component
   iterationDeckToolbar: {
-    height: dimensions.toolbar.height,
-    minWidth: dimensions.toolbar.minWidth,
+    height: localDimensions.toolbar.height,
+    minWidth: localDimensions.toolbar.minWidth,
     borderRadius: borderRadius.pill, // 64px pill shape
-    padding: spacing.toolbar.padding,
-    gap: spacing.toolbar.gap,
+    padding: localSpacing.toolbar.padding,
+    gap: localSpacing.toolbar.gap,
     shadow: shadows.toolbar,
     backdrop: backdrop.toolbar,
     
     // Positioning
     position: 'fixed',
-    bottom: spacing.toolbar.margin,
+    bottom: localSpacing.toolbar.margin,
     left: '50%',
     transform: 'translateX(-50%)',
     zIndex: 1000,
@@ -100,9 +142,9 @@ export const componentTokens = {
   button: {
     // Base button properties
     base: {
-      minHeight: dimensions.button.minWidth, // 44px touch target
-      minWidth: dimensions.button.minWidth,
-      padding: `${spacing.xs} ${spacing.md}`, // 4px 12px
+      minHeight: localDimensions.button.minWidth, // 44px touch target
+      minWidth: localDimensions.button.minWidth,
+      padding: `${localSpacing.xs} ${localSpacing.md}`, // 4px 12px
       borderRadius: borderRadius.sm,
       border: '1px solid transparent',
       fontSize: '14px',
@@ -121,67 +163,67 @@ export const componentTokens = {
     // Button variants
     variants: {
       primary: {
-        background: grayScale[600],
+        background: localGrayScale[600],
         color: '#ffffff',
-        border: `1px solid ${grayScale[600]}`,
+        border: `1px solid ${localGrayScale[600]}`,
         
         hover: {
-          background: grayScale[700],
-          border: `1px solid ${grayScale[700]}`,
+          background: localGrayScale[700],
+          border: `1px solid ${localGrayScale[700]}`,
         },
         
         active: {
-          background: grayScale[800],
-          border: `1px solid ${grayScale[800]}`,
+          background: localGrayScale[800],
+          border: `1px solid ${localGrayScale[800]}`,
         },
         
         disabled: {
-          background: grayScale[300],
-          color: grayScale[500],
-          border: `1px solid ${grayScale[300]}`,
+          background: localGrayScale[300],
+          color: localGrayScale[500],
+          border: `1px solid ${localGrayScale[300]}`,
           cursor: 'not-allowed',
         },
       },
       
       secondary: {
         background: 'transparent',
-        color: grayScale[600],
-        border: `1px solid ${grayScale[300]}`,
+        color: localGrayScale[600],
+        border: `1px solid ${localGrayScale[300]}`,
         
         hover: {
-          background: grayScale[50],
-          border: `1px solid ${grayScale[400]}`,
+          background: localGrayScale[50],
+          border: `1px solid ${localGrayScale[400]}`,
         },
         
         active: {
-          background: grayScale[100],
-          border: `1px solid ${grayScale[400]}`,
+          background: localGrayScale[100],
+          border: `1px solid ${localGrayScale[400]}`,
         },
         
         disabled: {
           background: 'transparent',
-          color: grayScale[400],
-          border: `1px solid ${grayScale[200]}`,
+          color: localGrayScale[400],
+          border: `1px solid ${localGrayScale[200]}`,
           cursor: 'not-allowed',
         },
       },
       
       ghost: {
         background: 'transparent',
-        color: grayScale[600],
+        color: localGrayScale[600],
         border: '1px solid transparent',
         
         hover: {
-          background: grayScale[100],
+          background: localGrayScale[100],
         },
         
         active: {
-          background: grayScale[200],
+          background: localGrayScale[200],
         },
         
         disabled: {
           background: 'transparent',
-          color: grayScale[400],
+          color: localGrayScale[400],
           cursor: 'not-allowed',
         },
       },
@@ -192,15 +234,15 @@ export const componentTokens = {
   dropdown: {
     minWidth: '160px',
     maxHeight: '240px',
-    padding: spacing.xs,
+    padding: localSpacing.xs,
     borderRadius: borderRadius.md,
     background: '#ffffff',
-    border: `1px solid ${grayScale[300]}`,
+    border: `1px solid ${localGrayScale[300]}`,
     shadow: shadows.dropdown,
     
     // Dropdown item
     item: {
-      padding: `${spacing.xs} ${spacing.md}`, // 4px 12px
+      padding: `${localSpacing.xs} ${localSpacing.md}`, // 4px 12px
       borderRadius: borderRadius.sm,
       fontSize: '14px',
       lineHeight: '1.5',
@@ -208,17 +250,17 @@ export const componentTokens = {
       transition: 'all 0.1s ease-in-out',
       
       hover: {
-        background: grayScale[100],
+        background: localGrayScale[100],
       },
       
       active: {
-        background: grayScale[200],
-        color: grayScale[700],
+        background: localGrayScale[200],
+        color: localGrayScale[700],
       },
       
       selected: {
-        background: grayScale[200],
-        color: grayScale[700],
+        background: localGrayScale[200],
+        color: localGrayScale[700],
         fontWeight: '500',
       },
     },
@@ -226,11 +268,11 @@ export const componentTokens = {
   
   // Input component tokens
   input: {
-    height: dimensions.input.height,
-    minWidth: dimensions.input.minWidth,
-    padding: `${spacing.xs} ${spacing.md}`, // 4px 12px
+    height: localDimensions.input.height,
+    minWidth: localDimensions.input.minWidth,
+    padding: `${localSpacing.xs} ${localSpacing.md}`, // 4px 12px
     borderRadius: borderRadius.sm,
-    border: `1px solid ${grayScale[300]}`,
+    border: `1px solid ${localGrayScale[300]}`,
     background: '#ffffff',
     fontSize: '14px',
     lineHeight: '1.5',
@@ -239,14 +281,14 @@ export const componentTokens = {
     // Input states
     focus: {
       outline: 'none',
-      border: `1px solid ${grayScale[500]}`,
+      border: `1px solid ${localGrayScale[500]}`,
       boxShadow: shadows.focus,
     },
     
     disabled: {
-      background: grayScale[100],
-      color: grayScale[400],
-      border: `1px solid ${grayScale[200]}`,
+      background: localGrayScale[100],
+      color: localGrayScale[400],
+      border: `1px solid ${localGrayScale[200]}`,
       cursor: 'not-allowed',
     },
     
@@ -258,7 +300,7 @@ export const componentTokens = {
   
   // Badge component tokens
   badge: {
-    padding: `2px ${spacing.xs}`, // 2px 4px
+    padding: `2px ${localSpacing.xs}`, // 2px 4px
     borderRadius: borderRadius.pill,
     fontSize: '12px',
     fontWeight: '500',
@@ -266,12 +308,12 @@ export const componentTokens = {
     
     variants: {
       default: {
-        background: grayScale[200],
-        color: grayScale[700],
+        background: localGrayScale[200],
+        color: localGrayScale[700],
       },
       
       primary: {
-        background: grayScale[600],
+        background: localGrayScale[600],
         color: '#ffffff',
       },
       
@@ -302,16 +344,16 @@ export const touchTargets = {
   
   // Touch target padding helpers
   padding: {
-    sm: spacing.xs,   // 4px
-    md: spacing.sm,   // 8px
-    lg: spacing.md,   // 12px
+    sm: localSpacing.xs,   // 4px
+    md: localSpacing.sm,   // 8px
+    lg: localSpacing.md,   // 12px
   },
   
   // Touch target spacing
   spacing: {
-    tight: spacing.xs,    // 4px between touch targets
-    normal: spacing.sm,   // 8px between touch targets
-    loose: spacing.md,    // 12px between touch targets
+    tight: localSpacing.xs,    // 4px between touch targets
+    normal: localSpacing.sm,   // 8px between touch targets
+    loose: localSpacing.md,    // 12px between touch targets
   },
 } as const;
 
