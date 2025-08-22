@@ -44,6 +44,7 @@ export const semanticColors = {
     secondary: grayScale[200],  // Subtle borders
     focus: grayScale[600],      // Focus rings
     disabled: grayScale[200],   // Disabled borders
+    medium: grayScale[500],   // Medium emphasis borders
   },
   
   // Interactive colors
