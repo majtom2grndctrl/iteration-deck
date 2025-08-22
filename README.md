@@ -15,25 +15,28 @@ Iteration Deck changes that, enabling designers and product managers to compare 
 - 🔧 **Universal Framework Support**: Works with React, Vue, Angular, Astro, and vanilla HTML
 - ⌨️ **Keyboard Navigation**: Cmd/Ctrl + Arrow keys for quick iteration switching
 
-## Quick Start
+## Getting started
 
-### Installation
+### Local development installation
+
+To install and test this package locally in other projects:
 
 ```bash
-# For React projects
-npm install @iteration-deck/core
+# In this repository
+pnpm build        # Build the package
+pnpm pack         # Create a tarball (iteration-deck-0.0.0.tgz)
 
-# For other frameworks
-npm install @iteration-deck/core
+# In your target project
+npm install /path/to/iteration-deck/iteration-deck-0.0.0.tgz
 ```
 
-### Basic Usage
+### Basic usage
 
 Once the package is installed, prompt your coding agent to build out multiple versions of a feature. See examples below.
 
-## AI Workflow Examples
+## AI workflow examples
 
-### Working with AI Coding Agents
+### Working with AI coding agents
 
 Iteration Deck is designed to work seamlessly with AI coding agents like Claude, ChatGPT, and others. 
 
@@ -44,7 +47,7 @@ Iteration Deck is designed to work seamlessly with AI coding agents like Claude,
 
 Here are example prompts and expected outputs:
 
-#### Example 1: Creating Button Variations
+#### Example 1: Creating button variations
 
 **Prompt to AI:**
 ```
@@ -99,7 +102,7 @@ function ButtonVariations() {
 }
 ```
 
-#### Example 2: Navigation Header Layouts
+#### Example 2: Navigation header layouts
 
 **Prompt to AI:**
 ```
@@ -174,7 +177,7 @@ function NavigationLayouts() {
 }
 ```
 
-#### Example 3: Dashboard Card Layouts
+#### Example 3: Dashboard card layouts
 
 **Prompt to AI:**
 ```
@@ -255,7 +258,7 @@ function DashboardCards({ data, isLoading }) {
 }
 ```
 
-## API Reference
+## API reference
 
 ### IterationDeck
 
@@ -285,9 +288,9 @@ interface IterationDeckSlideProps {
 }
 ```
 
-## Advanced Usage
+## Advanced usage
 
-### Multiple Decks
+### Multiple decks
 
 Use multiple iteration decks on the same page for complex prototyping:
 
@@ -323,7 +326,7 @@ function DesignSystemDemo() {
 }
 ```
 
-### Production Behavior
+### Production behavior
 
 In production builds, only the first slide of each deck renders:
 
@@ -340,13 +343,13 @@ In production builds, only the first slide of each deck renders:
 </IterationDeck>
 ```
 
-### Keyboard Shortcuts
+### Keyboard shortcuts
 
 - **Cmd/Ctrl + ←**: Previous slide in active deck
 - **Cmd/Ctrl + →**: Next slide in active deck
 - **Click deck in toolbar**: Switch active deck (when multiple decks present)
 
-## Framework Support
+## Framework support
 
 ### React
 ```tsx
@@ -419,7 +422,7 @@ pnpm test.watch   # Watch mode testing
 pnpm lint         # TypeScript linting
 ```
 
-### Project Structure
+### Project structure
 ```
 src/
 ├── components/           # Lit web components
