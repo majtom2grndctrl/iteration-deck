@@ -5,7 +5,7 @@
 
 > **AI-first prototyping web components for comparing interactive UI variations**
 
-One thing that Figma does really well is: It makes it easy to iterate quickly and non-dustrctively. When we design in code, we don’t had good ways to do that quite like in Figma.
+One thing that Figma does really well is: It makes it easy to iterate quickly and non-destructively. When we design in code, we don’t had good ways to do that quite like in Figma.
 
 Iteration Deck changes that, enabling designers and product managers to compare AI-generated UI variations in live, interactive prototypes. Built with Lit web components and manual React wrappers, it works with any framework while providing excellent developer experience.
 
