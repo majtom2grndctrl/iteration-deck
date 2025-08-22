@@ -1,9 +1,8 @@
 import { defineConfig } from 'vitest/config';
-import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin';
 import { resolve } from 'path';
 
 export default defineConfig({
-  plugins: [vanillaExtractPlugin()],
+  plugins: [],
   test: {
     environment: 'happy-dom',
     globals: true,
@@ -16,7 +15,6 @@ export default defineConfig({
       exclude: [
         'node_modules/',
         'src/test/',
-        'src/**/*.css.ts',
         'src/**/*.d.ts',
         'dist/',
         '**/*.config.{js,ts}',

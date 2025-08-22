@@ -1,9 +1,8 @@
 import { defineConfig } from 'vite';
-import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin';
 import { resolve } from 'path';
 
 export default defineConfig({
-  plugins: [vanillaExtractPlugin()],
+  plugins: [],
   build: {
     lib: {
       entry: {
@@ -19,12 +18,7 @@ export default defineConfig({
           format: 'es',
           entryFileNames: '[name].js',
           chunkFileNames: 'chunks/[name]-[hash].js',
-          assetFileNames: (assetInfo) => {
-            if (assetInfo.name?.endsWith('.css')) {
-              return 'style.css';
-            }
-            return 'assets/[name]-[hash][extname]';
-          },
+          assetFileNames: 'assets/[name]-[hash][extname]',
           globals: {
             react: 'React',
             'react-dom': 'ReactDOM',
@@ -36,12 +30,7 @@ export default defineConfig({
           format: 'cjs',
           entryFileNames: '[name].cjs',
           chunkFileNames: 'chunks/[name]-[hash].cjs',
-          assetFileNames: (assetInfo) => {
-            if (assetInfo.name?.endsWith('.css')) {
-              return 'style.css';
-            }
-            return 'assets/[name]-[hash][extname]';
-          },
+          assetFileNames: 'assets/[name]-[hash][extname]',
           globals: {
             react: 'React',
             'react-dom': 'ReactDOM',

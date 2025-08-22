@@ -30,6 +30,12 @@ Remember to follow instructions in @../CLAUDE.md and @.TECHNICAL_SPEC.md
 
 📋 **[Task Tool - npm-library-packager]** Remove @vanilla-extract dependencies - Clean up package.json, vite.config.ts, and any remaining @vanilla-extract/css imports throughout the codebase, ensure build system no longer processes CSS at build time
 
+**Concurrent Execution Strategy:**
+- Use Task Tool to launch multiple design-system-engineer agents concurrently
+- Each agent focuses on ONE component only (IterationDeck, IterationDeckSlide, or IterationDeckToolbar)
+- All three component refactoring tasks can run in parallel for maximum efficiency
+- Each agent works independently and completes their component refactoring
+
 **Instructions for each design-system-engineer agent:**
 - Focus on ONE component only (IterationDeck, IterationDeckSlide, or IterationDeckToolbar)
 - Replace all @vanilla-extract/css imports with Lit CSS tagged template literals

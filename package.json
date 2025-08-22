@@ -30,7 +30,6 @@
       "import": "./dist/react.js",
       "require": "./dist/react.cjs"
     },
-    "./styles": "./dist/style.css",
     "./package.json": "./package.json"
   },
   "files": [
@@ -66,7 +65,6 @@
     "chatgpt-ui",
     "ai-development",
     "typescript",
-    "vanilla-extract",
     "zustand",
     "custom-elements"
   ],
@@ -115,8 +113,6 @@
     "@types/jsdom": "^21.1.7",
     "@types/node": "^24.3.0",
     "@types/react": "^19.1.10",
-    "@vanilla-extract/css": "^1.17.4",
-    "@vanilla-extract/vite-plugin": "^5.1.1",
     "@vitest/ui": "^3.2.4",
     "happy-dom": "^18.0.1",
     "jsdom": "^26.1.0",

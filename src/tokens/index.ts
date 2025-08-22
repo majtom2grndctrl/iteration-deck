@@ -2,12 +2,12 @@
  * Design Tokens - Central Export
  * 
  * Comprehensive design token system for the iteration-deck project.
- * Integrates with @vanilla-extract/css for type-safe, zero-runtime styling.
+ * Pure TypeScript constants compatible with Lit CSS tagged template literals.
  * 
  * Usage:
  * ```typescript
  * import { colors, spacing, typography, zIndex } from './tokens';
- * import { lightTheme, darkTheme } from './tokens';
+ * import { lightTheme, darkTheme, lightThemeCssVars, darkThemeCssVars } from './tokens';
  * ```
  */
 
@@ -27,6 +27,9 @@ export type {
   ColorTheme,
   LightTheme,
   DarkTheme,
+  LightThemeCssVars,
+  DarkThemeCssVars,
+  ColorUtils,
 } from './colors';
 
 export type {
@@ -86,7 +89,7 @@ export type {
 } from './breakpoints';
 
 // Convenience exports for common token groups
-import { grayScale, semanticColors, lightTheme, darkTheme, colorTheme } from './colors';
+import { grayScale, semanticColors, lightTheme, darkTheme, colorTheme, lightThemeCssVars, darkThemeCssVars, colorUtils } from './colors';
 import { spaceScale, spacing, layout, dimensions } from './spacing';
 import { fontStacks, fontSizes, textStyles } from './typography';
 import { borderRadius, shadows, componentTokens, componentTransitions } from './components';
@@ -103,6 +106,9 @@ export const tokens = {
     light: lightTheme,
     dark: darkTheme,
     theme: colorTheme,
+    lightCssVars: lightThemeCssVars,
+    darkCssVars: darkThemeCssVars,
+    utils: colorUtils,
   },
   
   // Spacing tokens
@@ -147,11 +153,13 @@ export const tokens = {
   },
 } as const;
 
-// Theme configuration for vanilla-extract
+// Theme configuration for CSS custom properties
 export const themeConfig = {
-  contract: colorTheme,
+  cssVarNames: colorTheme,
   light: lightTheme,
   dark: darkTheme,
+  lightCssVars: lightThemeCssVars,
+  darkCssVars: darkThemeCssVars,
 } as const;
 
 // Utility functions for working with tokens
@@ -225,7 +233,7 @@ export const designSystem = {
     'Mobile-first responsive design',
     'Accessibility (WCAG 2.2 AA compliance)',
     'Type-safe styling with TypeScript',
-    'Zero-runtime CSS with @vanilla-extract',
+    'ShadowDOM-encapsulated CSS with Lit tagged template literals',
     'Consistent 8px grid system',
     'Semantic color tokens',
     'System font stacks',

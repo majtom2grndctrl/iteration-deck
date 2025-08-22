@@ -2,10 +2,8 @@
  * Color Design Tokens
  * 
  * Neutral gray scale with semantic variants supporting light/dark themes.
- * Integrates with @vanilla-extract/css for type-safe, zero-runtime styling.
+ * Pure TypeScript constants compatible with Lit CSS tagged template literals.
  */
-
-import { createThemeContract } from '@vanilla-extract/css';
 
 // Base color palette - neutral grays (50-900 scale)
 export const grayScale = {
@@ -65,49 +63,49 @@ export const semanticColors = {
   },
 } as const;
 
-// Theme contract for vanilla-extract CSS variables
-export const colorTheme = createThemeContract({
+// CSS custom property names for theme values (for runtime theme switching)
+export const colorTheme = {
   // Background colors
   background: {
-    primary: null,
-    secondary: null,
-    tertiary: null,
-    elevated: null,
+    primary: '--color-background-primary',
+    secondary: '--color-background-secondary',
+    tertiary: '--color-background-tertiary',
+    elevated: '--color-background-elevated',
   },
   
   // Text colors
   text: {
-    primary: null,
-    secondary: null,
-    tertiary: null,
-    disabled: null,
-    inverse: null,
+    primary: '--color-text-primary',
+    secondary: '--color-text-secondary',
+    tertiary: '--color-text-tertiary',
+    disabled: '--color-text-disabled',
+    inverse: '--color-text-inverse',
   },
   
   // Border colors
   border: {
-    primary: null,
-    secondary: null,
-    focus: null,
-    disabled: null,
+    primary: '--color-border-primary',
+    secondary: '--color-border-secondary',
+    focus: '--color-border-focus',
+    disabled: '--color-border-disabled',
   },
   
   // Interactive colors
   interactive: {
-    hover: null,
-    active: null,
-    selected: null,
-    focus: null,
+    hover: '--color-interactive-hover',
+    active: '--color-interactive-active',
+    selected: '--color-interactive-selected',
+    focus: '--color-interactive-focus',
   },
   
   // Component-specific colors
   toolbar: {
-    background: null,
-    backdrop: null,
-    border: null,
-    shadow: null,
+    background: '--color-toolbar-background',
+    backdrop: '--color-toolbar-backdrop',
+    border: '--color-toolbar-border',
+    shadow: '--color-toolbar-shadow',
   },
-});
+} as const;
 
 // Light theme implementation
 export const lightTheme = {
@@ -179,6 +177,55 @@ export const darkTheme = {
   },
 } as const;
 
+// CSS custom property mappings for theme switching
+export const lightThemeCssVars = {
+  '--color-background-primary': lightTheme.background.primary,
+  '--color-background-secondary': lightTheme.background.secondary,
+  '--color-background-tertiary': lightTheme.background.tertiary,
+  '--color-background-elevated': lightTheme.background.elevated,
+  '--color-text-primary': lightTheme.text.primary,
+  '--color-text-secondary': lightTheme.text.secondary,
+  '--color-text-tertiary': lightTheme.text.tertiary,
+  '--color-text-disabled': lightTheme.text.disabled,
+  '--color-text-inverse': lightTheme.text.inverse,
+  '--color-border-primary': lightTheme.border.primary,
+  '--color-border-secondary': lightTheme.border.secondary,
+  '--color-border-focus': lightTheme.border.focus,
+  '--color-border-disabled': lightTheme.border.disabled,
+  '--color-interactive-hover': lightTheme.interactive.hover,
+  '--color-interactive-active': lightTheme.interactive.active,
+  '--color-interactive-selected': lightTheme.interactive.selected,
+  '--color-interactive-focus': lightTheme.interactive.focus,
+  '--color-toolbar-background': lightTheme.toolbar.background,
+  '--color-toolbar-backdrop': lightTheme.toolbar.backdrop,
+  '--color-toolbar-border': lightTheme.toolbar.border,
+  '--color-toolbar-shadow': lightTheme.toolbar.shadow,
+} as const;
+
+export const darkThemeCssVars = {
+  '--color-background-primary': darkTheme.background.primary,
+  '--color-background-secondary': darkTheme.background.secondary,
+  '--color-background-tertiary': darkTheme.background.tertiary,
+  '--color-background-elevated': darkTheme.background.elevated,
+  '--color-text-primary': darkTheme.text.primary,
+  '--color-text-secondary': darkTheme.text.secondary,
+  '--color-text-tertiary': darkTheme.text.tertiary,
+  '--color-text-disabled': darkTheme.text.disabled,
+  '--color-text-inverse': darkTheme.text.inverse,
+  '--color-border-primary': darkTheme.border.primary,
+  '--color-border-secondary': darkTheme.border.secondary,
+  '--color-border-focus': darkTheme.border.focus,
+  '--color-border-disabled': darkTheme.border.disabled,
+  '--color-interactive-hover': darkTheme.interactive.hover,
+  '--color-interactive-active': darkTheme.interactive.active,
+  '--color-interactive-selected': darkTheme.interactive.selected,
+  '--color-interactive-focus': darkTheme.interactive.focus,
+  '--color-toolbar-background': darkTheme.toolbar.background,
+  '--color-toolbar-backdrop': darkTheme.toolbar.backdrop,
+  '--color-toolbar-border': darkTheme.toolbar.border,
+  '--color-toolbar-shadow': darkTheme.toolbar.shadow,
+} as const;
+
 // Color utilities for component usage
 export const colorUtils = {
   /**
@@ -195,6 +242,16 @@ export const colorUtils = {
   isDarkMode: () => 
     typeof window !== 'undefined' && 
     window.matchMedia('(prefers-color-scheme: dark)').matches,
+
+  /**
+   * Get CSS custom property value
+   */
+  cssVar: (varName: string) => `var(${varName})`,
+  
+  /**
+   * Get CSS custom property value with fallback
+   */
+  cssVarWithFallback: (varName: string, fallback: string) => `var(${varName}, ${fallback})`,
 } as const;
 
 // Export types for TypeScript usage
@@ -203,3 +260,6 @@ export type SemanticColors = typeof semanticColors;
 export type ColorTheme = typeof colorTheme;
 export type LightTheme = typeof lightTheme;
 export type DarkTheme = typeof darkTheme;
+export type LightThemeCssVars = typeof lightThemeCssVars;
+export type DarkThemeCssVars = typeof darkThemeCssVars;
+export type ColorUtils = typeof colorUtils;

@@ -15,7 +15,7 @@
  * - Dynamic deck registration/unregistration handling
  */
 
-import { LitElement, html, nothing, css } from 'lit';
+import { LitElement, html, nothing, css, unsafeCSS } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { 
   subscribeToIterationStore, 
@@ -32,9 +32,19 @@ import {
   type NavigationDirection
 } from '../../core/utilities.js';
 import type { DeckRegistration } from '../../core/types.js';
-import { deckGlow } from './iteration-deck-toolbar.css.js';
+import { 
+  grayScale,
+  semanticColors,
+  spacing,
+  borderRadius,
+  shadows,
+  fontStacks,
+  fontSizes,
+  zIndexScale,
+  transitions
+} from '../../tokens/index.js';
 
-// Note: Using Lit static styles instead of Vanilla Extract for shadow DOM compatibility
+// ShadowDOM encapsulation for isolated styling
 
 /**
  * Singleton instance tracking
@@ -68,87 +78,286 @@ export class IterationDeckToolbar extends LitElement {
    */
   private throttledKeyboardHandler = throttle(this.handleKeyboardNavigation.bind(this), 100);
 
-  /**
-   * Static styles for shadow DOM
-   * Since Vanilla Extract doesn't work in shadow DOM, we define styles here
-   */
   static styles = css`
     :host {
+      /* Positioning */
       position: fixed;
-      bottom: 24px;
+      bottom: ${unsafeCSS(spacing.xl)};
       left: 50%;
       transform: translateX(-50%);
-      z-index: 1000;
+      z-index: ${unsafeCSS(zIndexScale.overlay)};
       
+      /* Layout and sizing */
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: ${unsafeCSS(spacing.sm)};
+      min-width: 372px;
+      height: 48px;
+      padding: ${unsafeCSS(spacing.xs)} ${unsafeCSS(spacing.md)};
       
-      padding: 8px 16px;
-      background: rgba(255, 255, 255, 0.95);
-      border: 1px solid rgba(0, 0, 0, 0.1);
-      border-radius: 64px;
+      /* Visual design - signature pill shape */
+      border-radius: ${unsafeCSS(borderRadius.pill)};
+      background: rgba(128, 128, 128, 0.2);
+      backdrop-filter: blur(16px);
+      border: 1px solid ${unsafeCSS(grayScale[200])};
+      box-shadow: ${unsafeCSS(shadows.toolbar)};
       
-      backdrop-filter: blur(10px);
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      /* Typography */
+      font-family: ${unsafeCSS(fontStacks.system)};
+      font-size: ${unsafeCSS(fontSizes.sm)};
+      font-weight: 500;
+      line-height: 1;
+      color: ${unsafeCSS(semanticColors.text.primary)};
+      
+      /* Transitions */
+      transition: ${unsafeCSS(transitions.all)};
     }
-
-    button {
+    
+    :host(:hover) {
+      background: rgba(128, 128, 128, 0.2);
+      border-color: ${unsafeCSS(grayScale[300])};
+      box-shadow: ${unsafeCSS(shadows.md)};
+    }
+    
+    /* Dark mode support */
+    @media (prefers-color-scheme: dark) {
+      :host {
+        background: rgba(60, 60, 60, 0.25);
+        border-color: ${unsafeCSS(grayScale[700])};
+        color: ${unsafeCSS(semanticColors.text.inverse)};
+      }
+    }
+    
+    /* Mobile responsiveness */
+    @media (max-width: 480px) {
+      :host {
+        min-width: 320px;
+        height: 48px;
+        padding: ${unsafeCSS(spacing.xs)} ${unsafeCSS(spacing.md)};
+        gap: ${unsafeCSS(spacing.sm)};
+        font-size: ${unsafeCSS(fontSizes.xs)};
+      }
+    }
+    
+    /* Reduced motion support */
+    @media (prefers-reduced-motion: reduce) {
+      :host {
+        transition: none;
+      }
+    }
+    
+    .toolbar-container {
       display: flex;
       align-items: center;
-      justify-content: center;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      
-      background: white;
-      border: 1px solid rgba(0, 0, 0, 0.1);
-      color: #666;
-      cursor: pointer;
-      outline: none;
-      
-      transition: all 0.2s ease;
+      gap: ${unsafeCSS(spacing.sm)};
+      width: 100%;
     }
-
-    button:hover {
-      background: #f5f5f5;
-      color: #333;
+    
+    /* Deck selector styles */
+    .deck-selector {
+      position: relative;
+      display: flex;
+      align-items: center;
     }
-
-    button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    select {
-      background: white;
-      border: 1px solid rgba(0, 0, 0, 0.1);
-      border-radius: 20px;
-      padding: 6px 12px;
-      font-size: 14px;
-      color: #333;
+    
+    .select-element {
+      background: ${unsafeCSS(semanticColors.background.elevated)};
+      border: 1px solid ${unsafeCSS(semanticColors.border.secondary)};
+      border-radius: ${unsafeCSS(borderRadius['2xl'])};
+      padding: ${unsafeCSS(spacing.xs)} ${unsafeCSS(spacing.md)};
+      font-size: ${unsafeCSS(fontSizes.sm)};
+      color: ${unsafeCSS(semanticColors.text.primary)};
       outline: none;
       cursor: pointer;
     }
-
-    .separator {
-      width: 1px;
-      height: 24px;
-      background: rgba(0, 0, 0, 0.1);
+    
+    @media (prefers-color-scheme: dark) {
+      .select-element {
+        background: rgba(60, 60, 60, 0.8);
+        border-color: rgba(255, 255, 255, 0.2);
+        color: #fff;
+      }
     }
-
-    .slide-label {
-      padding: 0 8px;
-      font-size: 14px;
-      color: #666;
-      white-space: nowrap;
-    }
-
+    
+    /* Navigation section */
     .navigation {
       display: flex;
       align-items: center;
-      gap: 8px;
     }
+    
+    @media (max-width: 480px) {
+      .navigation {
+        gap: 0;
+      }
+    }
+    
+    /* Segmented button group */
+    .segmented-button-group {
+      display: flex;
+      align-items: center;
+      border-radius: ${unsafeCSS(borderRadius['2xl'])};
+      gap: 1px;
+      overflow: hidden;
+      border: 1px solid ${unsafeCSS(semanticColors.border.secondary)};
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      .segmented-button-group {
+        background: rgba(60, 60, 60, 0.8);
+        border-color: rgba(255, 255, 255, 0.2);
+      }
+    }
+    
+    /* Navigation buttons */
+    .nav-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      
+      background: ${unsafeCSS(semanticColors.background.elevated)};
+      border: 1px solid ${unsafeCSS(semanticColors.border.secondary)};
+      
+      color: ${unsafeCSS(semanticColors.text.secondary)};
+      cursor: pointer;
+      outline: none;
+      
+      transition: ${unsafeCSS(transitions.all)};
+    }
+    
+    .nav-button:hover {
+      background: ${unsafeCSS(semanticColors.background.elevated)};
+      border-color: ${unsafeCSS(semanticColors.border.primary)};
+      color: ${unsafeCSS(semanticColors.text.primary)};
+    }
+    
+    .nav-button:focus {
+      outline: none;
+    }
+    
+    .nav-button:focus-visible {
+      outline: 2px solid #007AFF;
+      outline-offset: 2px;
+      border-color: #007AFF;
+    }
+    
+    .nav-button:active {
+      opacity: 0.8;
+    }
+    
+    .nav-button:disabled {
+      color: ${unsafeCSS(semanticColors.text.disabled)};
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+    
+    .nav-button:disabled:hover {
+      background: ${unsafeCSS(semanticColors.background.elevated)};
+      border-color: ${unsafeCSS(semanticColors.border.secondary)};
+      transform: none;
+      box-shadow: none;
+    }
+    
+    /* Dark mode for navigation buttons */
+    @media (prefers-color-scheme: dark) {
+      .nav-button {
+        background: rgba(60, 60, 60, 0.8);
+        border-color: rgba(255, 255, 255, 0.2);
+        color: #fff;
+      }
+      
+      .nav-button:hover {
+        background: rgba(80, 80, 80, 1);
+        border-color: rgba(255, 255, 255, 0.3);
+      }
+      
+      .nav-button:focus {
+        outline: none;
+      }
+      
+      .nav-button:focus-visible {
+        border-color: #0A84FF;
+        outline: 2px solid #0A84FF;
+        outline-offset: 2px;
+      }
+      
+      .nav-button:disabled {
+        color: rgba(255, 255, 255, 0.3);
+      }
+    }
+    
+    /* Mobile button sizing */
+    @media (max-width: 480px) {
+      .nav-button {
+        width: 28px;
+        height: 28px;
+      }
+    }
+    
+    /* First and last button styling for seamless segmented group */
+    .nav-button-first {
+      border-radius: 0;
+      border-right: none;
+      border-top-left-radius: ${unsafeCSS(borderRadius.xl)};
+      border-bottom-left-radius: ${unsafeCSS(borderRadius.xl)};
+    }
+    
+    .nav-button-last {
+      border-radius: 0;
+      border-left: none;
+      border-top-right-radius: ${unsafeCSS(borderRadius.xl)};
+      border-bottom-right-radius: ${unsafeCSS(borderRadius.xl)};
+    }
+    
+    /* Slide label */
+    .slide-label {
+      flex: 1;
+      color: ${unsafeCSS(semanticColors.text.primary)};
+      font-size: ${unsafeCSS(fontSizes.sm)};
+      font-weight: 500;
+      line-height: ${unsafeCSS(spacing.lg)};
+      overflow: hidden;
+      padding: 0 ${unsafeCSS(spacing.sm)};
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      width: 20rem;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      .slide-label {
+        color: ${unsafeCSS(semanticColors.text.inverse)};
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .slide-label {
+        font-size: ${unsafeCSS(fontSizes.xs)};
+        font-weight: 400;
+        max-width: 100px;
+      }
+    }
+    
+    /* Separator */
+    .separator {
+      width: 1px;
+      height: ${unsafeCSS(spacing.xl)};
+      background: ${unsafeCSS(semanticColors.border.secondary)};
+      opacity: 0.6;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      .separator {
+        background: rgba(255, 255, 255, 0.2);
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .separator {
+        height: 20px;
+      }
+    }
+    
   `;
 
   constructor() {
@@ -179,7 +388,7 @@ export class IterationDeckToolbar extends LitElement {
       return;
     }
 
-    // Styles are now applied via static styles property
+    // Styles are now embedded via CSS tagged template literals with ShadowDOM encapsulation
 
     // Subscribe to store changes
     this.unsubscribeFromStore = subscribeToIterationStore((state) => {
@@ -425,16 +634,64 @@ export class IterationDeckToolbar extends LitElement {
   }
 
   /**
-   * Add temporary glow effect to deck element
+   * Inject global CSS for deck glow animations (called once)
+   */
+  private static ensureGlowStyles() {
+    const styleId = 'iteration-deck-glow-styles';
+    if (document.getElementById(styleId)) return; // Already injected
+    
+    const style = document.createElement('style');
+    style.id = styleId;
+    style.textContent = `
+      /* Iteration Deck Glow Effect Global Styles */
+      [data-iteration-glow] {
+        border-radius: ${spacing.sm};
+        position: relative;
+        animation: iteration-deck-glow 500ms ease-in-out;
+      }
+      
+      @keyframes iteration-deck-glow {
+        0% {
+          box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.2), 0 0 25px rgba(236, 72, 153, 0.1);
+          outline: 2px solid rgba(236, 72, 153, 0.2);
+        }
+        50% {
+          box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.4), 0 0 25px rgba(236, 72, 153, 0.3);
+          outline: 2px solid rgba(236, 72, 153, 0.6);
+        }
+        100% {
+          box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.2), 0 0 25px rgba(236, 72, 153, 0.1);
+          outline: 2px solid rgba(236, 72, 153, 0);
+        }
+      }
+      
+      /* Accessibility: respect reduced motion preference */
+      @media (prefers-reduced-motion: reduce) {
+        [data-iteration-glow] {
+          animation: none;
+          border: 2px solid rgba(236, 72, 153, 0.6);
+          box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.3), 0 0 25px rgba(236, 72, 153, 0.2);
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  /**
+   * Add temporary glow effect to deck element using CSS classes
+   * Much simpler and more performant than inline style manipulation
    */
   private addGlowEffect(deckElement: HTMLElement) {
-    // Apply the glow CSS class from Vanilla Extract
-    deckElement.classList.add(deckGlow);
+    // Ensure global styles are injected
+    IterationDeckToolbar.ensureGlowStyles();
     
-    // Remove glow class after animation completes (1s duration + buffer)
+    // Add glow data attribute to trigger CSS animation
+    deckElement.setAttribute('data-iteration-glow', '');
+    
+    // Remove glow attribute after animation completes
     setTimeout(() => {
-      deckElement.classList.remove(deckGlow);
-    }, 1300);
+      deckElement.removeAttribute('data-iteration-glow');
+    }, 800);
   }
 
   /**
@@ -563,48 +820,55 @@ export class IterationDeckToolbar extends LitElement {
     }
 
     return html`
-      ${hasMultipleDecks ? html`
-        <div class="deck-selector">
-          <select 
-            @change=${this.handleDeckSelection}
-            .value=${selectedDeckId || ''}
-            aria-label="Select iteration deck"
-          >
-            ${deckIds.map(deckId => html`
-              <option 
-                value=${deckId} 
-                ?selected=${deckId === selectedDeckId}
-              >
-                ${this.getDeckLabel(deckId)}
-              </option>
-            `)}
-          </select>
+      <div class="toolbar-container">
+        ${hasMultipleDecks ? html`
+          <div class="deck-selector">
+            <select 
+              class="select-element"
+              @change=${this.handleDeckSelection}
+              .value=${selectedDeckId || ''}
+              aria-label="Select iteration deck"
+            >
+              ${deckIds.map(deckId => html`
+                <option 
+                  value=${deckId} 
+                  ?selected=${deckId === selectedDeckId}
+                >
+                  ${this.getDeckLabel(deckId)}
+                </option>
+              `)}
+            </select>
+          </div>
+          <div class="separator"></div>
+        ` : ''}
+        
+        <div class="navigation">
+          <div class="segmented-button-group">
+            <button 
+              class="nav-button nav-button-first"
+              @click=${this.handlePrevSlide}
+              ?disabled=${!this.canNavigatePrev()}
+              aria-label="Previous slide (Ctrl/Cmd + Left Arrow)"
+              title="Previous slide (Ctrl/Cmd + ←)"
+            >
+              ◀
+            </button>
+            
+            <button 
+              class="nav-button nav-button-last"
+              @click=${this.handleNextSlide}
+              ?disabled=${!this.canNavigateNext()}
+              aria-label="Next slide (Ctrl/Cmd + Right Arrow)"
+              title="Next slide (Ctrl/Cmd + →)"
+            >
+              ▶
+            </button>
+          </div>
+          
+          <span class="slide-label" title=${this.getCurrentSlideLabel()}>
+            ${this.getCurrentSlideLabel()}
+          </span>
         </div>
-        <div class="separator"></div>
-      ` : ''}
-      
-      <div class="navigation">
-        <button 
-          @click=${this.handlePrevSlide}
-          ?disabled=${!this.canNavigatePrev()}
-          aria-label="Previous slide (Ctrl/Cmd + Left Arrow)"
-          title="Previous slide (Ctrl/Cmd + ←)"
-        >
-          ◀
-        </button>
-        
-        <span class="slide-label" title=${this.getCurrentSlideLabel()}>
-          ${this.getCurrentSlideLabel()}
-        </span>
-        
-        <button 
-          @click=${this.handleNextSlide}
-          ?disabled=${!this.canNavigateNext()}
-          aria-label="Next slide (Ctrl/Cmd + Right Arrow)"
-          title="Next slide (Ctrl/Cmd + →)"
-        >
-          ▶
-        </button>
       </div>
     `;
   }
