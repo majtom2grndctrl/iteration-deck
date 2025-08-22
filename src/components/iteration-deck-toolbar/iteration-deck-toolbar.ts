@@ -93,12 +93,11 @@ export class IterationDeckToolbar extends LitElement {
       align-items: center;
       gap: ${unsafeCSS(spacing.xs)};
       min-width: 320px;
-      height: 48px;
       padding: ${unsafeCSS(spacing.xs)} ${unsafeCSS(spacing.sm)};
       
       /* Visual design - signature pill shape */
       border-radius: ${unsafeCSS(borderRadius.pill)};
-      background: rgba(128, 128, 128, 0.2);
+      background: rgba(255, 255, 255, 0.9);
       backdrop-filter: blur(16px);
       border: 1px solid ${unsafeCSS(grayScale[200])};
       box-shadow: ${unsafeCSS(shadows.toolbar)};
@@ -127,7 +126,7 @@ export class IterationDeckToolbar extends LitElement {
     }
     
     :host(:hover) {
-      background: rgba(128, 128, 128, 0.2);
+      background: rgba(255, 255, 255, 0.95);
       border-color: ${unsafeCSS(grayScale[300])};
       box-shadow: ${unsafeCSS(shadows.md)};
     }
@@ -135,9 +134,14 @@ export class IterationDeckToolbar extends LitElement {
     /* Dark mode support */
     @media (prefers-color-scheme: dark) {
       :host {
-        background: rgba(60, 60, 60, 0.25);
+        background: rgba(40, 40, 40, 0.9);
         border-color: ${unsafeCSS(grayScale[700])};
         color: ${unsafeCSS(semanticColors.text.inverse)};
+      }
+      
+      :host(:hover) {
+        background: rgba(50, 50, 50, 0.95);
+        border-color: ${unsafeCSS(grayScale[600])};
       }
     }
     
@@ -186,7 +190,7 @@ export class IterationDeckToolbar extends LitElement {
       
       background: ${unsafeCSS(semanticColors.background.elevated)};
       border: 1px solid ${unsafeCSS(semanticColors.border.secondary)};
-      border-radius: ${unsafeCSS(borderRadius.xl)};
+      border-radius: ${unsafeCSS(borderRadius.xxl)};
       
       font-size: ${unsafeCSS(fontSizes.sm)};
       font-weight: 500;
@@ -252,7 +256,7 @@ export class IterationDeckToolbar extends LitElement {
     .segmented-button-group {
       display: flex;
       align-items: center;
-      border-radius: ${unsafeCSS(borderRadius['2xl'])};
+      border-radius: ${unsafeCSS(borderRadius.xxl)};
       gap: 1px;
       overflow: hidden;
       border: 1px solid ${unsafeCSS(semanticColors.border.secondary)};
@@ -329,12 +333,13 @@ export class IterationDeckToolbar extends LitElement {
       .nav-button {
         background: rgba(60, 60, 60, 0.8);
         border-color: rgba(255, 255, 255, 0.2);
-        color: #fff;
+        color: ${unsafeCSS(semanticColors.text.inverse)};
       }
       
       .nav-button:hover {
         background: rgba(80, 80, 80, 1);
         border-color: rgba(255, 255, 255, 0.3);
+        color: ${unsafeCSS(semanticColors.text.inverse)};
       }
       
       .nav-button:focus-visible {
@@ -374,7 +379,6 @@ export class IterationDeckToolbar extends LitElement {
       padding: 0 ${unsafeCSS(spacing.xs)};
       text-overflow: ellipsis;
       white-space: nowrap;
-      max-width: 100px;
     }
     
     /* Progressive enhancement for larger screens */
@@ -382,13 +386,20 @@ export class IterationDeckToolbar extends LitElement {
       .slide-label {
         font-size: ${unsafeCSS(fontSizes.sm)};
         padding: 0 ${unsafeCSS(spacing.sm)};
-        max-width: 20rem;
+        max-width: 50rem;
       }
     }
     
     @media (prefers-color-scheme: dark) {
       .slide-label {
         color: ${unsafeCSS(semanticColors.text.inverse)};
+      }
+    }
+
+    @media ${unsafeCSS(mediaQueries.lg)} {
+      .slide-label {
+        max-width: unset;
+        width: 25rem;
       }
     }
     

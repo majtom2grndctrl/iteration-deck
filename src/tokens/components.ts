@@ -57,7 +57,7 @@ export const borderRadius = {
   md: '8px',      // Medium radius - cards, panels
   lg: '12px',     // Large radius - modals, large cards
   xl: '16px',     // Extra large radius
-  '2xl': '24px',  // Very large radius
+  xxl: '24px',  // Very large radius
   pill: '64px',   // Pill-shaped - toolbar, badges
   full: '9999px', // Fully rounded - avatars, icons
 } as const;
