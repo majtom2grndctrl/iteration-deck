@@ -41,6 +41,7 @@ pnpm lint         # Lint TypeScript code
   - **Design Tokens**: Use TypeScript constants for values that never change at runtime (colors, spacing, typography scales)
   - **CSS Custom Properties**: Use for runtime-dynamic values (theme switching, user preferences, responsive behavior)
   - **ShadowDOM Isolation**: All styling encapsulated within component shadow roots for universal compatibility
+  - **Mobile-First CSS**: Use progressive enhancement consistently to ensure performance across device types
 
 ### Code Quality Standards
 - **Accessibility**: WCAG 2.2 AA compliance, proper ARIA attributes

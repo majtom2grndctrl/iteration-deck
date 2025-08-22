@@ -51,6 +51,7 @@ import {
   spaceScale,
   spacing,
   dimensions,
+  breakpoints,
 } from '../../tokens/index.js';
 
 /**
@@ -288,21 +289,23 @@ export class IterationDeck extends LitElement {
       }
     }
 
-    /* Responsive design - mobile first */
-    @media (max-width: 640px) {
-      :host {
-        padding: ${unsafeCSS(spacing.sm)};
-        min-height: 150px;
-      }
+    /* Mobile-first responsive design */
+    /* Base styles (mobile) */
+    :host {
+      padding: ${unsafeCSS(spacing.sm)};
+      min-height: 150px;
     }
 
-    @media (min-width: 641px) {
+    /* Tablet and larger (768px+) */
+    @media (min-width: ${unsafeCSS(breakpoints.md)}) {
       :host {
         padding: ${unsafeCSS(spacing.lg)};
+        min-height: ${unsafeCSS(dimensions.slide.minHeight)};
       }
     }
 
-    @media (min-width: 1025px) {
+    /* Desktop and larger (1024px+) */
+    @media (min-width: ${unsafeCSS(breakpoints.lg)}) {
       :host {
         padding: ${unsafeCSS(spacing.xl)};
       }

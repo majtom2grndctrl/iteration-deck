@@ -6,7 +6,7 @@
  * Fully integrated with Zustand store for cross-component reactivity.
  */
 
-import { LitElement, html, css } from 'lit';
+import { LitElement, html, css, unsafeCSS } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { IterationDeckSlideProps } from '../../core/types.js';
 import { 
@@ -19,6 +19,12 @@ import {
   debugLog, 
   errorLog 
 } from '../../core/utilities.js';
+import { 
+  spaceScale, 
+  spacing, 
+  dimensions,
+  mediaQueries 
+} from '../../tokens/index.js';
 
 // Design tokens imported and embedded directly in CSS for Lit compatibility
 
@@ -45,8 +51,8 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
       display: block;
       position: relative;
       width: 100%;
-      min-height: 200px;
-      border-radius: 8px;
+      min-height: 150px; /* Mobile-first: smaller minimum height */
+      border-radius: ${unsafeCSS(spaceScale[2])};
       transition: opacity 0.2s ease-in-out;
       isolation: isolate;
       outline: none;
@@ -113,13 +119,13 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
       background: rgba(239, 68, 68, 0.05);
     }
     
-    /* Slide content wrapper */
+    /* Slide content wrapper - mobile-first base styles */
     .slide-content {
       width: 100%;
       min-height: inherit;
       position: relative;
       z-index: 1;
-      padding: 16px;
+      padding: ${unsafeCSS(spacing.md)}; /* 12px - mobile base */
     }
     
     /* Development mode hover effects - REMOVED for better content interactivity */
@@ -149,8 +155,8 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      padding: 16px;
-      gap: 12px;
+      padding: ${unsafeCSS(spacing.lg)};
+      gap: ${unsafeCSS(spacing.md)};
       border-radius: inherit;
       border: 1px solid var(--slide-border);
       text-align: center;
@@ -184,7 +190,7 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
       letter-spacing: 0;
       color: var(--slide-text-primary);
       margin: 0;
-      margin-bottom: 8px;
+      margin-bottom: ${unsafeCSS(spaceScale[2])};
     }
     
     .metadata-prompt {
@@ -195,11 +201,11 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
       line-height: 1.5;
       color: var(--slide-text-secondary);
       background: var(--slide-bg-secondary);
-      padding: 12px;
-      border-radius: 8px;
+      padding: ${unsafeCSS(spacing.md)};
+      border-radius: ${unsafeCSS(spaceScale[2])};
       border: 1px solid var(--slide-border);
       margin: 0;
-      margin-bottom: 12px;
+      margin-bottom: ${unsafeCSS(spacing.md)};
     }
     
     .metadata-notes {
@@ -217,11 +223,11 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
     .metadata-score {
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: ${unsafeCSS(spaceScale[1])};
       font-size: 12px;
       font-weight: 500;
       color: var(--slide-text-secondary);
-      margin-top: 8px;
+      margin-top: ${unsafeCSS(spaceScale[2])};
     }
     
     .score-label {
@@ -256,8 +262,8 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
     }
     
     :host([tabindex="0"]:focus) {
-      outline: 3px solid var(--slide-focus-outline);
-      outline-offset: 2px;
+      outline: ${unsafeCSS(spacing.focus.width)} solid var(--slide-focus-outline);
+      outline-offset: ${unsafeCSS(spacing.focus.offset)};
     }
     
     /* Production mode overrides */
@@ -274,40 +280,41 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
       display: none;
     }
     
-    /* Responsive design */
-    @media (max-width: 640px) {
-      .slide-container {
-        min-height: 150px;
-      }
-      
+    /* Mobile-first responsive design using design tokens */
+    /* Base styles above are mobile-first (xs: 0px+) */
+    
+    /* Small mobile devices and up (sm: 640px+) */
+    @media ${unsafeCSS(mediaQueries.sm)} {
       .slide-content {
-        padding: 12px;
+        padding: ${unsafeCSS(spacing.lg)}; /* 16px */
       }
       
       .metadata-overlay {
-        padding: 12px;
-        gap: 8px;
-      }
-      
-      .metadata-prompt,
-      .metadata-notes {
-        max-width: 100%;
+        padding: ${unsafeCSS(spacing.lg)};
+        gap: ${unsafeCSS(spacing.md)}; /* 12px */
       }
     }
     
-    @media (min-width: 641px) and (max-width: 1024px) {
+    /* Tablet devices and up (md: 768px+) */
+    @media ${unsafeCSS(mediaQueries.md)} {
       .slide-container {
-        min-height: 200px;
+        min-height: ${unsafeCSS(dimensions.slide.minHeight)}; /* 200px */
       }
       
       .slide-content {
-        padding: 16px;
+        padding: ${unsafeCSS(spacing.lg)}; /* 16px */
       }
     }
     
-    @media (min-width: 1025px) {
+    /* Desktop devices and up (lg: 1024px+) */
+    @media ${unsafeCSS(mediaQueries.lg)} {
       .slide-content {
-        padding: 24px;
+        padding: ${unsafeCSS(spacing.xl)}; /* 24px */
+      }
+      
+      .metadata-overlay {
+        padding: ${unsafeCSS(spacing.xl)};
+        gap: ${unsafeCSS(spacing.lg)}; /* 16px */
       }
     }
     

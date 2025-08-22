@@ -41,7 +41,8 @@ import {
   fontStacks,
   fontSizes,
   zIndexScale,
-  transitions
+  transitions,
+  mediaQueries
 } from '../../tokens/index.js';
 
 // ShadowDOM encapsulation for isolated styling
@@ -82,18 +83,18 @@ export class IterationDeckToolbar extends LitElement {
     :host {
       /* Positioning */
       position: fixed;
-      bottom: ${unsafeCSS(spacing.xl)};
+      bottom: ${unsafeCSS(spacing.md)};
       left: 50%;
       transform: translateX(-50%);
       z-index: ${unsafeCSS(zIndexScale.overlay)};
       
-      /* Layout and sizing */
+      /* Layout and sizing - Mobile-first approach */
       display: flex;
       align-items: center;
-      gap: ${unsafeCSS(spacing.sm)};
-      min-width: 372px;
+      gap: ${unsafeCSS(spacing.xs)};
+      min-width: 320px;
       height: 48px;
-      padding: ${unsafeCSS(spacing.xs)} ${unsafeCSS(spacing.md)};
+      padding: ${unsafeCSS(spacing.xs)} ${unsafeCSS(spacing.sm)};
       
       /* Visual design - signature pill shape */
       border-radius: ${unsafeCSS(borderRadius.pill)};
@@ -102,15 +103,27 @@ export class IterationDeckToolbar extends LitElement {
       border: 1px solid ${unsafeCSS(grayScale[200])};
       box-shadow: ${unsafeCSS(shadows.toolbar)};
       
-      /* Typography */
+      /* Typography - Mobile-first */
       font-family: ${unsafeCSS(fontStacks.system)};
-      font-size: ${unsafeCSS(fontSizes.sm)};
+      font-size: ${unsafeCSS(fontSizes.xs)};
       font-weight: 500;
       line-height: 1;
       color: ${unsafeCSS(semanticColors.text.primary)};
       
       /* Transitions */
       transition: ${unsafeCSS(transitions.all)};
+    }
+    
+    /* Progressive enhancement for larger screens */
+    @media ${unsafeCSS(mediaQueries.sm)} {
+      :host {
+        min-width: 372px;
+        height: auto;
+        padding: ${unsafeCSS(spacing.sm)} ${unsafeCSS(spacing.md)};
+        gap: ${unsafeCSS(spacing.sm)};
+        bottom: ${unsafeCSS(spacing.xl)};
+        font-size: ${unsafeCSS(fontSizes.sm)};
+      }
     }
     
     :host(:hover) {
@@ -128,17 +141,6 @@ export class IterationDeckToolbar extends LitElement {
       }
     }
     
-    /* Mobile responsiveness */
-    @media (max-width: 480px) {
-      :host {
-        min-width: 320px;
-        height: 48px;
-        padding: ${unsafeCSS(spacing.xs)} ${unsafeCSS(spacing.md)};
-        gap: ${unsafeCSS(spacing.sm)};
-        font-size: ${unsafeCSS(fontSizes.xs)};
-      }
-    }
-    
     /* Reduced motion support */
     @media (prefers-reduced-motion: reduce) {
       :host {
@@ -153,41 +155,96 @@ export class IterationDeckToolbar extends LitElement {
       width: 100%;
     }
     
-    /* Deck selector styles */
+    /* Custom deck selector styles to match button height */
     .deck-selector {
       position: relative;
       display: flex;
       align-items: center;
     }
     
+    /* Hidden native select for accessibility and functionality */
     .select-element {
-      background: ${unsafeCSS(semanticColors.background.elevated)};
-      border: 1px solid ${unsafeCSS(semanticColors.border.secondary)};
-      border-radius: ${unsafeCSS(borderRadius['2xl'])};
-      padding: ${unsafeCSS(spacing.xs)} ${unsafeCSS(spacing.md)};
-      font-size: ${unsafeCSS(fontSizes.sm)};
-      color: ${unsafeCSS(semanticColors.text.primary)};
-      outline: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
       cursor: pointer;
+      z-index: 2;
     }
     
+    /* Custom select display that matches button styling */
+    .select-display {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 44px;
+      gap: ${unsafeCSS(spacing.lg)};
+      min-width: 120px;
+      padding: 0 ${unsafeCSS(spacing.lg)};
+      
+      background: ${unsafeCSS(semanticColors.background.elevated)};
+      border: 1px solid ${unsafeCSS(semanticColors.border.secondary)};
+      border-radius: ${unsafeCSS(borderRadius.xl)};
+      
+      font-size: ${unsafeCSS(fontSizes.sm)};
+      font-weight: 500;
+      line-height: ${unsafeCSS(spacing.lg)};
+      color: ${unsafeCSS(semanticColors.text.primary)};
+      
+      cursor: pointer;
+      user-select: none;
+      transition: ${unsafeCSS(transitions.all)};
+    }
+    
+    .select-display:hover {
+      background: ${unsafeCSS(semanticColors.background.elevated)};
+      border-color: ${unsafeCSS(semanticColors.border.primary)};
+    }
+    
+    .select-text {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
+    .select-arrow {
+      font-size: 8px;
+      color: ${unsafeCSS(semanticColors.text.secondary)};
+      pointer-events: none;
+    }
+    
+    /* Dark mode for custom select */
     @media (prefers-color-scheme: dark) {
-      .select-element {
+      .select-display {
         background: rgba(60, 60, 60, 0.8);
         border-color: rgba(255, 255, 255, 0.2);
         color: #fff;
       }
+      
+      .select-display:hover {
+        background: rgba(80, 80, 80, 1);
+        border-color: rgba(255, 255, 255, 0.3);
+      }
+      
+      .select-arrow {
+        color: rgba(255, 255, 255, 0.6);
+      }
     }
     
-    /* Navigation section */
+    /* Navigation section - Mobile-first */
     .navigation {
       display: flex;
       align-items: center;
+      gap: 0;
     }
     
-    @media (max-width: 480px) {
+    /* Progressive enhancement for larger screens */
+    @media ${unsafeCSS(mediaQueries.sm)} {
       .navigation {
-        gap: 0;
+        gap: ${unsafeCSS(spacing.xs)};
       }
     }
     
@@ -208,13 +265,13 @@ export class IterationDeckToolbar extends LitElement {
       }
     }
     
-    /* Navigation buttons */
+    /* Navigation buttons - Mobile-first */
     .nav-button {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 32px;
-      height: 32px;
+      width: 44px;
+      height: 44px;
       
       background: ${unsafeCSS(semanticColors.background.elevated)};
       border: 1px solid ${unsafeCSS(semanticColors.border.secondary)};
@@ -224,6 +281,14 @@ export class IterationDeckToolbar extends LitElement {
       outline: none;
       
       transition: ${unsafeCSS(transitions.all)};
+    }
+    
+    /* Progressive enhancement for larger screens */
+    @media ${unsafeCSS(mediaQueries.sm)} {
+      .nav-button {
+        width: 44px;
+        height: 44px;
+      }
     }
     
     .nav-button:hover {
@@ -272,14 +337,9 @@ export class IterationDeckToolbar extends LitElement {
         border-color: rgba(255, 255, 255, 0.3);
       }
       
-      .nav-button:focus {
-        outline: none;
-      }
-      
       .nav-button:focus-visible {
         border-color: #0A84FF;
         outline: 2px solid #0A84FF;
-        outline-offset: 2px;
       }
       
       .nav-button:disabled {
@@ -287,13 +347,6 @@ export class IterationDeckToolbar extends LitElement {
       }
     }
     
-    /* Mobile button sizing */
-    @media (max-width: 480px) {
-      .nav-button {
-        width: 28px;
-        height: 28px;
-      }
-    }
     
     /* First and last button styling for seamless segmented group */
     .nav-button-first {
@@ -310,18 +363,27 @@ export class IterationDeckToolbar extends LitElement {
       border-bottom-right-radius: ${unsafeCSS(borderRadius.xl)};
     }
     
-    /* Slide label */
+    /* Slide label - Mobile-first */
     .slide-label {
       flex: 1;
       color: ${unsafeCSS(semanticColors.text.primary)};
-      font-size: ${unsafeCSS(fontSizes.sm)};
+      font-size: ${unsafeCSS(fontSizes.xs)};
       font-weight: 500;
       line-height: ${unsafeCSS(spacing.lg)};
       overflow: hidden;
-      padding: 0 ${unsafeCSS(spacing.sm)};
+      padding: 0 ${unsafeCSS(spacing.xs)};
       text-overflow: ellipsis;
       white-space: nowrap;
-      width: 20rem;
+      max-width: 100px;
+    }
+    
+    /* Progressive enhancement for larger screens */
+    @media ${unsafeCSS(mediaQueries.sm)} {
+      .slide-label {
+        font-size: ${unsafeCSS(fontSizes.sm)};
+        padding: 0 ${unsafeCSS(spacing.sm)};
+        max-width: 20rem;
+      }
     }
     
     @media (prefers-color-scheme: dark) {
@@ -330,31 +392,24 @@ export class IterationDeckToolbar extends LitElement {
       }
     }
     
-    @media (max-width: 480px) {
-      .slide-label {
-        font-size: ${unsafeCSS(fontSizes.xs)};
-        font-weight: 400;
-        max-width: 100px;
-      }
-    }
-    
-    /* Separator */
+    /* Separator - Mobile-first */
     .separator {
       width: 1px;
-      height: ${unsafeCSS(spacing.xl)};
-      background: ${unsafeCSS(semanticColors.border.secondary)};
+      height: 20px;
+      background: ${unsafeCSS(semanticColors.border.medium)};
       opacity: 0.6;
+    }
+    
+    /* Progressive enhancement for larger screens */
+    @media ${unsafeCSS(mediaQueries.sm)} {
+      .separator {
+        height: ${unsafeCSS(spacing.xl)};
+      }
     }
     
     @media (prefers-color-scheme: dark) {
       .separator {
         background: rgba(255, 255, 255, 0.2);
-      }
-    }
-    
-    @media (max-width: 480px) {
-      .separator {
-        height: 20px;
       }
     }
     
@@ -838,6 +893,10 @@ export class IterationDeckToolbar extends LitElement {
                 </option>
               `)}
             </select>
+            <div class="select-display">
+              <span class="select-text">${this.getDeckLabel(selectedDeckId || '')}</span>
+              <span class="select-arrow">▼</span>
+            </div>
           </div>
           <div class="separator"></div>
         ` : ''}
