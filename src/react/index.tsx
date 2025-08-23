@@ -3,6 +3,11 @@
  * Provides React wrapper components and hooks for seamless integration
  */
 
+// Force component registration by importing the Lit components
+import '../components/iteration-deck/index.js';
+import '../components/iteration-deck-slide/index.js';
+import '../components/iteration-deck-toolbar/index.js';
+
 // React wrapper components
 export { IterationDeck } from './IterationDeck';
 export type { IterationDeckProps, IterationDeckHandle } from './IterationDeck';

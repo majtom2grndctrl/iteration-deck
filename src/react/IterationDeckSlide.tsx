@@ -74,38 +74,18 @@ export const IterationDeckSlide = forwardRef<IterationDeckSlideRef, ReactIterati
       getSlideData: () => any;
     }>(null);
 
-    // Set up properties on the underlying Lit element
+    // Note: Properties are now set as HTML attributes in createElement for proper timing.
+    // This useEffect is kept for any future complex property handling if needed.
     useEffect(() => {
       const element = elementRef.current;
       if (!element) return;
 
-      // Map React props to Lit element properties
-      element.label = label;
+      // All basic properties are now set as attributes in createElement
+      // This useEffect is reserved for any complex properties that can't be attributes
       
-      if (aiPrompt !== undefined) {
-        element.aiPrompt = aiPrompt;
-      }
-      
-      if (notes !== undefined) {
-        element.notes = notes;
-      }
-      
-      if (confidence !== undefined) {
-        element.confidence = confidence;
-      }
-      
-      if (slideId !== undefined) {
-        element.slideId = slideId;
-      }
     }, [label, aiPrompt, notes, confidence, slideId]);
 
-    // Add className handling
-    useEffect(() => {
-      const element = elementRef.current;
-      if (!element || !className) return;
-
-      element.className = className;
-    }, [className]);
+    // Note: className is now handled directly as an attribute in createElement
 
     // Expose imperative API through ref
     useImperativeHandle(ref, () => ({
@@ -127,6 +107,13 @@ export const IterationDeckSlide = forwardRef<IterationDeckSlideRef, ReactIterati
       'iteration-deck-slide',
       {
         ref: elementRef,
+        // Map React props to web component attributes for proper initialization timing
+        label: label,
+        'ai-prompt': aiPrompt,
+        notes: notes,
+        confidence: confidence,
+        'slide-id': slideId,
+        // React-specific props
         className
       },
       children

@@ -70,6 +70,8 @@
   ],
   "scripts": {
     "dev": "vite",
+    "demo:react": "cd examples/react-app && pnpm install && pnpm dev",
+    "demo:react:build": "cd examples/react-app && pnpm install && pnpm build",
     "clean": "rm -rf dist",
     "prebuild": "pnpm run clean",
     "build": "vite build && tsc --project tsconfig.build.json",

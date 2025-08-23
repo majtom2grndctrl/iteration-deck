@@ -13,9 +13,12 @@ import React, {
   type ReactElement 
 } from 'react';
 
-// Import the Lit web component to ensure it's registered
-import '../components/iteration-deck';
-import '../components/iteration-deck-slide';
+// TODO: Figure out how to import unset.css into this file so that it unsets externally defined resets
+
+// Import the Lit web components to ensure they're registered
+import '../components/iteration-deck/index.js';
+import '../components/iteration-deck-slide/index.js';
+import '../components/iteration-deck-toolbar/index.js';
 
 // Import types and hooks
 import type { IterationDeckProps as CoreIterationDeckProps, IterationDeckSlideProps } from '../core/types';
@@ -87,25 +90,15 @@ export const IterationDeck = forwardRef<IterationDeckHandle, IterationDeckProps>
     useIterationStore();
     useActiveSlide(id);
 
-    // Set up properties on the underlying Lit element
+    // Note: Properties are now set as HTML attributes in createElement for proper timing.
+    // This useEffect is kept for any future complex property handling if needed.
     useEffect(() => {
       const element = elementRef.current as any;
       if (!element) return;
 
-      // Map React props to Lit element properties
-      element.id = id;
+      // All basic properties are now set as attributes in createElement
+      // This useEffect is reserved for any complex properties that can't be attributes
       
-      if (label !== undefined) {
-        element.label = label;
-      }
-      
-      if (prompt !== undefined) {
-        element.prompt = prompt;
-      }
-      
-      if (description !== undefined) {
-        element.description = description;
-      }
     }, [id, label, prompt, description]);
 
     // Set up event listeners for web component events
@@ -168,10 +161,18 @@ export const IterationDeck = forwardRef<IterationDeckHandle, IterationDeckProps>
     }), []);
 
     // Render the web component with React children
+    // Map React props to web component attributes for proper initialization timing
     return React.createElement(
       'iteration-deck',
       {
         ref: elementRef,
+        // Required attributes that must be set before connectedCallback
+        id: id,
+        // Optional attributes
+        label: label,
+        prompt: prompt,
+        description: description,
+        // React-specific props
         className,
         style,
         ...otherProps

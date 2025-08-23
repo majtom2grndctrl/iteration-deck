@@ -78,7 +78,7 @@ Use Design Tokens defined as TypeScript constants in `src/util/tokens/` and CSS 
 ### File Organization
 ```
 src/
-├── lit/           # Lit web components with embedded CSS tagged template literals
+├── components/    # Lit web components with embedded CSS tagged template literals
 ├── react/         # Manual React wrapper components
 ├── util/          # Framework-agnostic types, utilities, and design tokens
 │   └── tokens/    # Design tokens (colors.ts, spacing.ts, typography.ts)
