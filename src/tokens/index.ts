@@ -15,29 +15,18 @@
 export * from './colors';
 export * from './spacing';
 export * from './typography';
-export * from './components';
 export * from './animation';
 export * from './zIndex';
 export * from './breakpoints';
 
 // Re-export commonly used types for convenience
 export type {
-  GrayScale,
-  SemanticColors,
-  ColorTheme,
-  LightTheme,
-  DarkTheme,
-  LightThemeCssVars,
-  DarkThemeCssVars,
-  ColorUtils,
+  ColorPrimitives,
+  GlassPrimitives,
 } from './colors';
 
 export type {
-  SpaceScale,
   Spacing,
-  Layout,
-  Dimensions,
-  Responsive,
 } from './spacing';
 
 export type {
@@ -49,15 +38,6 @@ export type {
   TextStyles,
   ResponsiveTypography,
 } from './typography';
-
-export type {
-  BorderRadius,
-  Shadows,
-  Backdrop,
-  ComponentTokens,
-  TouchTargets,
-  ComponentTransitions,
-} from './components';
 
 export type {
   Duration,
@@ -89,10 +69,9 @@ export type {
 } from './breakpoints';
 
 // Convenience exports for common token groups
-import { grayScale, semanticColors, lightTheme, darkTheme, colorTheme, lightThemeCssVars, darkThemeCssVars, colorUtils } from './colors';
-import { spaceScale, spacing, layout, dimensions } from './spacing';
+import { colorPrimitives, glassPrimitives, lightTheme, darkTheme } from './colors';
+import { spacing } from './spacing';
 import { fontStacks, fontSizes, textStyles } from './typography';
-import { borderRadius, shadows, componentTokens, componentTransitions } from './components';
 import { duration, easing, transitions, animations } from './animation';
 import { zIndexScale, zIndex } from './zIndex';
 import { breakpoints, mediaQueries, devices, breakpointUtils } from './breakpoints';
@@ -101,22 +80,15 @@ import { breakpoints, mediaQueries, devices, breakpointUtils } from './breakpoin
 export const tokens = {
   // Color tokens
   colors: {
-    gray: grayScale,
-    semantic: semanticColors,
+    primitives: colorPrimitives,
+    glass: glassPrimitives,
     light: lightTheme,
     dark: darkTheme,
-    theme: colorTheme,
-    lightCssVars: lightThemeCssVars,
-    darkCssVars: darkThemeCssVars,
-    utils: colorUtils,
   },
   
   // Spacing tokens
   spacing: {
-    scale: spaceScale,
-    semantic: spacing,
-    layout,
-    dimensions,
+    scale: spacing,
   },
   
   // Typography tokens
@@ -125,15 +97,7 @@ export const tokens = {
     sizes: fontSizes,
     styles: textStyles,
   },
-  
-  // Component tokens
-  components: {
-    borderRadius,
-    shadows,
-    tokens: componentTokens,
-    transitions: componentTransitions,
-  },
-  
+
   // Animation tokens
   animation: {
     duration,
@@ -220,43 +184,6 @@ export const tokenUtils = {
     if (typeof window === 'undefined') return false;
     return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   },
-} as const;
-
-// Design system metadata
-export const designSystem = {
-  name: 'Iteration Deck Design System',
-  version: '1.0.0',
-  description: 'Comprehensive design token system for AI-first prototyping workflows',
-  
-  // Design principles
-  principles: [
-    'Mobile-first responsive design',
-    'Accessibility (WCAG 2.2 AA compliance)',
-    'Type-safe styling with TypeScript',
-    'ShadowDOM-encapsulated CSS with Lit tagged template literals',
-    'Consistent 8px grid system',
-    'Semantic color tokens',
-    'System font stacks',
-    'Designer-friendly neutral palette',
-  ],
-  
-  // Supported frameworks
-  frameworks: [
-    'React (manual wrappers)',
-    'Lit (web components foundation)',
-    'Astro (SSR integration)',
-    'Vue (web component usage)',
-    'Angular (web component usage)',
-    'Vanilla HTML/JS',
-  ],
-  
-  // Browser support
-  browsers: [
-    'Chrome 91+',
-    'Firefox 90+',
-    'Safari 14+',
-    'Edge 91+',
-  ],
 } as const;
 
 // Export types for the complete token system
