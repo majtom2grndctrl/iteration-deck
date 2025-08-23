@@ -162,8 +162,7 @@ export class IterationDeck extends LitElement {
       font-size: ${unsafeCSS(spacing.spacing2)}; /* 16px - using spacing for consistent sizing */
       line-height: 1.5;
       color: var(--color-text-primary);
-      transition: all 0.2s ease;
-      will-change: transform, opacity;
+          will-change: transform, opacity;
       transform: translateZ(0);
     }
 

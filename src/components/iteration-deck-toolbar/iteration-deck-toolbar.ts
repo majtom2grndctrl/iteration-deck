@@ -107,8 +107,7 @@ export class IterationDeckToolbar extends LitElement {
       color: var(--color-text-primary);
       
       /* Transitions */
-      transition: all 0.2s ease;
-    }
+        }
     
     /* Progressive enhancement for larger screens */
     @media (min-width: ${unsafeCSS(breakpoints.sm)}) {
@@ -196,8 +195,7 @@ export class IterationDeckToolbar extends LitElement {
       
       cursor: pointer;
       user-select: none;
-      transition: all 0.2s ease;
-    }
+        }
     
     .select-display:hover {
       background: var(--color-bg-elevated);
@@ -281,8 +279,7 @@ export class IterationDeckToolbar extends LitElement {
       cursor: pointer;
       outline: none;
       
-      transition: all 0.2s ease;
-    }
+        }
     
     /* Progressive enhancement for larger screens */
     @media (min-width: ${unsafeCSS(breakpoints.sm)}) {
