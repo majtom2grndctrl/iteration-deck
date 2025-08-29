@@ -58,35 +58,17 @@ pnpm lint         # Lint TypeScript code
 - **Auto theming**: `prefers-color-scheme` support for light/dark modes
 - **Type-safe CSS**: Lit CSS tagged template literals with TypeScript design tokens
 
-### UI Design System Requirements
-Use Design Tokens defined as TypeScript constants in `src/util/tokens/` and CSS custom properties for runtime-dynamic styling within Lit CSS tagged template literals.
-
-**Design Token Strategy:**
-- **Static Tokens**: TypeScript constants for values that never change (base colors, spacing scale, typography scale)
-- **Dynamic Properties**: CSS custom properties for runtime values (current theme, user preferences, responsive breakpoints)
-- **ShadowDOM Encapsulation**: All styles contained within component shadow roots
-
-**Design System Scale:**
-- **Spacing**: 8px base grid system (4px, 8px, 12px, 16px, 24px, 32px, 40px, 48px, 56px, 64px progression)
-- **Colors**: Neutral gray scale with semantic variants (50, 100, 200, 300, 400, 500, 600, 700, 800, 900)
-- **Touch targets**: 44px minimum for interactive elements
-- **Typography**: System font stack matching OS/browser dev tools aesthetic
-- **Backdrop effects**: Modern blur and transparency effects for toolbar
-- **Theme Variables**: CSS custom properties for light/dark mode switching
-- **Token Files**: Central design tokens in `src/util/tokens/` directory (colors.ts, spacing.ts, typography.ts, components.ts, animation.ts, zIndex.ts, breakpoints.ts) with central export via index.ts
+### Design System
+- **Design Tokens**: TypeScript constants in `src/tokens/` with automatic light/dark theming
+- **ShadowDOM Styling**: Lit CSS tagged template literals with semantic CSS custom properties
+- **Responsive Design**: Mobile-first breakpoints with touch-friendly interactions
 
 ### File Organization
 ```
 src/
-├── components/    # Lit web components with embedded CSS tagged template literals
-├── react/         # Manual React wrapper components
-├── util/          # Framework-agnostic types, utilities, and design tokens
-│   └── tokens/    # Design tokens (colors.ts, spacing.ts, typography.ts)
-└── example/       # Demo application
-```
-
-**Implementation details:** @.claude/TECHNICAL_SPEC.md  
-**Task tracker:** @.claude/TASK_TRACKER.md  
-**Lit components:** @src/lit/*.ts (with embedded CSS tagged template literals)  
-**React wrappers:** @src/react/*.tsx  
-**Design tokens:** @src/util/tokens/*.ts  
+├── components/    # Lit web components with embedded CSS
+├── react/         # React wrapper components  
+├── tokens/        # Design tokens (colors, spacing, animation, breakpoints)
+├── store/         # Zustand state management
+└── core/          # Types and utilities
+```  
