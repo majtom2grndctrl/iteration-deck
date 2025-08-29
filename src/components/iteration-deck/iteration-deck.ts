@@ -43,15 +43,11 @@ import { ensureToolbarMounted, cleanupToolbarIfEmpty } from '../iteration-deck-t
 
 // Import design tokens for type-safe styling
 import {
-  lightTheme,
-  darkTheme,
-  fontStacks,
-  fontSizes,
-  lineHeights,
-  spaceScale,
+  themeTokens,
   spacing,
-  dimensions,
   breakpoints,
+  duration,
+  easing
 } from '../../tokens/index.js';
 
 /**
@@ -150,62 +146,23 @@ export class IterationDeck extends LitElement {
    * ShadowDOM-encapsulated styles using Lit CSS tagged template literals
    * with design tokens for type-safe styling
    */
-  static styles = css`
-    /* CSS custom properties for theme switching */
-    :host {
-      /* Light theme CSS custom properties */
-      --color-background-primary: ${unsafeCSS(lightTheme.background.primary)};
-      --color-background-secondary: ${unsafeCSS(lightTheme.background.secondary)};
-      --color-background-tertiary: ${unsafeCSS(lightTheme.background.tertiary)};
-      --color-background-elevated: ${unsafeCSS(lightTheme.background.elevated)};
-      --color-text-primary: ${unsafeCSS(lightTheme.text.primary)};
-      --color-text-secondary: ${unsafeCSS(lightTheme.text.secondary)};
-      --color-text-tertiary: ${unsafeCSS(lightTheme.text.tertiary)};
-      --color-text-disabled: ${unsafeCSS(lightTheme.text.disabled)};
-      --color-border-primary: ${unsafeCSS(lightTheme.border.primary)};
-      --color-border-secondary: ${unsafeCSS(lightTheme.border.secondary)};
-      --color-border-focus: ${unsafeCSS(lightTheme.border.focus)};
-      --color-interactive-hover: ${unsafeCSS(lightTheme.interactive.hover)};
-      --color-interactive-active: ${unsafeCSS(lightTheme.interactive.active)};
-      --color-interactive-selected: ${unsafeCSS(lightTheme.interactive.selected)};
-      --color-interactive-focus: ${unsafeCSS(lightTheme.interactive.focus)};
-    }
-    
-    @media (prefers-color-scheme: dark) {
-      :host {
-        /* Dark theme CSS custom properties */
-        --color-background-primary: ${unsafeCSS(darkTheme.background.primary)};
-        --color-background-secondary: ${unsafeCSS(darkTheme.background.secondary)};
-        --color-background-tertiary: ${unsafeCSS(darkTheme.background.tertiary)};
-        --color-background-elevated: ${unsafeCSS(darkTheme.background.elevated)};
-        --color-text-primary: ${unsafeCSS(darkTheme.text.primary)};
-        --color-text-secondary: ${unsafeCSS(darkTheme.text.secondary)};
-        --color-text-tertiary: ${unsafeCSS(darkTheme.text.tertiary)};
-        --color-text-disabled: ${unsafeCSS(darkTheme.text.disabled)};
-        --color-border-primary: ${unsafeCSS(darkTheme.border.primary)};
-        --color-border-secondary: ${unsafeCSS(darkTheme.border.secondary)};
-        --color-border-focus: ${unsafeCSS(darkTheme.border.focus)};
-        --color-interactive-hover: ${unsafeCSS(darkTheme.interactive.hover)};
-        --color-interactive-active: ${unsafeCSS(darkTheme.interactive.active)};
-        --color-interactive-selected: ${unsafeCSS(darkTheme.interactive.selected)};
-        --color-interactive-focus: ${unsafeCSS(darkTheme.interactive.focus)};
-      }
-    }
+  static styles = [
+    themeTokens,
+    css`
 
     /* Base component styles */
     :host {
       display: block;
       position: relative;
       width: 100%;
-      min-height: ${unsafeCSS(dimensions.slide.minHeight)};
+      min-height: ${unsafeCSS(spacing.spacing8)}; /* 64px */
       background: transparent;
-      border-radius: ${unsafeCSS(spaceScale[3])};
-      font-family: ${unsafeCSS(fontStacks.system)};
-      font-size: ${unsafeCSS(fontSizes.base)};
-      line-height: ${unsafeCSS(lineHeights.normal)};
+      border-radius: ${unsafeCSS(spacing.spacing3)};
+      font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif;
+      font-size: ${unsafeCSS(spacing.spacing2)}; /* 16px - using spacing for consistent sizing */
+      line-height: 1.5;
       color: var(--color-text-primary);
-      transition: all 0.2s ease;
-      will-change: transform, opacity;
+          will-change: transform, opacity;
       transform: translateZ(0);
     }
 
@@ -227,7 +184,7 @@ export class IterationDeck extends LitElement {
     /* Development mode styles */
     .development {
       position: relative;
-      margin-bottom: ${unsafeCSS(spaceScale[16])}; /* Space for toolbar */
+      margin-bottom: ${unsafeCSS(spacing.spacing8)}; /* Space for toolbar */
     }
 
     .development::before {
@@ -237,7 +194,7 @@ export class IterationDeck extends LitElement {
       left: 0;
       right: 0;
       bottom: 0;
-      border: ${unsafeCSS(spacing.border.thin)} dashed var(--color-border-secondary);
+      border: ${unsafeCSS(spacing.spacing00)} dashed var(--color-border-secondary);
       border-radius: inherit;
       opacity: 0.3;
       pointer-events: none;
@@ -255,24 +212,24 @@ export class IterationDeck extends LitElement {
 
     /* Animation states */
     .animated {
-      transition: opacity 0.2s ease, transform 0.2s ease;
+      transition: opacity ${unsafeCSS(duration.normal)} ${unsafeCSS(easing.ease)}, transform ${unsafeCSS(duration.normal)} ${unsafeCSS(easing.ease)};
     }
 
     /* Accessibility enhancements */
     :host(:focus-visible) {
-      outline: ${unsafeCSS(spacing.focus.width)} solid var(--color-border-focus);
-      outline-offset: ${unsafeCSS(spacing.focus.offset)};
+      outline: ${unsafeCSS(spacing.spacing0)} solid var(--color-border-focus);
+      outline-offset: ${unsafeCSS(spacing.spacing00)};
     }
 
     :host(:focus-within) {
-      outline: ${unsafeCSS(spacing.border.medium)} solid var(--color-border-focus);
-      outline-offset: ${unsafeCSS(spacing.focus.offset)};
+      outline: ${unsafeCSS(spacing.spacing0)} solid var(--color-border-focus);
+      outline-offset: ${unsafeCSS(spacing.spacing00)};
     }
 
     /* High contrast mode support */
     @media (prefers-contrast: high) {
       :host {
-        border: ${unsafeCSS(spacing.border.medium)} solid var(--color-border-primary);
+        border: ${unsafeCSS(spacing.spacing0)} solid var(--color-border-primary);
       }
     }
 
@@ -292,22 +249,22 @@ export class IterationDeck extends LitElement {
     /* Mobile-first responsive design */
     /* Base styles (mobile) */
     :host {
-      padding: ${unsafeCSS(spacing.sm)};
-      min-height: 150px;
+      padding: ${unsafeCSS(spacing.spacing2)};
+      min-height: ${unsafeCSS(spacing.spacing7)}; /* 56px */
     }
 
     /* Tablet and larger (768px+) */
     @media (min-width: ${unsafeCSS(breakpoints.md)}) {
       :host {
-        padding: ${unsafeCSS(spacing.lg)};
-        min-height: ${unsafeCSS(dimensions.slide.minHeight)};
+        padding: ${unsafeCSS(spacing.spacing3)};
+        min-height: ${unsafeCSS(spacing.spacing8)}; /* 64px */
       }
     }
 
     /* Desktop and larger (1024px+) */
     @media (min-width: ${unsafeCSS(breakpoints.lg)}) {
       :host {
-        padding: ${unsafeCSS(spacing.xl)};
+        padding: ${unsafeCSS(spacing.spacing4)};
       }
     }
 
@@ -325,25 +282,25 @@ export class IterationDeck extends LitElement {
       width: 100%;
       height: 100%;
       background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-      animation: slideInRight 1.5s ease-in-out infinite;
+      animation: slideInRight ${unsafeCSS(duration.loading)} ${unsafeCSS(easing.easeInOut)} infinite;
     }
 
     @media (prefers-reduced-motion: reduce) {
       .loading::after {
         animation: none;
-        background: rgba(255, 255, 255, 0.1);
+        background: var(--color-bg-glass);
         opacity: 0.5;
       }
     }
 
     /* Error state */
     .error {
-      border: 2px solid #ef4444;
-      background-color: rgba(239, 68, 68, 0.05);
+      border: ${unsafeCSS(spacing.spacing0)} solid var(--color-border-error);
+      background-color: var(--color-bg-error);
     }
 
     .error::before {
-      border-color: #ef4444 !important;
+      border-color: var(--color-border-error) !important;
       border-style: solid;
       opacity: 0.8;
     }
@@ -353,14 +310,14 @@ export class IterationDeck extends LitElement {
       display: flex;
       align-items: center;
       justify-content: center;
-      min-height: ${unsafeCSS(dimensions.slide.minHeight)};
+      min-height: ${unsafeCSS(spacing.spacing8)}; /* 64px */
       color: var(--color-text-tertiary);
       font-style: italic;
     }
 
     .empty::before {
       content: 'No slides available';
-      font-size: ${unsafeCSS(fontSizes.sm)};
+      font-size: ${unsafeCSS(spacing.spacing1)}; /* 8px - small text */
     }
 
     /* RTL support */
@@ -368,10 +325,7 @@ export class IterationDeck extends LitElement {
       direction: rtl;
     }
 
-    /* Container queries for advanced responsive design */
-    .container-responsive {
-      container-type: inline-size;
-    }
+    /* Container queries removed for broader browser support */
 
     /* Keyframes for loading animation */
     @keyframes slideInRight {
@@ -382,7 +336,8 @@ export class IterationDeck extends LitElement {
         left: 100%;
       }
     }
-  `;
+  `,
+  ];
 
   /**
    * Component lifecycle: Initialize store subscription and register deck
