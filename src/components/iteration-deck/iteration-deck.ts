@@ -14,7 +14,7 @@
  * - Multi-deck support with automatic cleanup
  */
 
-import { LitElement, html, css, unsafeCSS, type PropertyValues } from 'lit';
+import { LitElement, html, css, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
 // Import core types and utilities
@@ -41,14 +41,6 @@ import {
 // Import toolbar integration
 import { ensureToolbarMounted, cleanupToolbarIfEmpty } from '../iteration-deck-toolbar';
 
-// Import design tokens for type-safe styling
-import {
-  themeTokens,
-  spacing,
-  breakpoints,
-  duration,
-  easing
-} from '../../tokens/index.js';
 
 /**
  * Internal interface for slide element data extracted from slots
@@ -146,198 +138,19 @@ export class IterationDeck extends LitElement {
    * ShadowDOM-encapsulated styles using Lit CSS tagged template literals
    * with design tokens for type-safe styling
    */
-  static styles = [
-    themeTokens,
-    css`
-
-    /* Base component styles */
+  static styles = css`
     :host {
       display: block;
-      position: relative;
-      width: 100%;
-      min-height: ${unsafeCSS(spacing.spacing8)}; /* 64px */
-      background: transparent;
-      border-radius: ${unsafeCSS(spacing.spacing3)};
-      font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif;
-      font-size: ${unsafeCSS(spacing.spacing2)}; /* 16px - using spacing for consistent sizing */
-      line-height: 1.5;
-      color: var(--color-text-primary);
-          will-change: transform, opacity;
-      transform: translateZ(0);
     }
-
+    
     .iteration-deck-container {
       display: block;
-      position: relative;
-      width: 100%;
-      height: 100%;
     }
-
+    
     .iteration-deck-content {
       display: block;
-      position: relative;
-      width: 100%;
-      height: 100%;
-      z-index: 1;
     }
-
-    /* Development mode styles */
-    .development {
-      position: relative;
-      margin-bottom: ${unsafeCSS(spacing.spacing8)}; /* Space for toolbar */
-    }
-
-    .development::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      border: ${unsafeCSS(spacing.spacing00)} dashed var(--color-border-secondary);
-      border-radius: inherit;
-      opacity: 0.3;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    /* Production mode styles */
-    .production {
-      margin-bottom: 0;
-    }
-
-    .production::before {
-      display: none;
-    }
-
-    /* Animation states */
-    .animated {
-      transition: opacity ${unsafeCSS(duration.normal)} ${unsafeCSS(easing.ease)}, transform ${unsafeCSS(duration.normal)} ${unsafeCSS(easing.ease)};
-    }
-
-    /* Accessibility enhancements */
-    :host(:focus-visible) {
-      outline: ${unsafeCSS(spacing.spacing0)} solid var(--color-border-focus);
-      outline-offset: ${unsafeCSS(spacing.spacing00)};
-    }
-
-    :host(:focus-within) {
-      outline: ${unsafeCSS(spacing.spacing0)} solid var(--color-border-focus);
-      outline-offset: ${unsafeCSS(spacing.spacing00)};
-    }
-
-    /* High contrast mode support */
-    @media (prefers-contrast: high) {
-      :host {
-        border: ${unsafeCSS(spacing.spacing0)} solid var(--color-border-primary);
-      }
-    }
-
-    /* Reduced motion support */
-    @media (prefers-reduced-motion: reduce) {
-      :host {
-        will-change: auto;
-        transform: none;
-        transition: none;
-      }
-      
-      .animated {
-        transition: none;
-      }
-    }
-
-    /* Mobile-first responsive design */
-    /* Base styles (mobile) */
-    :host {
-      padding: ${unsafeCSS(spacing.spacing2)};
-      min-height: ${unsafeCSS(spacing.spacing7)}; /* 56px */
-    }
-
-    /* Tablet and larger (768px+) */
-    @media (min-width: ${unsafeCSS(breakpoints.md)}) {
-      :host {
-        padding: ${unsafeCSS(spacing.spacing3)};
-        min-height: ${unsafeCSS(spacing.spacing8)}; /* 64px */
-      }
-    }
-
-    /* Desktop and larger (1024px+) */
-    @media (min-width: ${unsafeCSS(breakpoints.lg)}) {
-      :host {
-        padding: ${unsafeCSS(spacing.spacing4)};
-      }
-    }
-
-    /* Loading state */
-    .loading {
-      position: relative;
-      overflow: hidden;
-    }
-
-    .loading::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-      animation: slideInRight ${unsafeCSS(duration.loading)} ${unsafeCSS(easing.easeInOut)} infinite;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .loading::after {
-        animation: none;
-        background: var(--color-bg-glass);
-        opacity: 0.5;
-      }
-    }
-
-    /* Error state */
-    .error {
-      border: ${unsafeCSS(spacing.spacing0)} solid var(--color-border-error);
-      background-color: var(--color-bg-error);
-    }
-
-    .error::before {
-      border-color: var(--color-border-error) !important;
-      border-style: solid;
-      opacity: 0.8;
-    }
-
-    /* Empty state */
-    .empty {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: ${unsafeCSS(spacing.spacing8)}; /* 64px */
-      color: var(--color-text-tertiary);
-      font-style: italic;
-    }
-
-    .empty::before {
-      content: 'No slides available';
-      font-size: ${unsafeCSS(spacing.spacing1)}; /* 8px - small text */
-    }
-
-    /* RTL support */
-    :host([dir="rtl"]) {
-      direction: rtl;
-    }
-
-    /* Container queries removed for broader browser support */
-
-    /* Keyframes for loading animation */
-    @keyframes slideInRight {
-      from {
-        left: -100%;
-      }
-      to {
-        left: 100%;
-      }
-    }
-  `,
-  ];
+  `;
 
   /**
    * Component lifecycle: Initialize store subscription and register deck
