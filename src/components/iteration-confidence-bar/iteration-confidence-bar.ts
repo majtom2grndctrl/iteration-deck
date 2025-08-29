@@ -24,7 +24,7 @@ import { LitElement, html, css, unsafeCSS } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
 // Import design tokens
-import { spacing } from '../../tokens/index.js';
+import { spacing, duration, easing } from '../../tokens/index.js';
 
 export interface IterationConfidenceBarProps {
   /** AI confidence score (0-1 scale) */
@@ -81,7 +81,7 @@ export class IterationConfidenceBar extends LitElement {
       background: linear-gradient(90deg, #ef4444 0%, #f59e0b 50%, #10b981 100%);
       border-radius: ${unsafeCSS(spacing.spacing8)}; /* Large border radius for pill shape */
       transform-origin: left center;
-      transition: width 0.3s ease-in-out;
+      transition: width ${unsafeCSS(duration.slow)} ${unsafeCSS(easing.easeInOut)};
     }
     
     /* Dark mode support */

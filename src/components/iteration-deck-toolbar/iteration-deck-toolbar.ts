@@ -35,7 +35,9 @@ import type { DeckRegistration } from '../../core/types.js';
 import { 
   themeTokens,
   spacing,
-  breakpoints
+  breakpoints,
+  duration,
+  easing
 } from '../../tokens/index.js';
 
 // ShadowDOM encapsulation for isolated styling
@@ -619,7 +621,7 @@ export class IterationDeckToolbar extends LitElement {
       [data-iteration-glow] {
         border-radius: ${unsafeCSS(spacing.spacing1)}; /* 8px - small radius */
         position: relative;
-        animation: iteration-deck-glow 500ms ease-in-out;
+        animation: iteration-deck-glow ${unsafeCSS(duration.slower)} ${unsafeCSS(easing.easeInOut)};
       }
       
       @keyframes iteration-deck-glow {

@@ -45,7 +45,9 @@ import { ensureToolbarMounted, cleanupToolbarIfEmpty } from '../iteration-deck-t
 import {
   themeTokens,
   spacing,
-  breakpoints
+  breakpoints,
+  duration,
+  easing
 } from '../../tokens/index.js';
 
 /**
@@ -210,7 +212,7 @@ export class IterationDeck extends LitElement {
 
     /* Animation states */
     .animated {
-      transition: opacity 0.2s ease, transform 0.2s ease;
+      transition: opacity ${unsafeCSS(duration.normal)} ${unsafeCSS(easing.ease)}, transform ${unsafeCSS(duration.normal)} ${unsafeCSS(easing.ease)};
     }
 
     /* Accessibility enhancements */
@@ -280,7 +282,7 @@ export class IterationDeck extends LitElement {
       width: 100%;
       height: 100%;
       background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-      animation: slideInRight 1.5s ease-in-out infinite;
+      animation: slideInRight ${unsafeCSS(duration.loading)} ${unsafeCSS(easing.easeInOut)} infinite;
     }
 
     @media (prefers-reduced-motion: reduce) {

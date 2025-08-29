@@ -23,7 +23,9 @@ import {
 import { 
   themeTokens,
   spacing,
-  breakpoints
+  breakpoints,
+  duration,
+  easing
 } from '../../tokens/index.js';
 
 // Design tokens imported and embedded directly in CSS for Lit compatibility
@@ -55,7 +57,7 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
       width: 100%;
       min-height: ${unsafeCSS(spacing.spacing8)}; /* Mobile-first: smaller minimum height - using spacing8 (64px) for better proportion */
       border-radius: ${unsafeCSS(spacing.spacing2)};
-      transition: opacity 0.2s ease-in-out;
+      transition: opacity ${unsafeCSS(duration.normal)} ${unsafeCSS(easing.easeInOut)};
       isolation: isolate;
       outline: none;
     }
@@ -67,7 +69,7 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
       min-height: inherit;
       border-radius: inherit;
       background: transparent;
-      transition: all 0.15s ease-in-out;
+      transition: all ${unsafeCSS(duration.fast)} ${unsafeCSS(easing.easeInOut)};
       isolation: isolate;
       outline: none;
     }
