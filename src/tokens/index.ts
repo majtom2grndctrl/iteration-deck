@@ -11,9 +11,7 @@
  */
 
 // Re-export all design tokens
+export * from './animation';
 export * from './colors';
 export * from './spacing';
-export * from './typography';
-export * from './animation';
-export * from './zIndex';
 export * from './breakpoints';
