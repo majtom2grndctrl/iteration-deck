@@ -16,9 +16,19 @@ export const detectEnvironment = (): Environment => {
     return 'production';
   }
   
-  // Check for Vite development mode
-  if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
-    return 'development';
+  // Check for development indicators (broader check)
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    // More comprehensive localhost detection
+    if (hostname === 'localhost' || 
+        hostname === '127.0.0.1' || 
+        hostname.startsWith('localhost:') ||
+        hostname.startsWith('127.0.0.1:') ||
+        // Development port patterns
+        /^localhost:\d+$/.test(window.location.host) ||
+        /^127\.0\.0\.1:\d+$/.test(window.location.host)) {
+      return 'development';
+    }
   }
   
   // Fallback: assume development if we can't determine
