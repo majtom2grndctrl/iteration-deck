@@ -105,9 +105,7 @@ export class IterationDeckToolbar extends LitElement {
       font-weight: 500;
       line-height: 1;
       color: var(--color-text-primary);
-      
-      /* Transitions */
-        }
+    }
     
     /* Progressive enhancement for larger screens */
     @media (min-width: ${unsafeCSS(breakpoints.sm)}) {
@@ -121,7 +119,6 @@ export class IterationDeckToolbar extends LitElement {
       }
     }
 
-    
     /* Reduced motion support */
     @media (prefers-reduced-motion: reduce) {
       :host {

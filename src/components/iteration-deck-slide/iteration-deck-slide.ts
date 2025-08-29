@@ -69,7 +69,9 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
       min-height: inherit;
       border-radius: inherit;
       background: transparent;
-      transition: all ${unsafeCSS(duration.fast)} ${unsafeCSS(easing.easeInOut)};
+      transition-property: opacity, border-color, background-color;
+      transition-duration: ${unsafeCSS(duration.fast)};
+      transition-timing-function: ${unsafeCSS(easing.easeInOut)};
       isolation: isolate;
       outline: none;
     }
