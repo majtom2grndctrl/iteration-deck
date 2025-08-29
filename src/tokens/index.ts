@@ -6,7 +6,7 @@
  * 
  * Usage:
  * ```typescript
- * import { lightTheme, darkTheme, spacing, breakpoints } from './tokens';
+ * import { themeTokens, spacing, breakpoints } from './tokens';
  * ```
  */
 

@@ -21,8 +21,7 @@ import {
   errorLog 
 } from '../../core/utilities.js';
 import { 
-  lightTheme,
-  darkTheme,
+  themeTokens,
   spacing,
   breakpoints
 } from '../../tokens/index.js';
@@ -48,8 +47,7 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
    * with design tokens for consistent styling and theme support
    */
   static styles = [
-    lightTheme,
-    darkTheme,
+    themeTokens,
     css`
     :host {
       display: block;

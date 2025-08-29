@@ -33,8 +33,7 @@ import {
 } from '../../core/utilities.js';
 import type { DeckRegistration } from '../../core/types.js';
 import { 
-  lightTheme,
-  darkTheme,
+  themeTokens,
   spacing,
   breakpoints
 } from '../../tokens/index.js';
@@ -74,8 +73,7 @@ export class IterationDeckToolbar extends LitElement {
   private throttledKeyboardHandler = throttle(this.handleKeyboardNavigation.bind(this), 100);
 
   static styles = [
-    lightTheme,
-    darkTheme,
+    themeTokens,
     css`
     :host {
       /* Positioning */
@@ -97,7 +95,7 @@ export class IterationDeckToolbar extends LitElement {
       background: var(--color-bg-glass);
       backdrop-filter: blur(${unsafeCSS(spacing.spacing2)}); /* 16px blur */
       border: ${unsafeCSS(spacing.spacing00)} solid var(--color-border-secondary);
-      box-shadow: var(--shadow-toolbar);
+      box-shadow: var(--toolbar-shadow);
       
       /* Typography - Mobile-first */
       font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif;
@@ -114,32 +112,13 @@ export class IterationDeckToolbar extends LitElement {
       :host {
         min-width: calc(${unsafeCSS(spacing.spacing8)} * 6); /* ~384px equivalent */
         height: auto;
-        padding: ${unsafeCSS(spacing.spacing2)} ${unsafeCSS(spacing.spacing2)};
+        padding: ${unsafeCSS(spacing.spacing1)};
         gap: ${unsafeCSS(spacing.spacing2)};
         bottom: ${unsafeCSS(spacing.spacing4)};
         font-size: ${unsafeCSS(spacing.spacing2)}; /* 16px - standard text */
       }
     }
-    
-    :host(:hover) {
-      background: var(--color-bg-glass-hover);
-      border-color: var(--color-border-primary);
-      box-shadow: var(--shadow-toolbar-hover);
-    }
-    
-    /* Dark mode support */
-    @media (prefers-color-scheme: dark) {
-      :host {
-        background: var(--color-bg-glass);
-        border-color: var(--color-border-secondary);
-        color: var(--color-text-inverse);
-      }
-      
-      :host(:hover) {
-        background: var(--color-bg-glass-hover);
-        border-color: var(--color-border-primary);
-      }
-    }
+
     
     /* Reduced motion support */
     @media (prefers-reduced-motion: reduce) {
@@ -215,26 +194,8 @@ export class IterationDeckToolbar extends LitElement {
       pointer-events: none;
     }
     
-    /* Dark mode for custom select */
-    @media (prefers-color-scheme: dark) {
-      .select-display {
-        background: var(--color-bg-glass);
-        border-color: var(--color-border-secondary);
-        color: #fff;
-      }
-      
-      .select-display:hover {
-        background: rgba(80, 80, 80, 1);
-        border-color: rgba(255, 255, 255, 0.3);
-      }
-      
-      .select-arrow {
-        color: rgba(255, 255, 255, 0.6);
-      }
-    }
-    
     /* Navigation section - Mobile-first */
-    .navigation {
+    .slide-selector {
       display: flex;
       align-items: center;
       gap: 0;
@@ -242,7 +203,7 @@ export class IterationDeckToolbar extends LitElement {
     
     /* Progressive enhancement for larger screens */
     @media (min-width: ${unsafeCSS(breakpoints.sm)}) {
-      .navigation {
+      .slide-selector {
         gap: ${unsafeCSS(spacing.spacing1)};
       }
     }
@@ -251,17 +212,9 @@ export class IterationDeckToolbar extends LitElement {
     .segmented-button-group {
       display: flex;
       align-items: center;
-      border-radius: 24px;
-      gap: 1px;
+      gap: ${unsafeCSS(spacing.spacing00)};
       overflow: hidden;
-      border: ${unsafeCSS(spacing.spacing00)} solid var(--color-border-secondary);
-    }
-    
-    @media (prefers-color-scheme: dark) {
-      .segmented-button-group {
-        background: var(--color-bg-glass);
-        border-color: var(--color-border-secondary);
-      }
+      background: var(--segmented-shadow);
     }
     
     /* Navigation buttons - Mobile-first */
@@ -269,8 +222,8 @@ export class IterationDeckToolbar extends LitElement {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 44px;
-      height: 44px;
+      width: ${unsafeCSS(spacing.spacing6)};
+      height: ${unsafeCSS(spacing.spacing6)};
       
       background: var(--color-bg-elevated);
       border: ${unsafeCSS(spacing.spacing00)} solid var(--color-border-secondary);
@@ -281,16 +234,8 @@ export class IterationDeckToolbar extends LitElement {
       
         }
     
-    /* Progressive enhancement for larger screens */
-    @media (min-width: ${unsafeCSS(breakpoints.sm)}) {
-      .nav-button {
-        width: 44px;
-        height: 44px;
-      }
-    }
-    
     .nav-button:hover {
-      background: var(--color-bg-elevated);
+      background: var(--color-interactive-hover);
       border-color: var(--color-border-primary);
       color: var(--color-text-primary);
     }
@@ -322,44 +267,21 @@ export class IterationDeckToolbar extends LitElement {
       box-shadow: none;
     }
     
-    /* Dark mode for navigation buttons */
-    @media (prefers-color-scheme: dark) {
-      .nav-button {
-        background: var(--color-bg-glass);
-        border-color: var(--color-border-secondary);
-        color: var(--color-text-inverse);
-      }
-      
-      .nav-button:hover {
-        background: rgba(80, 80, 80, 1);
-        border-color: rgba(255, 255, 255, 0.3);
-        color: var(--color-text-inverse);
-      }
-      
-      .nav-button:focus-visible {
-        border-color: #0A84FF;
-        outline: 2px solid #0A84FF;
-      }
-      
-      .nav-button:disabled {
-        color: rgba(255, 255, 255, 0.3);
-      }
-    }
     
     
     /* First and last button styling for seamless segmented group */
-    .nav-button-first {
+    .nav-button:first-child {
       border-radius: 0;
       border-right: none;
-      border-top-left-radius: 16px;
-      border-bottom-left-radius: 16px;
+      border-top-left-radius: ${unsafeCSS(spacing.spacing3)};
+      border-bottom-left-radius: ${unsafeCSS(spacing.spacing3)};
     }
     
-    .nav-button-last {
+    .nav-button:last-child {
       border-radius: 0;
       border-left: none;
-      border-top-right-radius: 16px;
-      border-bottom-right-radius: 16px;
+      border-top-right-radius: ${unsafeCSS(spacing.spacing3)};
+      border-bottom-right-radius: ${unsafeCSS(spacing.spacing3)};
     }
     
     /* Slide label - Mobile-first */
@@ -384,11 +306,6 @@ export class IterationDeckToolbar extends LitElement {
       }
     }
     
-    @media (prefers-color-scheme: dark) {
-      .slide-label {
-        color: var(--color-text-inverse);
-      }
-    }
 
     @media (min-width: ${unsafeCSS(breakpoints.lg)}) {
       .slide-label {
@@ -412,11 +329,6 @@ export class IterationDeckToolbar extends LitElement {
       }
     }
     
-    @media (prefers-color-scheme: dark) {
-      .separator {
-        background: rgba(255, 255, 255, 0.2);
-      }
-    }
     
   `];
 
@@ -906,8 +818,8 @@ export class IterationDeckToolbar extends LitElement {
           <div class="separator"></div>
         ` : ''}
         
-        <div class="navigation">
-          <div class="segmented-button-group">
+        <div class="slide-selector">
+          <nav class="segmented-button-group">
             <button 
               class="nav-button nav-button-first"
               @click=${this.handlePrevSlide}
@@ -927,7 +839,7 @@ export class IterationDeckToolbar extends LitElement {
             >
               ▶
             </button>
-          </div>
+          </nav>
           
           <span class="slide-label" title=${this.getCurrentSlideLabel()}>
             ${this.getCurrentSlideLabel()}

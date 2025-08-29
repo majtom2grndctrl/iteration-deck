@@ -43,8 +43,7 @@ import { ensureToolbarMounted, cleanupToolbarIfEmpty } from '../iteration-deck-t
 
 // Import design tokens for type-safe styling
 import {
-  lightTheme,
-  darkTheme,
+  themeTokens,
   spacing,
   breakpoints
 } from '../../tokens/index.js';
@@ -146,8 +145,7 @@ export class IterationDeck extends LitElement {
    * with design tokens for type-safe styling
    */
   static styles = [
-    lightTheme,
-    darkTheme,
+    themeTokens,
     css`
 
     /* Base component styles */
