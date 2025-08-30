@@ -7,7 +7,7 @@
  */
 
 import { LitElement, html, css } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, property, state, queryAssignedElements } from 'lit/decorators.js';
 import type { IterationDeckSlideProps } from '../../core/types.js';
 import { 
   subscribeToIterationStore, 
@@ -91,6 +91,10 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
 
   @state()
   private isDevelopment = false;
+
+  // Lit-specific slot content query (TypeScript-friendly)
+  @queryAssignedElements()
+  private _slottedElements!: HTMLElement[];
 
   // Store subscription cleanup function
   private unsubscribeStore?: () => void;
@@ -242,6 +246,20 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
       isActive: this.isActive,
       deckId: this.deckId,
     };
+  }
+
+  /**
+   * Programmatic API: Get slotted content elements (Lit + TypeScript pattern)
+   */
+  public getSlottedElements(): HTMLElement[] {
+    return this._slottedElements;
+  }
+
+  /**
+   * Programmatic API: Get primary slotted content element for highlighting
+   */
+  public getPrimarySlottedElement(): HTMLElement | null {
+    return this._slottedElements?.[0] || null;
   }
 
   /**
