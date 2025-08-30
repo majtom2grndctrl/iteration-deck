@@ -343,7 +343,7 @@ export class IterationDeckToolbar extends LitElement {
     }
     
     .slide-indicator.active {
-      opacity: 0.7;
+      opacity: 0.8;
     }
     
     /* Separator - Mobile-first */
@@ -791,7 +791,7 @@ export class IterationDeckToolbar extends LitElement {
     const currentSlideIndex = deck.slideIds.indexOf(deck.activeSlideId);
 
     return html`
-      <div class="slide-indicators">
+      <div class="slide-indicators" aria-hidden="true">
         ${deck.slideIds.map((slideId, index) => html`
           <div
             class="slide-indicator ${index === currentSlideIndex ? 'active' : ''}"
