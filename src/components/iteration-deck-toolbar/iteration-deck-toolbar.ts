@@ -283,15 +283,36 @@ export class IterationDeckToolbar extends LitElement {
       border-bottom-right-radius: ${unsafeCSS(spacing.spacing3)};
     }
     
+    /* Slide info wrapper - Mobile-first */
+    .slide-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: ${unsafeCSS(spacing.spacing0)};
+    }
+    
+    /* Progressive enhancement for larger screens */
+    @media (min-width: ${unsafeCSS(breakpoints.sm)}) {
+      .slide-info {
+        padding: 0 ${unsafeCSS(spacing.spacing2)};
+        max-width: 50rem;
+      }
+    }
+
+    @media (min-width: ${unsafeCSS(breakpoints.lg)}) {
+      .slide-info {
+        max-width: unset;
+        width: 20rem;
+      }
+    }
+    
     /* Slide label - Mobile-first */
     .slide-label {
-      flex: 1;
       color: var(--color-text-primary);
       font-size: ${unsafeCSS(spacing.spacing1)}; /* 8px - small text */
       font-weight: 500;
       line-height: ${unsafeCSS(spacing.spacing3)};
       overflow: hidden;
-      padding: 0 ${unsafeCSS(spacing.spacing1)};
       text-overflow: ellipsis;
       white-space: nowrap;
     }
@@ -300,17 +321,29 @@ export class IterationDeckToolbar extends LitElement {
     @media (min-width: ${unsafeCSS(breakpoints.sm)}) {
       .slide-label {
         font-size: ${unsafeCSS(spacing.spacing2)}; /* 16px - standard text */
-        padding: 0 ${unsafeCSS(spacing.spacing2)};
-        max-width: 50rem;
       }
     }
     
-
-    @media (min-width: ${unsafeCSS(breakpoints.lg)}) {
-      .slide-label {
-        max-width: unset;
-        width: 20rem;
-      }
+    /* Carousel indicators */
+    .slide-indicators {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: ${unsafeCSS(spacing.spacing1)};
+      width: 100%;
+    }
+    
+    .slide-indicator {
+      width: ${unsafeCSS(spacing.spacing0)};
+      height: ${unsafeCSS(spacing.spacing0)};
+      border-radius: 50%;
+      background: var(--color-text-secondary);
+      opacity: 0.4;
+      transition: opacity ${unsafeCSS(duration.normal)};
+    }
+    
+    .slide-indicator.active {
+      opacity: 0.8;
     }
     
     /* Separator - Mobile-first */
@@ -742,6 +775,34 @@ export class IterationDeckToolbar extends LitElement {
   }
 
   /**
+   * Render carousel-style slide indicators
+   */
+  private renderSlideIndicators() {
+    const selectedDeckId = this.getSelectedDeckId();
+    if (!selectedDeckId) {
+      return '';
+    }
+
+    const deck = this.getCurrentDeck(selectedDeckId);
+    if (!deck || deck.slideIds.length <= 1) {
+      return '';
+    }
+
+    const currentSlideIndex = deck.slideIds.indexOf(deck.activeSlideId);
+
+    return html`
+      <div class="slide-indicators" aria-hidden="true">
+        ${deck.slideIds.map((slideId, index) => html`
+          <div
+            class="slide-indicator ${index === currentSlideIndex ? 'active' : ''}"
+          ></div>
+        `)}
+      </div>
+    `;
+  }
+
+
+  /**
    * Check if we can navigate to next slide
    */
   private canNavigateNext(): boolean {
@@ -840,9 +901,12 @@ export class IterationDeckToolbar extends LitElement {
             </button>
           </nav>
           
-          <span class="slide-label" title=${this.getCurrentSlideLabel()}>
-            ${this.getCurrentSlideLabel()}
-          </span>
+          <div class="slide-info">
+            <span class="slide-label" title=${this.getCurrentSlideLabel()}>
+              ${this.getCurrentSlideLabel()}
+            </span>
+            ${this.renderSlideIndicators()}
+          </div>
         </div>
       </div>
     `;
