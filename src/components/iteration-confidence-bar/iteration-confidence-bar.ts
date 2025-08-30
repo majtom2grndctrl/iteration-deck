@@ -125,9 +125,7 @@ export class IterationConfidenceBar extends LitElement {
     // Clamp to valid range
     const clamped = Math.max(0, Math.min(1, this.confidence));
     
-    if (clamped !== this.confidence) {
-      console.warn(`IterationConfidenceBar: confidence value ${this.confidence} was clamped to ${clamped} (valid range: 0-1)`);
-    }
+    // Value automatically clamped to valid range
     
     return clamped;
   }

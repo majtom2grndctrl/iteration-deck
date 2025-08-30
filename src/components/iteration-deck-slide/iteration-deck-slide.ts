@@ -16,7 +16,6 @@ import {
 } from '../../store/iteration-store.js';
 import { 
   generateSlideId, 
-  debugLog, 
   errorLog 
 } from '../../core/utilities.js';
 
@@ -134,8 +133,6 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
     
     // Initial active state check
     this.updateActiveState();
-    
-    debugLog(`IterationDeckSlide connected: ${this.label} (ID: ${this._internalSlideId})`);
   }
 
   /**
@@ -144,7 +141,6 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
   override disconnectedCallback() {
     super.disconnectedCallback();
     this.unsubscribeStore?.();
-    debugLog(`IterationDeckSlide disconnected: ${this.label}`);
   }
 
   /**
@@ -158,7 +154,6 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
     
     if (parent) {
       this.deckId = parent.getAttribute('id');
-      debugLog(`Found parent deck: ${this.deckId} for slide: ${this.label}`);
     } else {
       errorLog(`IterationDeckSlide "${this.label}" is not inside an iteration-deck element`);
     }
@@ -189,9 +184,9 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
     this.setAttribute('aria-hidden', this.isActive ? 'false' : 'true');
     this.setAttribute('role', 'tabpanel');
     
-    // Log state changes
+    // Update state if changed
     if (wasActive !== this.isActive) {
-      debugLog(`Slide "${this.label}" active state changed: ${wasActive} -> ${this.isActive}`);
+      // State changed, component will re-render automatically
     }
   }
 
@@ -225,7 +220,6 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
     
     const store = getIterationStoreState();
     store.setActiveSlide(this.deckId, this._internalSlideId);
-    debugLog(`Slide "${this.label}" activated programmatically`);
   }
 
   /**

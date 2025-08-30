@@ -42,7 +42,6 @@ vi.mock('../../core/utilities.js', async () => {
   return {
     ...actual,
     isNavigationShortcut: vi.fn(),
-    debugLog: vi.fn(),
     warnLog: vi.fn(),
     throttle: vi.fn((fn) => fn) // Return unthrottled function for testing
   };
@@ -135,12 +134,12 @@ describe('IterationDeckToolbar Component', () => {
 
     it('should return early from connectedCallback in production', async () => {
       const { isDevelopmentMode } = await import('../../store/iteration-store.js');
-      const { debugLog } = await import('../../core/utilities.js');
       vi.mocked(isDevelopmentMode).mockReturnValue(false);
       
       toolbar = await createLitElement<IterationDeckToolbar>('iteration-deck-toolbar', {});
       
-      expect(debugLog).toHaveBeenCalledWith('IterationDeckToolbar hidden in production mode');
+      // Toolbar should not be visible in production mode
+      expect(toolbar.getAttribute('visible')).toBe(null);
     });
   });
 
