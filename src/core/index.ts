@@ -31,7 +31,6 @@ export {
   throttle,
   
   // Debugging
-  debugLog,
   warnLog,
   errorLog,
 } from './utilities.js';

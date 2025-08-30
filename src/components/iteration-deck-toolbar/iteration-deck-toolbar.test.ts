@@ -12,6 +12,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { LitElement } from 'lit';
 import './iteration-deck-toolbar.js';
 import { 
   IterationDeckToolbar,
@@ -42,7 +43,6 @@ vi.mock('../../core/utilities.js', async () => {
   return {
     ...actual,
     isNavigationShortcut: vi.fn(),
-    debugLog: vi.fn(),
     warnLog: vi.fn(),
     throttle: vi.fn((fn) => fn) // Return unthrottled function for testing
   };
@@ -135,12 +135,12 @@ describe('IterationDeckToolbar Component', () => {
 
     it('should return early from connectedCallback in production', async () => {
       const { isDevelopmentMode } = await import('../../store/iteration-store.js');
-      const { debugLog } = await import('../../core/utilities.js');
       vi.mocked(isDevelopmentMode).mockReturnValue(false);
       
       toolbar = await createLitElement<IterationDeckToolbar>('iteration-deck-toolbar', {});
       
-      expect(debugLog).toHaveBeenCalledWith('IterationDeckToolbar hidden in production mode');
+      // Toolbar should not be visible in production mode
+      expect(toolbar.getAttribute('visible')).toBe(null);
     });
   });
 
@@ -638,6 +638,62 @@ describe('IterationDeckToolbar Component', () => {
       mockStore.notifyListeners();
       
       expect(requestUpdateSpy).toHaveBeenCalled();
+    });
+  });
+
+  // Basic functionality tests (from simple.test.ts)
+  describe('Basic Functionality', () => {
+    it('should create element', () => {
+      const toolbar = document.createElement('iteration-deck-toolbar') as IterationDeckToolbar;
+      expect(toolbar).toBeInstanceOf(IterationDeckToolbar);
+      expect(toolbar).toBeInstanceOf(LitElement);
+    });
+
+    it('should render without errors', async () => {
+      const toolbar = document.createElement('iteration-deck-toolbar') as IterationDeckToolbar;
+      document.body.appendChild(toolbar);
+      
+      await toolbar.updateComplete;
+      
+      expect(toolbar.shadowRoot).toBeTruthy();
+      
+      // Cleanup
+      toolbar.remove();
+    });
+
+    it('should support custom element registration', () => {
+      const element = document.createElement('iteration-deck-toolbar');
+      expect(element.constructor.name).toBe('IterationDeckToolbar');
+    });
+  });
+
+  describe('Basic Singleton Pattern', () => {
+    it('should track singleton instance', () => {
+      const toolbar = document.createElement('iteration-deck-toolbar') as IterationDeckToolbar;
+      document.body.appendChild(toolbar);
+      
+      expect(getToolbarInstance()).toBe(toolbar);
+      
+      // Cleanup
+      toolbar.remove();
+    });
+
+    it('should clear singleton reference on disconnect', async () => {
+      const toolbar = document.createElement('iteration-deck-toolbar') as IterationDeckToolbar;
+      document.body.appendChild(toolbar);
+      
+      expect(getToolbarInstance()).toBe(toolbar);
+      
+      toolbar.remove();
+      await new Promise(resolve => setTimeout(resolve, 0)); // Allow disconnectedCallback to run
+      
+      expect(getToolbarInstance()).toBeNull();
+    });
+  });
+
+  describe('Utility Functions', () => {
+    it('should export utility functions', () => {
+      expect(typeof getToolbarInstance).toBe('function');
     });
   });
 });

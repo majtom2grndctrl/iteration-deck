@@ -26,7 +26,6 @@ import {
   isDevelopment, 
   generateSlideId, 
   validateDeckId, 
-  debugLog, 
   errorLog, 
   warnLog 
 } from '../../core/utilities.js';
@@ -158,8 +157,6 @@ export class IterationDeck extends LitElement {
   connectedCallback(): void {
     super.connectedCallback();
     
-    debugLog(`IterationDeck connecting: ${this.id}`);
-    
     // Validate required properties
     if (!this.id) {
       errorLog('IterationDeck requires an id property');
@@ -194,8 +191,6 @@ export class IterationDeck extends LitElement {
    */
   disconnectedCallback(): void {
     super.disconnectedCallback();
-    
-    debugLog(`IterationDeck disconnecting: ${this.id}`);
     
     // Unsubscribe from store
     this._unsubscribeStore?.();
@@ -244,8 +239,6 @@ export class IterationDeck extends LitElement {
         const previousSlideId = this._activeSlideId;
         this._activeSlideId = newActiveSlideId;
         
-        debugLog(`Slide changed for deck ${this.id}: ${previousSlideId} -> ${newActiveSlideId}`);
-        
         // Fire slide change event
         if (previousSlideId && newActiveSlideId) {
           const slideIndex = this._slides.findIndex(slide => slide.id === newActiveSlideId);
@@ -270,7 +263,6 @@ export class IterationDeck extends LitElement {
       const newIsProduction = state.isProduction;
       if (newIsProduction !== this._isProduction) {
         this._isProduction = newIsProduction;
-        debugLog(`Environment mode changed for deck ${this.id}: production=${newIsProduction}`);
       }
     });
   }
@@ -290,7 +282,6 @@ export class IterationDeck extends LitElement {
       });
       
       if (shouldRedetect) {
-        debugLog(`Slot changes detected for deck ${this.id}, re-detecting slides`);
         this._detectSlidesAndRegister();
       }
     });
@@ -336,9 +327,6 @@ export class IterationDeck extends LitElement {
       };
     });
 
-    debugLog(`Detected ${this._slides.length} slides for deck ${this.id}`, 
-             this._slides.map(s => ({ id: s.id, label: s.label })));
-
     // Register with store
     this._registerWithStore();
   }
@@ -361,12 +349,6 @@ export class IterationDeck extends LitElement {
     // Get the active slide that was set during registration
     this._activeSlideId = store.getActiveSlide(this.id) || slideIds[0];
     this._isRegistered = true;
-
-    debugLog(`Registered deck ${this.id} with store`, {
-      slides: slideIds,
-      activeSlide: this._activeSlideId,
-      label: this.label
-    });
 
     // Fire registration event
     this.dispatchEvent(new CustomEvent('deck-registered', {
@@ -427,7 +409,6 @@ export class IterationDeck extends LitElement {
     const store = getIterationStoreState();
     store.setActiveSlide(this.id, slideId);
     
-    debugLog(`Navigated to slide ${slideId} in deck ${this.id}`);
     return true;
   }
 

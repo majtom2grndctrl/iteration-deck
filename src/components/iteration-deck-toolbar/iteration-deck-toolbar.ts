@@ -25,7 +25,6 @@ import {
 } from '../../store/iteration-store.js';
 import {
   isNavigationShortcut,
-  debugLog,
   warnLog,
   errorLog,
   throttle,
@@ -380,7 +379,6 @@ export class IterationDeckToolbar extends LitElement {
     }
     
     toolbarInstance = this;
-    debugLog('IterationDeckToolbar instance created');
   }
 
   connectedCallback() {
@@ -388,7 +386,6 @@ export class IterationDeckToolbar extends LitElement {
     
     // Only mount in development mode
     if (!isDevelopmentMode()) {
-      debugLog('IterationDeckToolbar hidden in production mode');
       return;
     }
 
@@ -412,8 +409,6 @@ export class IterationDeckToolbar extends LitElement {
     
     // Set toolbar as visible
     this.setAttribute('visible', '');
-    
-    debugLog('IterationDeckToolbar connected and listening for keyboard shortcuts');
   }
 
   disconnectedCallback() {
@@ -427,8 +422,6 @@ export class IterationDeckToolbar extends LitElement {
     if (toolbarInstance === this) {
       toolbarInstance = null;
     }
-    
-    debugLog('IterationDeckToolbar disconnected');
   }
 
   /**
@@ -465,7 +458,6 @@ export class IterationDeckToolbar extends LitElement {
   private navigateSelectedDeck(direction: NavigationDirection) {
     const selectedDeckId = this.getSelectedDeckId();
     if (!selectedDeckId) {
-      debugLog('No selected deck for navigation');
       return;
     }
 
@@ -499,7 +491,6 @@ export class IterationDeckToolbar extends LitElement {
     if (newSlideId) {
       const store = getIterationStoreState();
       store.setActiveSlide(selectedDeckId, newSlideId);
-      debugLog(`Navigated deck ${selectedDeckId} to slide ${newSlideId} (${direction})`);
     }
   }
 
@@ -549,7 +540,6 @@ export class IterationDeckToolbar extends LitElement {
     if (deckId) {
       const store = getIterationStoreState();
       store.setSelectedDeck(deckId);
-      debugLog(`Selected deck: ${deckId}`);
       
       // Auto-scroll to deck and highlight it
       this.scrollToDeckAndHighlight(deckId);
@@ -564,7 +554,6 @@ export class IterationDeckToolbar extends LitElement {
     const deckElement = document.querySelector(`iteration-deck[id="${deckId}"]`) as HTMLElement;
     
     if (!deckElement) {
-      debugLog(`Deck element not found: ${deckId}`);
       return;
     }
     
@@ -611,7 +600,6 @@ export class IterationDeckToolbar extends LitElement {
           window.removeEventListener('scroll', onScroll);
           clearTimeout(maxWaitTimeout);
           callback();
-          debugLog(`Scroll completed at ${currentY}, target was ${targetY}`);
         }
       }, 150); // Wait 150ms of no scroll movement to consider it "stopped"
     };
@@ -621,7 +609,6 @@ export class IterationDeckToolbar extends LitElement {
       window.removeEventListener('scroll', onScroll);
       clearTimeout(scrollTimeout);
       callback();
-      debugLog('Scroll completion detected via safety timeout');
     }, 3000);
     
     // Start listening for scroll events
@@ -633,7 +620,6 @@ export class IterationDeckToolbar extends LitElement {
       window.removeEventListener('scroll', onScroll);
       clearTimeout(maxWaitTimeout);
       setTimeout(callback, 100); // Small delay to ensure DOM is settled
-      debugLog('Already at target scroll position');
     }
   }
 
@@ -755,22 +741,18 @@ export class IterationDeckToolbar extends LitElement {
   private canNavigatePrev(): boolean {
     const selectedDeckId = this.getSelectedDeckId();
     if (!selectedDeckId) {
-      debugLog('canNavigatePrev: No selected deck');
       return false;
     }
 
     const deck = this.getCurrentDeck(selectedDeckId);
     if (!deck) {
-      debugLog(`canNavigatePrev: No deck found for ID ${selectedDeckId}`);
       return false;
     }
     
     if (deck.slideIds.length <= 1) {
-      debugLog(`canNavigatePrev: Deck ${selectedDeckId} has ${deck.slideIds.length} slides`);
       return false;
     }
 
-    debugLog(`canNavigatePrev: Deck ${selectedDeckId} can navigate prev (${deck.slideIds.length} slides)`);
     return true; // Always allow navigation (wraps around)
   }
 
@@ -792,7 +774,7 @@ export class IterationDeckToolbar extends LitElement {
 
     return html`
       <div class="slide-indicators" aria-hidden="true">
-        ${deck.slideIds.map((slideId, index) => html`
+        ${deck.slideIds.map((_, index) => html`
           <div
             class="slide-indicator ${index === currentSlideIndex ? 'active' : ''}"
           ></div>
@@ -808,22 +790,18 @@ export class IterationDeckToolbar extends LitElement {
   private canNavigateNext(): boolean {
     const selectedDeckId = this.getSelectedDeckId();
     if (!selectedDeckId) {
-      debugLog('canNavigateNext: No selected deck');
       return false;
     }
 
     const deck = this.getCurrentDeck(selectedDeckId);
     if (!deck) {
-      debugLog(`canNavigateNext: No deck found for ID ${selectedDeckId}`);
       return false;
     }
     
     if (deck.slideIds.length <= 1) {
-      debugLog(`canNavigateNext: Deck ${selectedDeckId} has ${deck.slideIds.length} slides`);
       return false;
     }
 
-    debugLog(`canNavigateNext: Deck ${selectedDeckId} can navigate next (${deck.slideIds.length} slides)`);
     return true; // Always allow navigation (wraps around)
   }
 
@@ -838,16 +816,8 @@ export class IterationDeckToolbar extends LitElement {
     const hasMultipleDecks = deckIds.length > 1;
     const hasAnyDecks = deckIds.length > 0;
     
-    debugLog(`Toolbar render: ${deckIds.length} decks, selected: ${selectedDeckId}`);
-    
-    // Check button states
-    const canPrev = this.canNavigatePrev();
-    const canNext = this.canNavigateNext();
-    debugLog(`Toolbar render: canPrev=${canPrev}, canNext=${canNext}`);
-
     // Don't render if no decks are registered
     if (!hasAnyDecks) {
-      debugLog('Toolbar render: No decks registered, returning nothing');
       return nothing;
     }
 
@@ -925,14 +895,12 @@ export function ensureToolbarMounted(): void {
 
   // Check if toolbar already exists in DOM
   if (document.querySelector('iteration-deck-toolbar')) {
-    debugLog('IterationDeckToolbar already mounted');
     return;
   }
 
   // Create and mount toolbar
   const toolbar = new IterationDeckToolbar();
   document.body.appendChild(toolbar);
-  debugLog('IterationDeckToolbar automatically mounted');
 }
 
 /**
@@ -950,7 +918,6 @@ export function cleanupToolbarIfEmpty(): void {
       const toolbar = document.querySelector('iteration-deck-toolbar');
       if (toolbar) {
         toolbar.remove();
-        debugLog('IterationDeckToolbar removed - no decks remaining');
       }
     }
   }, 100);

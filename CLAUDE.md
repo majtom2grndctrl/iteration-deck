@@ -50,6 +50,7 @@ pnpm lint         # Lint TypeScript code
 - **TypeScript**: Strict mode throughout with Lit's TypeScript decorators
 - **Testing**: Comprehensive unit + integration tests for Lit components and React wrappers
 - **Web Standards**: Custom elements, shadow DOM, and standard web APIs with Lit optimizations
+- **Logging**: Only log errors and warnings - designers get visual feedback from the browser, console should stay quiet unless something is wrong
 
 ### Visual Design Principles
 - **Designer-friendly**: Clean, neutral palette that doesn't compete with user designs

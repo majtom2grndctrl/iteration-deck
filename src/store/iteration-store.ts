@@ -67,17 +67,12 @@ class SimpleStore implements IterationStore {
   selectedDeckId?: string;
   
   constructor() {
-    console.log('[DEBUG] Store initialized:', { 
-      isProduction: this.isProduction,
-      isDevelopment: isDevelopment()
-    });
+    // Store initialized
   }
   
   private listeners: Set<(state: IterationStore) => void> = new Set();
   
   registerDeck(deckId: string, slideIds: string[], label?: string): void {
-    console.log(`[DEBUG] Store: Registering deck "${deckId}" with slides:`, slideIds);
-    
     // Store deck metadata
     this.deckMetadata[deckId] = {
       slideIds: [...slideIds],
@@ -92,8 +87,6 @@ class SimpleStore implements IterationStore {
     
     // Update metadata with actual active slide
     this.deckMetadata[deckId].activeSlideId = validActiveSlide;
-    
-    console.log(`[DEBUG] Store: Deck "${deckId}" registered successfully. Active slide: ${validActiveSlide}`);
     
     this.notifyListeners();
   }
@@ -177,7 +170,5 @@ export const getIterationStoreState = (): IterationStore => {
  * Check if we're in development mode
  */
 export const isDevelopmentMode = (): boolean => {
-  const result = !store.isProduction;
-  console.log('[DEBUG] isDevelopmentMode check:', { isProduction: store.isProduction, result });
-  return result;
+  return !store.isProduction;
 };

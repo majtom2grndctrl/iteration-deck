@@ -74,7 +74,7 @@ describe('React-Lit Integration (Comprehensive)', () => {
       const ComplexReactComponent = () => (
         <div className="complex-react">
           <h2>React Component</h2>
-          <button onClick={() => console.log('React click')}>React Button</button>
+          <button onClick={() => {}}>React Button</button>
           <ul>
             <li>Item 1</li>
             <li>Item 2</li>

@@ -93,48 +93,22 @@ export const validateDeckId = (id: string): boolean => {
 };
 
 /**
- * Debug logging (only in development, and only for important messages)
- */
-export const debugLog = (message: string, data?: any): void => {
-  if (isDevelopment()) {
-    // Only log important debug messages to reduce console noise
-    const importantKeywords = [
-      'ERROR', 'WARN', 'VALIDATION', 
-      'registered successfully', 'web components registered',
-      'failed', 'not found', 'missing'
-    ];
-    
-    const isImportant = importantKeywords.some(keyword => 
-      message.toLowerCase().includes(keyword.toLowerCase())
-    );
-    
-    if (isImportant) {
-      console.log(`[IterationDeck] ${message}`, data || '');
-    }
-  }
-};
-
-/**
- * Error logging (quieter during testing)
+ * Error logging for development
  */
 export const errorLog = (message: string, error?: any): void => {
-  // In test environments, use debug logging for validation errors to reduce noise
-  if (isTestEnvironment() && message.includes('not inside an iteration-deck element')) {
-    debugLog(`VALIDATION: ${message}`, error);
+  // In test environments, suppress noisy validation errors
+  if (isTestEnvironment() && (
+    message.includes('not inside an iteration-deck element') ||
+    message.includes('Cannot activate slide: no parent deck found')
+  )) {
     return;
   }
   
-  if (isTestEnvironment() && message.includes('Cannot activate slide: no parent deck found')) {
-    debugLog(`VALIDATION: ${message}`, error);
-    return;
-  }
-  
-  // For all other errors or non-test environments, log normally
   console.error(`[IterationDeck ERROR] ${message}`, error || '');
 };
 
 /**
- * Warning logging
+ * Warning logging for development
  */
 export const warnLog = (message: string, data?: any): void => {
   console.warn(`[IterationDeck WARN] ${message}`, data || '');
