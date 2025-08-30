@@ -67,13 +67,13 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
   @property({ type: String, reflect: true })
   label!: string;
 
-  @property({ type: String, attribute: 'ai-prompt' })
+  @property({ type: String, attribute: 'ai-prompt', reflect: false })
   aiPrompt?: string;
 
-  @property({ type: String })
+  @property({ type: String, reflect: false })
   notes?: string;
 
-  @property({ type: Number })
+  @property({ type: Number, reflect: false })
   confidence?: number;
 
   @property({ type: String, reflect: true, attribute: 'slide-id' })
@@ -168,29 +168,39 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
    */
   private subscribeToStore() {
     this.unsubscribeStore = subscribeToIterationStore((state: IterationStore) => {
-      this.isDevelopment = !state.isProduction;
+      const newIsDevelopment = !state.isProduction;
+      
+      // Update development mode if changed
+      if (newIsDevelopment !== this.isDevelopment) {
+        this.isDevelopment = newIsDevelopment;
+      }
+      
+      // Update active state based on store changes
       this.updateActiveState(state);
+      
+      // Lit will automatically re-render due to @state() property changes
     });
   }
 
   /**
-   * Update active state based on store
+   * Update active state based on store with idiomatic Lit patterns
    */
   private updateActiveState(storeState?: IterationStore) {
     if (!this.deckId) return;
     
     const state = storeState || getIterationStoreState();
     const activeSlideId = state.activeDecks[this.deckId];
-    const wasActive = this.isActive;
-    this.isActive = activeSlideId === this._internalSlideId;
+    const newIsActive = activeSlideId === this._internalSlideId;
     
-    // Update ARIA attributes for accessibility
-    this.setAttribute('aria-hidden', this.isActive ? 'false' : 'true');
-    this.setAttribute('role', 'tabpanel');
-    
-    // Update state if changed
-    if (wasActive !== this.isActive) {
-      // State changed, component will re-render automatically
+    // Only update if state actually changed
+    if (newIsActive !== this.isActive) {
+      this.isActive = newIsActive;
+      
+      // Update ARIA attributes for accessibility
+      this.setAttribute('aria-hidden', this.isActive ? 'false' : 'true');
+      this.setAttribute('role', 'tabpanel');
+      
+      // Lit automatically re-renders when @state() properties change
     }
   }
 
