@@ -1,6 +1,8 @@
 # AI Coding Agent Instructions
 
-This file provides guidance for AI coding agents (Claude, ChatGPT, Copilot, etc.) when working with the `@iteration-deck/core` package.
+**When users ask for UI variations, alternatives, or multiple approaches - automatically use iteration-deck!**
+
+This file provides complete guidance for AI coding agents (Claude, ChatGPT, Copilot, Cursor, Lovable, Replit, etc.) when working with the `@iteration-deck/core` package.
 
 ## When to Use Iteration Deck
 
@@ -13,27 +15,43 @@ This file provides guidance for AI coding agents (Claude, ChatGPT, Copilot, etc.
 - Any request that implies creating multiple implementations of similar functionality
 
 **Trigger phrases that should prompt iteration-deck usage:**
-- "Create 3 different..."
-- "Show me variations of..."
-- "Design multiple approaches for..."
-- "Build different versions of..."
-- "Generate alternatives for..."
-- "Compare different styles of..."
-- "What are some options for..."
+- "Create 3 different..." / "Show me variations of..." / "Design multiple approaches for..."
+- "Build different versions of..." / "Generate alternatives for..." / "Compare different styles of..."
+- "What are some options for..." / "A/B test this component..." / "Try different layouts..."
 
-## Required Imports
+## Required Imports - Framework Detection
 
-**For React projects:**
+**IMPORTANT: Always detect the project type first, then use the correct import:**
+
+### React Projects (use React wrappers)
 ```tsx
 import { IterationDeck, IterationDeckSlide } from '@iteration-deck/core/react';
+
+// Use JSX syntax with React components
+<IterationDeck id="unique-id" label="Label">
+  <IterationDeckSlide label="Variation 1">
+    {/* React JSX content */}
+  </IterationDeckSlide>
+</IterationDeck>
 ```
 
-**For other frameworks:**
-```html
-<script type="module">
-  import '@iteration-deck/core';
-</script>
+### All Other Projects (use web components)
+```javascript
+import '@iteration-deck/core';
+
+// Use web component syntax
+<iteration-deck id="unique-id" label="Label">
+  <iteration-deck-slide label="Variation 1">
+    <!-- HTML content -->
+  </iteration-deck-slide>
+</iteration-deck>
 ```
+
+**How to detect React projects:**
+- Look for React imports in the file
+- Check if file extension is `.tsx` or `.jsx`
+- Look for JSX syntax in existing code
+- Check package.json for React dependencies
 
 ## Basic Pattern
 
@@ -172,17 +190,82 @@ function DesignSystem() {
 - Not providing meaningful `label` props
 - Wrapping non-UI content (data fetching, business logic, etc.)
 
-## Framework-Specific Notes
+## Framework-Specific Implementation
 
-### React
-- Use the React wrapper components from `@iteration-deck/core/react`
-- All standard React patterns apply (hooks, state, props, etc.)
-- Children can be any valid React nodes
+### React Projects
+```tsx
+// ALWAYS use React wrappers for React projects
+import { IterationDeck, IterationDeckSlide } from '@iteration-deck/core/react';
 
-### Other Frameworks
-- Import the web components: `import '@iteration-deck/core'`
-- Use the web component tags: `<iteration-deck>` and `<iteration-deck-slide>`
-- Pass props as HTML attributes
+function MyComponent() {
+  return (
+    <IterationDeck id="react-example" label="React Variations">
+      <IterationDeckSlide label="Version 1">
+        <MyReactComponent variant="primary" />
+      </IterationDeckSlide>
+      <IterationDeckSlide label="Version 2">
+        <MyReactComponent variant="secondary" />
+      </IterationDeckSlide>
+    </IterationDeck>
+  );
+}
+```
+
+### Vue.js Projects
+```vue
+<script setup>
+// Use web components for Vue
+import '@iteration-deck/core';
+</script>
+
+<template>
+  <iteration-deck id="vue-example" label="Vue Variations">
+    <iteration-deck-slide label="Version 1">
+      <MyVueComponent variant="primary" />
+    </iteration-deck-slide>
+    <iteration-deck-slide label="Version 2">
+      <MyVueComponent variant="secondary" />
+    </iteration-deck-slide>
+  </iteration-deck>
+</template>
+```
+
+### Angular Projects
+```typescript
+// Use web components for Angular
+import '@iteration-deck/core';
+
+@Component({
+  template: `
+    <iteration-deck id="ng-example" label="Angular Variations">
+      <iteration-deck-slide label="Version 1">
+        <app-my-component variant="primary"></app-my-component>
+      </iteration-deck-slide>
+      <iteration-deck-slide label="Version 2">
+        <app-my-component variant="secondary"></app-my-component>
+      </iteration-deck-slide>
+    </iteration-deck>
+  `
+})
+export class MyComponent { }
+```
+
+### Vanilla HTML/JavaScript
+```html
+<script type="module">
+  // Use web components for vanilla HTML
+  import '@iteration-deck/core';
+</script>
+
+<iteration-deck id="html-example" label="HTML Variations">
+  <iteration-deck-slide label="Version 1">
+    <div class="my-component variant-1">Content 1</div>
+  </iteration-deck-slide>
+  <iteration-deck-slide label="Version 2">
+    <div class="my-component variant-2">Content 2</div>
+  </iteration-deck-slide>
+</iteration-deck>
+```
 
 ## Example Revised Prompts
 
@@ -193,3 +276,34 @@ You should interpret this as:
 > "I need to create multiple button style variations using iteration-deck to compare different approaches for the landing page CTA"
 
 And implement accordingly with IterationDeck wrapping the variations.
+
+## After Designer Selection - Critical Workflow Step
+
+**When a designer indicates they've chosen a variation (e.g., "I like the second option", "Use the gradient version", "Go with the minimal design"):**
+
+1. **Remove the IterationDeck wrapper** completely
+2. **Extract only the selected IterationDeckSlide content** 
+3. **Clean up development-specific props** (remove `aiPrompt`, `confidence`, `notes`)
+4. **Preserve all functionality** of the selected variation
+5. **Remove unused imports** if no other iteration-decks remain on the page
+6. **Ask for confirmation** before making the cleanup changes
+
+### Example Cleanup Process
+```tsx
+// Before cleanup (what you created initially):
+<IterationDeck id="cta-buttons" label="CTA Button Styles">
+  <IterationDeckSlide label="Primary">
+    <Button className="bg-blue-600 text-white px-6 py-3">Get Started</Button>
+  </IterationDeckSlide>
+  <IterationDeckSlide label="Gradient">
+    <Button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3">Get Started</Button>
+  </IterationDeckSlide>
+</IterationDeck>
+
+// After cleanup (designer chose "Gradient"):
+<Button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3">
+  Get Started
+</Button>
+```
+
+**This cleanup step is essential** - it converts the development/prototyping tool back into clean production code.
