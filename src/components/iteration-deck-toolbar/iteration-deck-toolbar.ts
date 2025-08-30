@@ -157,7 +157,7 @@ export class IterationDeckToolbar extends LitElement {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      height: 44px;
+      height: ${unsafeCSS(spacing.spacing6)};
       gap: ${unsafeCSS(spacing.spacing3)};
       min-width: 120px;
       padding: 0 ${unsafeCSS(spacing.spacing3)};
@@ -309,9 +309,9 @@ export class IterationDeckToolbar extends LitElement {
     /* Slide label - Mobile-first */
     .slide-label {
       color: var(--color-text-primary);
-      font-size: ${unsafeCSS(spacing.spacing1)}; /* 8px - small text */
+      font-size: ${unsafeCSS(spacing.spacing3)};
       font-weight: 500;
-      line-height: ${unsafeCSS(spacing.spacing3)};
+      line-height: ${unsafeCSS(spacing.spacing4)};
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -320,7 +320,7 @@ export class IterationDeckToolbar extends LitElement {
     /* Progressive enhancement for larger screens */
     @media (min-width: ${unsafeCSS(breakpoints.sm)}) {
       .slide-label {
-        font-size: ${unsafeCSS(spacing.spacing2)}; /* 16px - standard text */
+        font-size: 14px;
       }
     }
     
