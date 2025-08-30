@@ -6,8 +6,7 @@
  * Fully integrated with Zustand store for cross-component reactivity.
  */
 
-import { LitElement, html, css, unsafeCSS } from 'lit';
-import { ifDefined } from 'lit/directives/if-defined.js';
+import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { IterationDeckSlideProps } from '../../core/types.js';
 import { 
@@ -20,15 +19,6 @@ import {
   debugLog, 
   errorLog 
 } from '../../core/utilities.js';
-import { 
-  themeTokens,
-  spacing,
-  breakpoints,
-  duration,
-  easing
-} from '../../tokens/index.js';
-
-// Design tokens imported and embedded directly in CSS for Lit compatibility
 
 /**
  * Custom element for individual iteration deck slides
@@ -48,143 +38,31 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
    * ShadowDOM-encapsulated styles using Lit CSS tagged template literals
    * with design tokens for consistent styling and theme support
    */
-  static styles = [
-    themeTokens,
-    css`
+  static styles = css`
     :host {
       display: block;
-      position: relative;
-      width: 100%;
-      min-height: ${unsafeCSS(spacing.spacing8)}; /* Mobile-first: smaller minimum height - using spacing8 (64px) for better proportion */
-      border-radius: ${unsafeCSS(spacing.spacing2)};
-      transition: opacity ${unsafeCSS(duration.normal)} ${unsafeCSS(easing.easeInOut)};
-      isolation: isolate;
-      outline: none;
     }
-
+    
     .slide-container {
       display: block;
-      position: relative;
-      width: 100%;
-      min-height: inherit;
-      border-radius: inherit;
-      background: transparent;
-      transition-property: opacity, border-color, background-color;
-      transition-duration: ${unsafeCSS(duration.fast)};
-      transition-timing-function: ${unsafeCSS(easing.easeInOut)};
-      isolation: isolate;
-      outline: none;
     }
-
-    /* Slide state variants */
+    
     .slide-container.active {
-      opacity: 1;
-      pointer-events: auto;
-      z-index: 1;
+      display: block;
     }
     
     .slide-container.inactive {
-      opacity: 0;
-      pointer-events: none;
-      z-index: 0;
-    }
-    
-    .slide-container.loading {
-      opacity: 0.6;
-      pointer-events: none;
-    }
-    
-    .slide-container.error {
-      opacity: 0.4;
-      pointer-events: none;
-      border: ${unsafeCSS(spacing.spacing00)} solid var(--color-border-error);
-      background: var(--color-bg-error);
-    }
-    
-    /* Slide content wrapper - mobile-first base styles */
-    .slide-content {
-      width: 100%;
-      min-height: inherit;
-      position: relative;
-      z-index: 1;
-      padding: ${unsafeCSS(spacing.spacing2)}; /* 12px - mobile base */
-    }
-
-    :host([aria-hidden="true"]) {
-      position: absolute;
-      left: -10000px;
-      width: ${unsafeCSS(spacing.spacing00)};
-      height: ${unsafeCSS(spacing.spacing00)};
-      overflow: hidden;
-    }
-    
-    :host([tabindex="0"]:focus) {
-      outline: ${unsafeCSS(spacing.spacing0)} solid var(--color-border-focus);
-      outline-offset: ${unsafeCSS(spacing.spacing00)};
-    }
-
-    /* Production mode overrides */
-    .slide-container.production {
-      background: transparent;
-      transform: none;
-      box-shadow: none;
-      cursor: default;
-    }
-
-    /* Confidence indicator production hiding - REMOVED with component extraction */
-
-    .slide-container.production .metadata-overlay {
       display: none;
     }
-
-    /* Mobile-first responsive design using design tokens */
-    /* Base styles above are mobile-first (xs: 0px+) */
-
-    /* Small mobile devices and up (sm: 640px+) */
-    @media (min-width: ${unsafeCSS(breakpoints.sm)}) {
-      .slide-content {
-        padding: ${unsafeCSS(spacing.spacing3)}; /* 16px */
-      }
-
-      /* Tablet devices and up (md: 768px+) */
-    @media (min-width: ${unsafeCSS(breakpoints.md)}) {
-      .slide-container {
-        min-height: ${unsafeCSS(spacing.spacing8)}; /* Keep same height for consistency */
-      }
-      
-      .slide-content {
-        padding: ${unsafeCSS(spacing.spacing3)}; /* 16px */
-      }
+    
+    .slide-content {
+      display: block;
     }
     
-    /* Desktop devices and up (lg: 1024px+) */
-    @media (min-width: ${unsafeCSS(breakpoints.lg)}) {
-      .slide-content {
-        padding: ${unsafeCSS(spacing.spacing4)}; /* 24px */
-      }
-      
-      .metadata-overlay {
-        padding: ${unsafeCSS(spacing.spacing4)};
-        gap: ${unsafeCSS(spacing.spacing3)}; /* 16px */
-      }
+    :host([aria-hidden="true"]) {
+      display: none;
     }
-    
-    /* Reduced motion support */
-    @media (prefers-reduced-motion: reduce) {
-      .slide-container,
-      .metadata-overlay {
-        transition: none;
-      }
-      
-      /* Reduced motion hover override - REMOVED with hover effects */
-      /*
-      .slide-container.development:hover {
-        transform: none;
-      }
-      */
-    }
-  `,
-  ];
+  `;
 
   // Public properties from IterationDeckSlideProps interface
   @property({ type: String, reflect: true })
@@ -317,77 +195,21 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
     }
   }
 
-  /**
-   * Get confidence level for styling
-   */
-  private getConfidenceLevel(): 'low' | 'medium' | 'high' | null {
-    if (!this.confidence) return null;
-    
-    if (this.confidence >= 0.8) return 'high';
-    if (this.confidence >= 0.6) return 'medium';
-    return 'low';
-  }
 
   /**
    * Render the slide content with metadata overlay in development
    */
   override render() {
-    // Build classes for slide container
     const containerClasses = [
       'slide-container',
-      this.isActive ? 'active' : 'inactive',
-      this.isDevelopment ? 'development' : 'production'
+      this.isActive ? 'active' : 'inactive'
     ].join(' ');
 
-    const confidenceLevel = this.getConfidenceLevel();
-
     return html`
-      <div 
-        class="${containerClasses}" 
-        role="tabpanel" 
-        aria-label="${this.label}"
-        data-env="${this.isDevelopment ? 'development' : 'production'}"
-        style="display: ${this.isActive ? 'block' : 'none'}"
-      >
-        <!-- Main slide content wrapper -->
+      <div class="${containerClasses}">
         <div class="slide-content">
           <slot></slot>
         </div>
-        
-        <!-- AI confidence indicator - REMOVED, use <iteration-confidence-bar> component instead -->
-        
-        <!-- Development mode metadata overlay -->
-        ${this.isDevelopment ? html`
-          <div class="metadata-overlay">
-            <h3 class="metadata-title">${this.label}</h3>
-            
-            ${this.aiPrompt ? html`
-              <div class="metadata-prompt">
-                <strong>AI Prompt:</strong><br>
-                ${this.aiPrompt}
-              </div>
-            ` : ''}
-            
-            ${this.notes ? html`
-              <div class="metadata-notes">
-                <strong>Notes:</strong><br>
-                ${this.notes}
-              </div>
-            ` : ''}
-            
-            ${this.confidence !== undefined ? html`
-              <div class="metadata-score">
-                <span class="score-label">Confidence:</span>
-                <span 
-                  class="score-value" 
-                  data-score="${ifDefined(confidenceLevel || undefined)}"
-                >
-                  ${Math.round(this.confidence * 100)}%
-                </span>
-              </div>
-            ` : ''}
-          </div>
-        ` : ''}
       </div>
     `;
   }
