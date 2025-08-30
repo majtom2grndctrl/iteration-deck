@@ -76,21 +76,21 @@ export class IterationDeck extends LitElement {
    * Display label for this deck in the toolbar dropdown
    * Falls back to the deck ID if not provided
    */
-  @property({ type: String })
+  @property({ type: String, reflect: false })
   label?: string;
 
   /**
    * Original AI prompt context for generation tracking
    * Used for stakeholder communication and iteration history
    */
-  @property({ type: String })
+  @property({ type: String, reflect: false })
   prompt?: string;
 
   /**
    * Additional context for stakeholder presentations
    * Design rationale, requirements, or other relevant information
    */
-  @property({ type: String })
+  @property({ type: String, reflect: false })
   description?: string;
 
   /**
@@ -234,12 +234,13 @@ export class IterationDeck extends LitElement {
   private _subscribeToStore(): void {
     this._unsubscribeStore = subscribeToIterationStore((state: IterationStore) => {
       const newActiveSlideId = state.activeDecks[this.id] || '';
+      const previousSlideId = this._activeSlideId;
       
-      if (newActiveSlideId !== this._activeSlideId) {
-        const previousSlideId = this._activeSlideId;
+      // Update active slide if changed
+      if (newActiveSlideId !== previousSlideId) {
         this._activeSlideId = newActiveSlideId;
         
-        // Fire slide change event
+        // Fire slide change event (only if both slides exist)
         if (previousSlideId && newActiveSlideId) {
           const slideIndex = this._slides.findIndex(slide => slide.id === newActiveSlideId);
           
@@ -254,12 +255,9 @@ export class IterationDeck extends LitElement {
             composed: true
           }));
         }
-        
-        // Trigger re-render
-        this.requestUpdate();
       }
       
-      // Update production mode if it changed
+      // Update production mode if changed  
       const newIsProduction = state.isProduction;
       if (newIsProduction !== this._isProduction) {
         this._isProduction = newIsProduction;
