@@ -93,24 +93,22 @@ export const validateDeckId = (id: string): boolean => {
 };
 
 /**
- * Error logging (quieter during testing)
+ * Error logging for development
  */
 export const errorLog = (message: string, error?: any): void => {
-  // In test environments, suppress validation errors to reduce noise during testing
+  // In test environments, suppress noisy validation errors
   if (isTestEnvironment() && (
     message.includes('not inside an iteration-deck element') ||
     message.includes('Cannot activate slide: no parent deck found')
   )) {
-    // Silently ignore validation errors during testing
     return;
   }
   
-  // For all other errors or non-test environments, log normally
   console.error(`[IterationDeck ERROR] ${message}`, error || '');
 };
 
 /**
- * Warning logging
+ * Warning logging for development
  */
 export const warnLog = (message: string, data?: any): void => {
   console.warn(`[IterationDeck WARN] ${message}`, data || '');
