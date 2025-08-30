@@ -38,6 +38,7 @@ import {
   duration,
   easing
 } from '../../tokens/index.js';
+import type { IterationDeckSlide } from '../iteration-deck-slide/iteration-deck-slide.js';
 
 // ShadowDOM encapsulation for isolated styling
 
@@ -550,31 +551,28 @@ export class IterationDeckToolbar extends LitElement {
    * Scroll to deck and add glow effect
    */
   private scrollToDeckAndHighlight(deckId: string) {
-    // Find the deck element
     const deckElement = document.querySelector(`iteration-deck[id="${deckId}"]`) as HTMLElement;
     
     if (!deckElement) {
       return;
     }
     
-    // Find the actual visible content within the deck to highlight
-    const contentElement = deckElement.querySelector('.demo-content') as HTMLElement;
-    const elementToHighlight = contentElement || deckElement;
+    const activeSlide = deckElement.querySelector('iteration-deck-slide[aria-hidden="false"]') as IterationDeckSlide;
+    const slottedContent = activeSlide?.getPrimarySlottedElement();
+    
+    const elementToHighlight = slottedContent || activeSlide || deckElement;
 
-    // Calculate scroll position to put deck near the top of window
     const rect = deckElement.getBoundingClientRect();
     const currentScrollY = window.scrollY;
     const elementTop = rect.top + currentScrollY;
-    const targetScrollY = elementTop - (window.innerHeight * 0.15); // Near top (15% from top)
+    const targetScrollY = elementTop - (window.innerHeight * 0.15);
 
-    // Smooth scroll to position
     const finalScrollY = Math.max(0, targetScrollY);
     window.scrollTo({
       top: finalScrollY,
       behavior: 'smooth'
     });
 
-    // Add glow effect after scroll animation actually completes
     this.waitForScrollComplete(finalScrollY, () => {
       this.addGlowEffect(elementToHighlight);
     });
