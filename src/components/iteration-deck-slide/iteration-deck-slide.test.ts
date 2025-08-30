@@ -1,7 +1,7 @@
 /**
- * Simple IterationDeckSlide Component Tests
+ * IterationDeckSlide Component Tests
  * 
- * Basic test suite that doesn't rely on complex mocking
+ * Test suite for the IterationDeckSlide Lit component
  */
 
 import { describe, it, expect, afterEach, beforeEach } from 'vitest';
@@ -11,7 +11,7 @@ import { IterationDeckSlide } from './iteration-deck-slide.js';
 // Import the component to register it
 import './iteration-deck-slide.js';
 
-describe('IterationDeckSlide Basic Tests', () => {
+describe('IterationDeckSlide Component Tests', () => {
   let slide: IterationDeckSlide;
   
   afterEach(async () => {
