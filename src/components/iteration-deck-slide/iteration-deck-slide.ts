@@ -44,23 +44,23 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
     
     .slide-container {
       display: block;
+      min-height: inherit;
     }
     
     .slide-container.active {
       display: block;
     }
     
+    /* Hide inactive slides properly once deck IDs are resolved */
     .slide-container.inactive {
       display: none;
     }
     
     .slide-content {
       display: block;
+      min-height: inherit;
     }
     
-    :host([aria-hidden="true"]) {
-      display: none;
-    }
   `;
 
   // Public properties from IterationDeckSlideProps interface
@@ -128,6 +128,26 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
     // Find parent deck element
     this.findParentDeck();
     
+    // If we couldn't find the parent deck, try again after a short delay
+    // This handles cases where React hasn't finished rendering the parent yet
+    if (!this.deckId) {
+      setTimeout(() => {
+        this.findParentDeck();
+        // Regenerate slide ID with proper deck context
+        if (this.deckId) {
+          this._internalSlideId = this.slideId || 
+                                 this.getAttribute('slide-id') ||
+                                 generateSlideId(this.deckId, this.label || 'slide');
+          
+          // Update the active state now that we have the correct deck and slide IDs
+          this.updateActiveState();
+          
+          // Force a re-render to update the visual state
+          this.requestUpdate();
+        }
+      }, 10);
+    }
+    
     // Generate internal slide ID now that we have deck context
     if (!this._internalSlideId) {
       this._internalSlideId = this.slideId || 
@@ -157,6 +177,7 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
    */
   private findParentDeck() {
     let parent = this.parentElement;
+    
     while (parent && parent.tagName !== 'ITERATION-DECK') {
       parent = parent.parentElement;
     }
@@ -197,15 +218,23 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
     const activeSlideId = state.activeDecks[this.deckId];
     const newIsActive = activeSlideId === this._internalSlideId;
     
+    // If no active slide is set yet, treat first slide as active to prevent zero height
+    const isFirstSlide = !activeSlideId && this.parentElement && 
+                         this.parentElement.querySelector('iteration-deck-slide') === this;
+    
+    const shouldBeActive = newIsActive || !!isFirstSlide;
+    
+    
     // Only update if state actually changed
-    if (newIsActive !== this.isActive) {
-      this.isActive = newIsActive;
+    if (shouldBeActive !== this.isActive) {
+      this.isActive = shouldBeActive;
       
       // Update ARIA attributes for accessibility
       this.setAttribute('aria-hidden', this.isActive ? 'false' : 'true');
       this.setAttribute('role', 'tabpanel');
       
       // Lit automatically re-renders when @state() properties change
+      this.requestUpdate(); // Force a re-render to ensure visual update
     }
   }
 
@@ -223,10 +252,29 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
     return html`
       <div class="${containerClasses}">
         <div class="slide-content">
-          <slot></slot>
+          <slot @slotchange=${this.handleSlotChange}></slot>
         </div>
       </div>
     `;
+  }
+
+  /**
+   * Handle slot content changes
+   */
+  private handleSlotChange(e: Event) {
+    const slot = e.target as HTMLSlotElement;
+    const slottedElements = slot.assignedElements();
+
+    // If we have slotted content and we're the first slide, make sure we're active
+    if (slottedElements.length > 0 && this.deckId && !this.isActive) {
+      const store = getIterationStoreState();
+      const activeSlide = store.getActiveSlide(this.deckId);
+      
+      // If no slide is active yet, activate this one
+      if (!activeSlide) {
+        store.setActiveSlide(this.deckId, this._internalSlideId);
+      }
+    }
   }
 
   /**

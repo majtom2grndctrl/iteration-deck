@@ -1,8 +1,22 @@
 /* Reset and Base Styles */
-* {
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Reset body and common elements but preserve component content */
+body,
+h1, h2, h3, h4, h5, h6,
+p, ul, ol, li {
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
+}
+
+/* Ensure iteration deck components have proper display */
+iteration-deck,
+iteration-deck-slide {
+  display: block;
 }
 
 body {

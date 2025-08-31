@@ -38,7 +38,7 @@ Include hover states and accessibility features.
 
 **Expected AI Output:**
 ```tsx
-import { IterationDeck, IterationDeckSlide } from '@iteration-deck/core/react';
+import { IterationDeck, IterationDeckSlide } from 'iteration-deck/react';
 
 function ButtonVariations() {
   return (

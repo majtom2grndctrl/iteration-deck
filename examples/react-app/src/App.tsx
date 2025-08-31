@@ -42,7 +42,7 @@ function App() {
   useEffect(() => {
     const handleSlideChange = (event: Event) => {
       const customEvent = event as CustomEvent;
-      addDebugMessage(`Slide changed in deck "${customEvent.detail.deckId}": ${customEvent.detail.previousSlide} → ${customEvent.detail.activeSlide}`);
+      addDebugMessage(`Slide changed in deck "${customEvent.detail.deckId}": ${customEvent.detail.previousSlideId} → ${customEvent.detail.currentSlideId}`);
     };
 
     const handleDeckRegistered = (event: Event) => {
@@ -150,7 +150,7 @@ function App() {
             id="react-user-preferences" 
             label="User Preferences (React)"
             prompt="Create a user preferences form with clean, modern styling and good UX"
-            onSlideChange={(e: CustomEvent) => addDebugMessage(`React: Form slide changed to ${e.detail.activeSlide}`)}
+            onSlideChange={(e: CustomEvent) => addDebugMessage(`React: Form slide changed to ${e.detail.currentSlideId}`)}
             onDeckRegistered={(e: CustomEvent) => addDebugMessage(`React: Form deck registered with ${e.detail.slideCount} slides`)}
           >
             <IterationDeckSlide 
@@ -191,7 +191,7 @@ function App() {
             id="react-budget-dashboard" 
             label="Budget Dashboard (React)"
             prompt="Design a personal budget dashboard that helps users understand their spending"
-            onSlideChange={(e: CustomEvent) => addDebugMessage(`React: Budget slide changed to ${e.detail.activeSlide}`)}
+            onSlideChange={(e: CustomEvent) => addDebugMessage(`React: Budget slide changed to ${e.detail.currentSlideId}`)}
           >
             <IterationDeckSlide 
               label="Simple Summary"
@@ -231,7 +231,7 @@ function App() {
             id="react-contacts-list" 
             label="Contacts List (React)"
             prompt="Design a contacts list that's easy to scan and interact with"
-            onSlideChange={(e: CustomEvent) => addDebugMessage(`React: Contacts slide changed to ${e.detail.activeSlide}`)}
+            onSlideChange={(e: CustomEvent) => addDebugMessage(`React: Contacts slide changed to ${e.detail.currentSlideId}`)}
           >
             <IterationDeckSlide 
               label="Compact List"

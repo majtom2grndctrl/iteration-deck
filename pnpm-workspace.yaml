@@ -1,6 +1,8 @@
 packages:
   - .
   - examples/*
+  - website
+  - website-2
 
 onlyBuiltDependencies:
   - esbuild
