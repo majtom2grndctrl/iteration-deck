@@ -6,7 +6,7 @@
  */
 
 import { createRef, useState, useEffect } from 'react';
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, cleanup, waitFor, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
@@ -591,6 +591,217 @@ describe('React-Lit Integration (Comprehensive)', () => {
       await waitFor(() => {
         expect(stateDisplay).toHaveTextContent('3');
       });
+    });
+  });
+
+  describe('6. Lit Lifecycle Warning Prevention', () => {
+    it('should not trigger Lit update warnings during React property changes', async () => {
+      const warnings: string[] = [];
+      const originalWarn = console.warn;
+      
+      // Capture console warnings
+      console.warn = vi.fn((message: string) => {
+        warnings.push(message);
+        originalWarn(message);
+      });
+
+      const DynamicProps = ({ deckId, label }: { deckId: string; label: string }) => (
+        <IterationDeck id={deckId} label={label}>
+          <IterationDeckSlide label="Test Slide">
+            <div>Test Content</div>
+          </IterationDeckSlide>
+        </IterationDeck>
+      );
+
+      const { rerender } = render(<DynamicProps deckId="warn-test-1" label="Initial" />);
+
+      // Force React property updates that previously caused Lit warnings
+      rerender(<DynamicProps deckId="warn-test-1" label="Updated 1" />);
+      rerender(<DynamicProps deckId="warn-test-1" label="Updated 2" />);
+      rerender(<DynamicProps deckId="warn-test-1" label="Updated 3" />);
+
+      // Wait for any deferred operations to complete
+      await waitFor(() => {
+        const litWarnings = warnings.filter(msg => 
+          msg.includes('scheduled an update') && 
+          msg.includes('after an update completed')
+        );
+        expect(litWarnings).toHaveLength(0);
+      }, { timeout: 200 });
+
+      // Restore console.warn
+      console.warn = originalWarn;
+    });
+
+    it('should handle rapid React re-renders without Lit lifecycle conflicts', async () => {
+      const errors: string[] = [];
+      const originalError = console.error;
+      
+      console.error = vi.fn((message: string) => {
+        errors.push(message);
+        originalError(message);
+      });
+
+      const RapidUpdate = ({ counter }: { counter: number }) => (
+        <IterationDeck id={`rapid-${counter}`} label={`Rapid ${counter}`}>
+          <IterationDeckSlide label={`Slide ${counter}`}>
+            <div>Counter: {counter}</div>
+          </IterationDeckSlide>
+        </IterationDeck>
+      );
+
+      const { rerender } = render(<RapidUpdate counter={0} />);
+
+      // Rapidly trigger re-renders
+      for (let i = 1; i <= 10; i++) {
+        rerender(<RapidUpdate counter={i} />);
+      }
+
+      // Should not cause any Lit errors
+      await waitFor(() => {
+        const litErrors = errors.filter(msg => 
+          msg.includes('Lit') || 
+          msg.includes('update') ||
+          msg.includes('lifecycle')
+        );
+        expect(litErrors).toHaveLength(0);
+      }, { timeout: 200 });
+
+      console.error = originalError;
+    });
+
+    it('should complete deferred operations within expected timeframes', async () => {
+      const registrationEvents: any[] = [];
+      
+      const TimingTest = ({ id }: { id: string }) => (
+        <IterationDeck 
+          id={id}
+          onDeckRegistered={(event) => registrationEvents.push({
+            deckId: event.detail.deckId,
+            timestamp: Date.now()
+          })}
+        >
+          <IterationDeckSlide label="Timing Slide">
+            <div>Timing Test Content</div>
+          </IterationDeckSlide>
+        </IterationDeck>
+      );
+
+      const startTime = Date.now();
+      render(<TimingTest id="timing-test-deck" />);
+
+      // Deferred registration should complete quickly (within 100ms)
+      await waitFor(() => {
+        expect(registrationEvents).toHaveLength(1);
+        const registrationTime = registrationEvents[0].timestamp - startTime;
+        expect(registrationTime).toBeLessThan(100);
+      }, { timeout: 150 });
+    });
+
+    it('should handle multiple simultaneous deck initializations', async () => {
+      const warnings: string[] = [];
+      const originalWarn = console.warn;
+      console.warn = vi.fn((msg: string) => warnings.push(msg));
+
+      const MultiDeckInit = () => (
+        <div>
+          <IterationDeck id="multi-init-1" label="Deck 1">
+            <IterationDeckSlide label="Slide 1A">Content 1A</IterationDeckSlide>
+            <IterationDeckSlide label="Slide 1B">Content 1B</IterationDeckSlide>
+          </IterationDeck>
+          <IterationDeck id="multi-init-2" label="Deck 2">
+            <IterationDeckSlide label="Slide 2A">Content 2A</IterationDeckSlide>
+            <IterationDeckSlide label="Slide 2B">Content 2B</IterationDeckSlide>
+          </IterationDeck>
+          <IterationDeck id="multi-init-3" label="Deck 3">
+            <IterationDeckSlide label="Slide 3A">Content 3A</IterationDeckSlide>
+            <IterationDeckSlide label="Slide 3B">Content 3B</IterationDeckSlide>
+          </IterationDeck>
+        </div>
+      );
+
+      render(<MultiDeckInit />);
+
+      // Multiple decks initializing simultaneously should not cause warnings
+      await waitFor(() => {
+        const litWarnings = warnings.filter(msg => 
+          msg.includes('scheduled an update') ||
+          msg.includes('lifecycle')
+        );
+        expect(litWarnings).toHaveLength(0);
+      }, { timeout: 200 });
+
+      console.warn = originalWarn;
+    });
+  });
+
+  describe('7. Error Boundary and Edge Cases', () => {
+    it('should handle invalid deck IDs without lifecycle warnings', async () => {
+      const warnings: string[] = [];
+      const errors: string[] = [];
+      const originalWarn = console.warn;
+      const originalError = console.error;
+      
+      console.warn = vi.fn((msg: string) => warnings.push(msg));
+      console.error = vi.fn((msg: string) => errors.push(msg));
+
+      // Test various invalid deck IDs
+      const InvalidDeckTest = () => (
+        <div>
+          <IterationDeck id="" label="Empty ID">
+            <IterationDeckSlide label="Slide">Content</IterationDeckSlide>
+          </IterationDeck>
+          <IterationDeck id="   " label="Whitespace ID">
+            <IterationDeckSlide label="Slide">Content</IterationDeckSlide>
+          </IterationDeck>
+        </div>
+      );
+
+      render(<InvalidDeckTest />);
+
+      await waitFor(() => {
+        // Should log appropriate errors for invalid IDs
+        const deckErrors = errors.filter(msg => 
+          msg.includes('IterationDeck requires an id') || 
+          msg.includes('Invalid deck ID format')
+        );
+        expect(deckErrors.length).toBeGreaterThan(0);
+
+        // But should NOT cause lifecycle warnings
+        const lifecycleWarnings = warnings.filter(msg => 
+          msg.includes('scheduled an update') && 
+          msg.includes('after an update completed')
+        );
+        expect(lifecycleWarnings).toHaveLength(0);
+      }, { timeout: 100 });
+
+      console.warn = originalWarn;
+      console.error = originalError;
+    });
+
+    it('should handle empty decks without lifecycle issues', async () => {
+      const warnings: string[] = [];
+      const originalWarn = console.warn;
+      console.warn = vi.fn((msg: string) => warnings.push(msg));
+
+      const EmptyDeckTest = () => (
+        <IterationDeck id="empty-deck" label="Empty Deck">
+          {/* No slides */}
+        </IterationDeck>
+      );
+
+      render(<EmptyDeckTest />);
+
+      await waitFor(() => {
+        // Should not cause lifecycle warnings even with no slides
+        const litWarnings = warnings.filter(msg => 
+          msg.includes('scheduled an update') && 
+          msg.includes('after an update completed')
+        );
+        expect(litWarnings).toHaveLength(0);
+      }, { timeout: 100 });
+
+      console.warn = originalWarn;
     });
   });
 });

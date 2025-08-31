@@ -92,6 +92,9 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
   @state()
   private isDevelopment = false;
 
+  @state()
+  private isInitializing = true;
+
   // Lit-specific slot content query (TypeScript-friendly)
   @queryAssignedElements()
   private _slottedElements!: HTMLElement[];
@@ -113,12 +116,12 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
   }
 
   /**
-   * Lifecycle: Setup store subscription and register with parent deck
+   * Lifecycle: Setup basic properties and defer store setup
    */
   override connectedCallback() {
     super.connectedCallback();
     
-    // Get initial store state
+    // Get initial store state (no subscriptions yet)
     const storeState = getIterationStoreState();
     this.isDevelopment = !storeState.isProduction;
     
@@ -132,11 +135,13 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
                              generateSlideId(this.deckId || 'unknown', this.label || 'slide');
     }
     
-    // Subscribe to store changes
-    this.subscribeToStore();
-    
-    // Initial active state check
-    this.updateActiveState();
+    // Defer store subscription to avoid React render conflicts
+    // Use setTimeout to ensure React's render cycle is complete
+    setTimeout(() => {
+      this.subscribeToStore();
+      this.updateActiveState();
+      this.isInitializing = false; // Now ready for proper visibility management
+    }, 0);
   }
 
   /**
@@ -211,8 +216,9 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
   override render() {
     const containerClasses = [
       'slide-container',
-      this.isActive ? 'active' : 'inactive'
-    ].join(' ');
+      this.isActive ? 'active' : 'inactive',
+      this.isInitializing ? 'initializing' : ''
+    ].filter(Boolean).join(' ');
 
     return html`
       <div class="${containerClasses}">
