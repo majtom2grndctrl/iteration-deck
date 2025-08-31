@@ -153,9 +153,9 @@ export const isNavigationShortcut = (event: KeyboardEvent): NavigationDirection 
   if (!isModified) return null;
   
   switch (key) {
-    case 'ArrowLeft':
+    case '[':
       return 'prev';
-    case 'ArrowRight':
+    case ']':
       return 'next';
     case 'Home':
       return 'first';

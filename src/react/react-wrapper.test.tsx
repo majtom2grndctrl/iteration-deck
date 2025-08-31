@@ -4,7 +4,7 @@
  * Tests React-Lit interop with property vs attribute handling and ref forwarding
  */
 
-import React, { createRef } from 'react';
+import { createRef } from 'react';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { render, cleanup, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
