@@ -40,27 +40,29 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
   static styles = css`
     :host {
       display: block;
+      min-height: 1px; /* Prevent total collapse */
     }
     
     .slide-container {
       display: block;
+      min-height: inherit;
+      position: relative; /* For debug label positioning */
     }
     
     .slide-container.active {
       display: block;
     }
     
+    /* Hide inactive slides properly once deck IDs are resolved */
     .slide-container.inactive {
       display: none;
     }
     
     .slide-content {
       display: block;
+      min-height: inherit;
     }
     
-    :host([aria-hidden="true"]) {
-      display: none;
-    }
   `;
 
   // Public properties from IterationDeckSlideProps interface
@@ -92,6 +94,9 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
   @state()
   private isDevelopment = false;
 
+  @state()
+  private isInitializing = true;
+
   // Lit-specific slot content query (TypeScript-friendly)
   @queryAssignedElements()
   private _slottedElements!: HTMLElement[];
@@ -113,17 +118,37 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
   }
 
   /**
-   * Lifecycle: Setup store subscription and register with parent deck
+   * Lifecycle: Setup basic properties and defer store setup
    */
   override connectedCallback() {
     super.connectedCallback();
     
-    // Get initial store state
+    // Get initial store state (no subscriptions yet)
     const storeState = getIterationStoreState();
     this.isDevelopment = !storeState.isProduction;
     
     // Find parent deck element
     this.findParentDeck();
+    
+    // If we couldn't find the parent deck, try again after a short delay
+    // This handles cases where React hasn't finished rendering the parent yet
+    if (!this.deckId) {
+      setTimeout(() => {
+        this.findParentDeck();
+        // Regenerate slide ID with proper deck context
+        if (this.deckId) {
+          this._internalSlideId = this.slideId || 
+                                 this.getAttribute('slide-id') ||
+                                 generateSlideId(this.deckId, this.label || 'slide');
+          
+          // Update the active state now that we have the correct deck and slide IDs
+          this.updateActiveState();
+          
+          // Force a re-render to update the visual state
+          this.requestUpdate();
+        }
+      }, 10);
+    }
     
     // Generate internal slide ID now that we have deck context
     if (!this._internalSlideId) {
@@ -132,11 +157,13 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
                              generateSlideId(this.deckId || 'unknown', this.label || 'slide');
     }
     
-    // Subscribe to store changes
-    this.subscribeToStore();
-    
-    // Initial active state check
-    this.updateActiveState();
+    // Defer store subscription to avoid React render conflicts
+    // Use setTimeout to ensure React's render cycle is complete
+    setTimeout(() => {
+      this.subscribeToStore();
+      this.updateActiveState();
+      this.isInitializing = false; // Now ready for proper visibility management
+    }, 0);
   }
 
   /**
@@ -152,6 +179,7 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
    */
   private findParentDeck() {
     let parent = this.parentElement;
+    
     while (parent && parent.tagName !== 'ITERATION-DECK') {
       parent = parent.parentElement;
     }
@@ -192,15 +220,23 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
     const activeSlideId = state.activeDecks[this.deckId];
     const newIsActive = activeSlideId === this._internalSlideId;
     
+    // If no active slide is set yet, treat first slide as active to prevent zero height
+    const isFirstSlide = !activeSlideId && this.parentElement && 
+                         this.parentElement.querySelector('iteration-deck-slide') === this;
+    
+    const shouldBeActive = newIsActive || !!isFirstSlide;
+    
+    
     // Only update if state actually changed
-    if (newIsActive !== this.isActive) {
-      this.isActive = newIsActive;
+    if (shouldBeActive !== this.isActive) {
+      this.isActive = shouldBeActive;
       
       // Update ARIA attributes for accessibility
       this.setAttribute('aria-hidden', this.isActive ? 'false' : 'true');
       this.setAttribute('role', 'tabpanel');
       
       // Lit automatically re-renders when @state() properties change
+      this.requestUpdate(); // Force a re-render to ensure visual update
     }
   }
 
@@ -211,16 +247,36 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
   override render() {
     const containerClasses = [
       'slide-container',
-      this.isActive ? 'active' : 'inactive'
-    ].join(' ');
+      this.isActive ? 'active' : 'inactive',
+      this.isInitializing ? 'initializing' : ''
+    ].filter(Boolean).join(' ');
 
     return html`
       <div class="${containerClasses}">
         <div class="slide-content">
-          <slot></slot>
+          <slot @slotchange=${this.handleSlotChange}></slot>
         </div>
       </div>
     `;
+  }
+
+  /**
+   * Handle slot content changes
+   */
+  private handleSlotChange(e: Event) {
+    const slot = e.target as HTMLSlotElement;
+    const slottedElements = slot.assignedElements();
+
+    // If we have slotted content and we're the first slide, make sure we're active
+    if (slottedElements.length > 0 && this.deckId && !this.isActive) {
+      const store = getIterationStoreState();
+      const activeSlide = store.getActiveSlide(this.deckId);
+      
+      // If no slide is active yet, activate this one
+      if (!activeSlide) {
+        store.setActiveSlide(this.deckId, this._internalSlideId);
+      }
+    }
   }
 
   /**
