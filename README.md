@@ -27,7 +27,7 @@ pnpm build        # Build the package
 pnpm pack         # Create a tarball (iteration-deck-0.0.0.tgz)
 
 # In your target project
-npm install /path/to/iteration-deck/iteration-deck-0.0.0.tgz
+npm install iteration-deck
 ```
 
 ### Basic usage
@@ -43,7 +43,6 @@ Iteration Deck is designed to work seamlessly with AI coding agents like Claude,
 **🤖 For AI Coding Agents:** See the included instruction files:
 - [`AI_INSTRUCTIONS.md`](./AI_INSTRUCTIONS.md) - Complete guidance on when and how to use iteration-deck
 - [`AI_EXAMPLES.md`](./AI_EXAMPLES.md) - Working code examples for common use cases  
-- [`AI_QUICK_REFERENCE.md`](./AI_QUICK_REFERENCE.md) - Quick reference for trigger phrases and patterns
 
 Here are example prompts and expected outputs:
 
@@ -58,7 +57,7 @@ Include hover states and accessibility features.
 
 **Expected AI Output:**
 ```tsx
-import { IterationDeck, IterationDeckSlide } from '@iteration-deck/core/react';
+import { IterationDeck, IterationDeckSlide } from 'iteration-deck/react';
 
 function ButtonVariations() {
   return (

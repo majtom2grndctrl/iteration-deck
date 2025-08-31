@@ -11,15 +11,15 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
+    "iteration-deck": "workspace:*",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1",
-    "iteration-deck": "workspace:*"
+    "react-dom": "^19.1.1"
   },
   "devDependencies": {
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
-    "@vitejs/plugin-react": "^4.2.1",
+    "@vitejs/plugin-react": "^5.0.2",
     "typescript": "^5.2.2",
-    "vite": "^5.2.0"
+    "vite": "^5.4.19"
   }
 }

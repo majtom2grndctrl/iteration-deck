@@ -140,14 +140,17 @@ export class IterationDeck extends LitElement {
   static styles = css`
     :host {
       display: block;
+      min-height: 1px; /* Prevent total collapse */
     }
     
     .iteration-deck-container {
       display: block;
+      min-height: inherit;
     }
     
     .iteration-deck-content {
       display: block;
+      min-height: inherit;
     }
   `;
 
