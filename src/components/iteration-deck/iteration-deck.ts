@@ -168,22 +168,17 @@ export class IterationDeck extends LitElement {
       return;
     }
 
-    // Subscribe to store changes
-    this._subscribeToStore();
-    
     // Set up slot observation for dynamic slide detection
     this._setupSlotObserver();
     
     // Ensure global toolbar is mounted (development mode only)
     ensureToolbarMounted();
     
-    // Initial slide detection and registration - wait for slides to connect
-    this.updateComplete.then(() => {
-      // Use a small delay to ensure all child slides are connected
-      setTimeout(() => {
-        this._detectSlidesAndRegister();
-      }, 100);
-    });
+    // Defer store operations to avoid React render conflicts
+    setTimeout(() => {
+      this._subscribeToStore();
+      this._detectSlidesAndRegister();
+    }, 0);
   }
 
   /**
@@ -222,8 +217,11 @@ export class IterationDeck extends LitElement {
     super.updated(changedProperties);
     
     // If id, label, or slides changed, re-register the deck
+    // Defer to avoid calling requestUpdate() during Lit's update cycle
     if (changedProperties.has('id') || changedProperties.has('label')) {
-      this._detectSlidesAndRegister();
+      setTimeout(() => {
+        this._detectSlidesAndRegister();
+      }, 0);
     }
   }
 
@@ -233,11 +231,14 @@ export class IterationDeck extends LitElement {
    */
   private _subscribeToStore(): void {
     this._unsubscribeStore = subscribeToIterationStore((state: IterationStore) => {
+      // Use requestUpdate instead of direct state property updates to avoid timing conflicts
       const newActiveSlideId = state.activeDecks[this.id] || '';
       const previousSlideId = this._activeSlideId;
       
       // Update active slide if changed
       if (newActiveSlideId !== previousSlideId) {
+        // Schedule the update for next tick to avoid render conflicts
+        this.requestUpdate('_activeSlideId', previousSlideId);
         this._activeSlideId = newActiveSlideId;
         
         // Fire slide change event (only if both slides exist)
@@ -260,6 +261,7 @@ export class IterationDeck extends LitElement {
       // Update production mode if changed  
       const newIsProduction = state.isProduction;
       if (newIsProduction !== this._isProduction) {
+        this.requestUpdate('_isProduction', this._isProduction);
         this._isProduction = newIsProduction;
       }
     });
@@ -302,8 +304,8 @@ export class IterationDeck extends LitElement {
       return;
     }
 
-    // Extract slide data from elements
-    this._slides = slideElements.map((element, index) => {
+    // Extract slide data from elements and update state safely
+    const newSlides = slideElements.map((element, index) => {
       const label = element.getAttribute('label') || `Slide ${index + 1}`;
       const slideId = element.getAttribute('id') || 
                      element.getAttribute('slide-id') ||
@@ -325,6 +327,12 @@ export class IterationDeck extends LitElement {
       };
     });
 
+    // Update slides state properly
+    if (JSON.stringify(newSlides.map(s => s.id)) !== JSON.stringify(this._slides.map(s => s.id))) {
+      this.requestUpdate('_slides', this._slides);
+      this._slides = newSlides;
+    }
+
     // Register with store
     this._registerWithStore();
   }
@@ -344,9 +352,19 @@ export class IterationDeck extends LitElement {
     // Register deck with all slide IDs and label
     store.registerDeck(this.id, slideIds, this.label);
     
-    // Get the active slide that was set during registration
-    this._activeSlideId = store.getActiveSlide(this.id) || slideIds[0];
-    this._isRegistered = true;
+    // Get the active slide that was set during registration and update properties safely
+    const activeSlideId = store.getActiveSlide(this.id) || slideIds[0];
+    
+    // Use requestUpdate to properly schedule the state changes
+    if (activeSlideId !== this._activeSlideId) {
+      this.requestUpdate('_activeSlideId', this._activeSlideId);
+      this._activeSlideId = activeSlideId;
+    }
+    
+    if (!this._isRegistered) {
+      this.requestUpdate('_isRegistered', this._isRegistered);
+      this._isRegistered = true;
+    }
 
     // Fire registration event
     this.dispatchEvent(new CustomEvent('deck-registered', {
