@@ -1,0 +1,109 @@
+/**
+ * Core Utilities Tests
+ * 
+ * Tests essential keyboard navigation and utility functions
+ */
+
+import { describe, it, expect } from 'vitest';
+import { isNavigationShortcut } from './utilities.js';
+
+describe('Keyboard Navigation', () => {
+  describe('isNavigationShortcut', () => {
+    it('should detect Ctrl+[ as previous navigation', () => {
+      const event = new KeyboardEvent('keydown', {
+        key: '[',
+        ctrlKey: true,
+        metaKey: false
+      });
+      
+      expect(isNavigationShortcut(event)).toBe('prev');
+    });
+
+    it('should detect Cmd+[ as previous navigation', () => {
+      const event = new KeyboardEvent('keydown', {
+        key: '[',
+        ctrlKey: false,
+        metaKey: true
+      });
+      
+      expect(isNavigationShortcut(event)).toBe('prev');
+    });
+
+    it('should detect Ctrl+] as next navigation', () => {
+      const event = new KeyboardEvent('keydown', {
+        key: ']',
+        ctrlKey: true,
+        metaKey: false
+      });
+      
+      expect(isNavigationShortcut(event)).toBe('next');
+    });
+
+    it('should detect Cmd+] as next navigation', () => {
+      const event = new KeyboardEvent('keydown', {
+        key: ']',
+        ctrlKey: false,
+        metaKey: true
+      });
+      
+      expect(isNavigationShortcut(event)).toBe('next');
+    });
+
+    it('should detect Ctrl+Home as first navigation', () => {
+      const event = new KeyboardEvent('keydown', {
+        key: 'Home',
+        ctrlKey: true,
+        metaKey: false
+      });
+      
+      expect(isNavigationShortcut(event)).toBe('first');
+    });
+
+    it('should detect Ctrl+End as last navigation', () => {
+      const event = new KeyboardEvent('keydown', {
+        key: 'End',
+        ctrlKey: true,
+        metaKey: false
+      });
+      
+      expect(isNavigationShortcut(event)).toBe('last');
+    });
+
+    it('should return null for non-modified keys', () => {
+      const event = new KeyboardEvent('keydown', {
+        key: '[',
+        ctrlKey: false,
+        metaKey: false
+      });
+      
+      expect(isNavigationShortcut(event)).toBeNull();
+    });
+
+    it('should return null for unknown keys', () => {
+      const event = new KeyboardEvent('keydown', {
+        key: 'a',
+        ctrlKey: true,
+        metaKey: false
+      });
+      
+      expect(isNavigationShortcut(event)).toBeNull();
+    });
+
+    it('should not detect old arrow key shortcuts', () => {
+      const leftEvent = new KeyboardEvent('keydown', {
+        key: 'ArrowLeft',
+        ctrlKey: true,
+        metaKey: false
+      });
+      
+      const rightEvent = new KeyboardEvent('keydown', {
+        key: 'ArrowRight',
+        ctrlKey: true,
+        metaKey: false
+      });
+      
+      expect(isNavigationShortcut(leftEvent)).toBeNull();
+      expect(isNavigationShortcut(rightEvent)).toBeNull();
+    });
+  });
+});

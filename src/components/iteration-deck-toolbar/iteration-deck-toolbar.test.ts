@@ -137,4 +137,82 @@ describe('IterationDeckToolbar Essential Tests', () => {
       expect(subscribeToIterationStore).toHaveBeenCalled();
     });
   });
+
+  describe('Keyboard Navigation', () => {
+    beforeEach(async () => {
+      const { isDevelopmentMode } = await import('../../store/iteration-store.js');
+      vi.mocked(isDevelopmentMode).mockReturnValue(true);
+    });
+
+    it('should register keyboard event listener on connect', async () => {
+      const addEventListenerSpy = vi.spyOn(document, 'addEventListener');
+      
+      toolbar = document.createElement('iteration-deck-toolbar') as IterationDeckToolbar;
+      document.body.appendChild(toolbar);
+      
+      // Wait for connectedCallback
+      await new Promise(resolve => setTimeout(resolve, 10));
+      
+      expect(addEventListenerSpy).toHaveBeenCalledWith(
+        'keydown',
+        expect.any(Function)
+      );
+      
+      addEventListenerSpy.mockRestore();
+    });
+
+    it('should remove keyboard event listener on disconnect', async () => {
+      const removeEventListenerSpy = vi.spyOn(document, 'removeEventListener');
+      
+      toolbar = document.createElement('iteration-deck-toolbar') as IterationDeckToolbar;
+      document.body.appendChild(toolbar);
+      
+      // Wait for connectedCallback
+      await new Promise(resolve => setTimeout(resolve, 10));
+      
+      toolbar.remove();
+      
+      expect(removeEventListenerSpy).toHaveBeenCalledWith(
+        'keydown',
+        expect.any(Function)
+      );
+      
+      removeEventListenerSpy.mockRestore();
+    });
+
+    it('should ignore keyboard events in form elements', async () => {
+      toolbar = document.createElement('iteration-deck-toolbar') as IterationDeckToolbar;
+      document.body.appendChild(toolbar);
+      
+      // Wait for connectedCallback
+      await new Promise(resolve => setTimeout(resolve, 10));
+      
+      // Create a mock input element
+      const input = document.createElement('input');
+      document.body.appendChild(input);
+      input.focus();
+      
+      // Simulate keyboard event on input
+      const event = new KeyboardEvent('keydown', {
+        key: '[',
+        ctrlKey: true,
+        bubbles: true
+      });
+      
+      Object.defineProperty(event, 'target', { 
+        value: input,
+        configurable: true
+      });
+      
+      // Should not prevent default when target is input
+      const preventDefaultSpy = vi.spyOn(event, 'preventDefault');
+      
+      document.dispatchEvent(event);
+      
+      expect(preventDefaultSpy).not.toHaveBeenCalled();
+      
+      input.remove();
+      preventDefaultSpy.mockRestore();
+    });
+  });
 });

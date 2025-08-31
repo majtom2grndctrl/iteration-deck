@@ -13,7 +13,7 @@ Iteration Deck changes that, enabling designers and product managers to compare 
 
 - 🎯 **AI-First Design**: Built specifically for AI-generated UI variation workflows
 - 🔧 **Universal Framework Support**: Works with React, Vue, Angular, Astro, and vanilla HTML
-- ⌨️ **Keyboard Navigation**: Cmd/Ctrl + Arrow keys for quick iteration switching
+- ⌨️ **Keyboard Navigation**: Cmd/Ctrl + [ ] keys for quick iteration switching
 
 ## Getting started
 
@@ -330,8 +330,8 @@ In production builds, only the first slide of each deck renders:
 
 ### Keyboard shortcuts
 
-- **Cmd/Ctrl + ←**: Previous slide in active deck
-- **Cmd/Ctrl + →**: Next slide in active deck
+- **Cmd/Ctrl + [**: Previous slide in active deck
+- **Cmd/Ctrl + ]**: Next slide in active deck
 - **Click deck in toolbar**: Switch active deck (when multiple decks present)
 
 ## Framework support

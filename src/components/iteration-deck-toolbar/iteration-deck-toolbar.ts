@@ -10,7 +10,7 @@
  * - Development mode only (hidden in production)
  * - Multi-deck dropdown selector
  * - Previous/Next navigation for active deck
- * - Global keyboard shortcuts (Ctrl/Cmd + Arrow keys)
+ * - Global keyboard shortcuts (Ctrl/Cmd + [ ] keys)
  * - Accessible UI with ARIA labels and focus management
  * - Dynamic deck registration/unregistration handling
  */
@@ -852,8 +852,8 @@ export class IterationDeckToolbar extends LitElement {
               class="nav-button nav-button-first"
               @click=${this.handlePrevSlide}
               ?disabled=${!this.canNavigatePrev()}
-              aria-label="Previous slide (Ctrl/Cmd + Left Arrow)"
-              title="Previous slide (Ctrl/Cmd + ←)"
+              aria-label="Previous slide (Ctrl/Cmd + [)"
+              title="Previous slide (Ctrl/Cmd + [)"
             >
               ◀
             </button>
@@ -862,8 +862,8 @@ export class IterationDeckToolbar extends LitElement {
               class="nav-button nav-button-last"
               @click=${this.handleNextSlide}
               ?disabled=${!this.canNavigateNext()}
-              aria-label="Next slide (Ctrl/Cmd + Right Arrow)"
-              title="Next slide (Ctrl/Cmd + →)"
+              aria-label="Next slide (Ctrl/Cmd + ])"
+              title="Next slide (Ctrl/Cmd + ])"
             >
               ▶
             </button>
