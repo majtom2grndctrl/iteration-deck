@@ -40,13 +40,11 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
   static styles = css`
     :host {
       display: block;
-      min-height: 1px; /* Prevent total collapse */
     }
     
     .slide-container {
       display: block;
       min-height: inherit;
-      position: relative; /* For debug label positioning */
     }
     
     .slide-container.active {
