@@ -3,9 +3,9 @@
 [![npm version](https://badge.fury.io/js/@iteration-deck%2Fcore.svg)](https://badge.fury.io/js/@iteration-deck%2Fcore)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-> **AI-first prototyping web components for comparing interactive UI variations**
+> AI-first prototyping tool that helps you rapidly compare iterations live in-browser.
 
-One thing that Figma does really well is: It makes it easy to iterate quickly and non-destructively. When we design in code, we don’t had good ways to do that quite like in Figma.
+One thing that Figma does really well is: It makes it easy to iterate quickly and non-destructively. When we design in code, we don’t have good ways to do that quite like in Figma.
 
 Iteration Deck changes that, enabling designers and product managers to compare AI-generated UI variations in live, interactive prototypes. Built with Lit web components and manual React wrappers, it works with any framework while providing excellent developer experience.
 
@@ -17,35 +17,15 @@ Iteration Deck changes that, enabling designers and product managers to compare 
 
 ## Getting started
 
-### Local development installation
-
-To install and test this package locally in other projects:
-
-```bash
-# In this repository
-pnpm build        # Build the package
-pnpm pack         # Create a tarball (iteration-deck-0.0.0.tgz)
-
-# In your target project
-npm install /path/to/iteration-deck/iteration-deck-0.0.0.tgz
 ```
-
-### Basic usage
-
-Once the package is installed, prompt your coding agent to build out multiple versions of a feature. See examples below.
+npm install iteration-deck
+```
 
 ## AI workflow examples
 
 ### Working with AI coding agents
 
-Iteration Deck is designed to work seamlessly with AI coding agents like Claude, ChatGPT, and others. 
-
-**🤖 For AI Coding Agents:** See the included instruction files:
-- [`AI_INSTRUCTIONS.md`](./AI_INSTRUCTIONS.md) - Complete guidance on when and how to use iteration-deck
-- [`AI_EXAMPLES.md`](./AI_EXAMPLES.md) - Working code examples for common use cases  
-- [`AI_QUICK_REFERENCE.md`](./AI_QUICK_REFERENCE.md) - Quick reference for trigger phrases and patterns
-
-Here are example prompts and expected outputs:
+Iteration Deck is built for designers who use AI coding agents like Claude, ChatGPT, and others.
 
 #### Example 1: Creating button variations
 
@@ -257,6 +237,11 @@ function DashboardCards({ data, isLoading }) {
   );
 }
 ```
+
+## **🤖 For AI Coding Agents:** See the included instruction files:
+- [`AI_INSTRUCTIONS.md`](./AI_INSTRUCTIONS.md) - Complete guidance on when and how to use iteration-deck
+- [`AI_EXAMPLES.md`](./AI_EXAMPLES.md) - Working code examples for common use cases  
+- [`AI_QUICK_REFERENCE.md`](./AI_QUICK_REFERENCE.md) - Quick reference for trigger phrases and patterns
 
 ## API reference
 
