@@ -385,8 +385,8 @@ export class IterationDeckToolbar extends LitElement {
   connectedCallback() {
     super.connectedCallback();
     
-    // Only mount in development mode
-    if (!isDevelopmentMode()) {
+    // Only mount in development mode (or if any deck has development features enabled in production)
+    if (!this.shouldShowToolbar()) {
       return;
     }
 
@@ -423,6 +423,25 @@ export class IterationDeckToolbar extends LitElement {
     if (toolbarInstance === this) {
       toolbarInstance = null;
     }
+  }
+
+  /**
+   * Check if any deck has development features enabled in production or if we're in natural development mode
+   */
+  private shouldShowToolbar(): boolean {
+    if (isDevelopmentMode()) {
+      return true;
+    }
+    
+    // Check if any deck has development features enabled in production
+    const deckElements = document.querySelectorAll('iteration-deck');
+    for (const deckElement of deckElements) {
+      if (deckElement.hasAttribute('enable-in-production')) {
+        return true;
+      }
+    }
+    
+    return false;
   }
 
   /**
@@ -804,8 +823,8 @@ export class IterationDeckToolbar extends LitElement {
   }
 
   render() {
-    // Don't render in production mode
-    if (!isDevelopmentMode()) {
+    // Don't render in production mode (unless any deck is forcing dev mode)
+    if (!this.shouldShowToolbar()) {
       return nothing;
     }
 
@@ -882,12 +901,31 @@ export class IterationDeckToolbar extends LitElement {
 }
 
 /**
+ * Check if any deck has development features enabled in production
+ */
+function shouldShowToolbarGlobally(): boolean {
+  if (isDevelopmentMode()) {
+    return true;
+  }
+  
+  // Check if any deck has development features enabled in production
+  const deckElements = document.querySelectorAll('iteration-deck');
+  for (const deckElement of deckElements) {
+    if (deckElement.hasAttribute('enable-in-production')) {
+      return true;
+    }
+  }
+  
+  return false;
+}
+
+/**
  * Utility function to ensure toolbar is mounted
  * Called by IterationDeck components when they connect
  */
 export function ensureToolbarMounted(): void {
-  // Only mount in development mode
-  if (!isDevelopmentMode()) {
+  // Only mount in development mode or if any deck has development features enabled in production
+  if (!shouldShowToolbarGlobally()) {
     return;
   }
 

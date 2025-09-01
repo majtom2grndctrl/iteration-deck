@@ -57,14 +57,38 @@ export interface IterationStore {
   
   /** Sets the selected deck for toolbar navigation */
   setSelectedDeck: (deckId: string) => void;
+  
+  /** For testing: Override production mode */
+  _setProductionModeForTesting?: (isProduction: boolean) => void;
 }
 
 // Simple store implementation
 class SimpleStore implements IterationStore {
   activeDecks: Record<string, string> = {};
   deckMetadata: Record<string, DeckMetadata> = {};
-  isProduction = !isDevelopment();
   selectedDeckId?: string;
+  
+  // For testing: allow overriding production mode
+  private _testProductionModeOverride?: boolean;
+  
+  /**
+   * Dynamic production state check to support test mocking
+   */
+  get isProduction(): boolean {
+    if (this._testProductionModeOverride !== undefined) {
+      return this._testProductionModeOverride;
+    }
+    return !isDevelopment();
+  }
+  
+  /**
+   * For testing: Override production mode
+   */
+  _setProductionModeForTesting(isProduction: boolean): void {
+    this._testProductionModeOverride = isProduction;
+    // Notify listeners of the change
+    this.notifyListeners();
+  }
   
   constructor() {
     // Store initialized
