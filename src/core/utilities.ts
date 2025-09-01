@@ -147,15 +147,15 @@ export const throttle = <T extends (...args: any[]) => any>(
  * Check if a keyboard event is a navigation shortcut
  */
 export const isNavigationShortcut = (event: KeyboardEvent): NavigationDirection | null => {
-  const { key, metaKey, ctrlKey } = event;
-  const isModified = metaKey || ctrlKey;
+  const { code, metaKey, ctrlKey, altKey } = event;
+  const isModified = (metaKey || ctrlKey) && altKey;
   
   if (!isModified) return null;
   
-  switch (key) {
-    case '[':
+  switch (code) {
+    case 'BracketLeft':
       return 'prev';
-    case ']':
+    case 'BracketRight':
       return 'next';
     case 'Home':
       return 'first';
