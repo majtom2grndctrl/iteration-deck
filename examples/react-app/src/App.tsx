@@ -262,6 +262,96 @@ function App() {
           </IterationDeck>
         </section>
 
+        {/* Demo 4: Production Override Example */}
+        <section className="demo-section">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">🚀 Production Override Demo</h2>
+          <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-4">
+            <h3 className="font-medium text-orange-900 mb-2">✨ New Feature: enableInProduction</h3>
+            <p className="text-orange-800 text-sm mb-2">
+              By default, IterationDeck only shows the first slide in production builds. 
+              The <code className="bg-orange-100 px-1 rounded">enableInProduction</code> prop allows you to show all slides and the toolbar even in production.
+            </p>
+            <p className="text-orange-800 text-sm">
+              This is useful for design reviews, A/B testing, or when you need iteration functionality in production environments.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
+              <h3 className="font-medium text-gray-900 mb-3">🚫 Default Production Behavior</h3>
+              <p className="text-gray-600 text-sm mb-3">Only first slide shows, no toolbar</p>
+              <IterationDeck 
+                id="prod-default" 
+                label="Default (Production)"
+                onSlideChange={(e: CustomEvent) => addDebugMessage(`Prod Default: ${e.detail.currentSlideId}`)}
+              >
+                <IterationDeckSlide label="Primary Button">
+                  <div className="bg-white border border-gray-200 rounded-lg p-4">
+                    <h4 className="font-medium text-gray-900">Primary CTA</h4>
+                    <button className="bg-blue-600 text-white px-4 py-2 rounded mt-2 hover:bg-blue-700">
+                      Get Started
+                    </button>
+                  </div>
+                </IterationDeckSlide>
+                <IterationDeckSlide label="Secondary Button">
+                  <div className="bg-white border border-gray-200 rounded-lg p-4">
+                    <h4 className="font-medium text-gray-900">Secondary CTA</h4>
+                    <button className="bg-gray-100 text-gray-900 px-4 py-2 rounded mt-2 hover:bg-gray-200">
+                      Get Started
+                    </button>
+                  </div>
+                </IterationDeckSlide>
+              </IterationDeck>
+            </div>
+            
+            <div>
+              <h3 className="font-medium text-gray-900 mb-3">✅ With enableInProduction</h3>
+              <p className="text-gray-600 text-sm mb-3">All slides available, toolbar appears</p>
+              <IterationDeck 
+                id="prod-enabled" 
+                label="Enabled (Production)"
+                enableInProduction={true}
+                onSlideChange={(e: CustomEvent) => addDebugMessage(`Prod Enabled: ${e.detail.currentSlideId}`)}
+              >
+                <IterationDeckSlide label="Primary Button">
+                  <div className="bg-white border border-gray-200 rounded-lg p-4">
+                    <h4 className="font-medium text-gray-900">Primary CTA</h4>
+                    <button className="bg-blue-600 text-white px-4 py-2 rounded mt-2 hover:bg-blue-700">
+                      Get Started
+                    </button>
+                  </div>
+                </IterationDeckSlide>
+                <IterationDeckSlide label="Secondary Button">
+                  <div className="bg-white border border-gray-200 rounded-lg p-4">
+                    <h4 className="font-medium text-gray-900">Secondary CTA</h4>
+                    <button className="bg-gray-100 text-gray-900 px-4 py-2 rounded mt-2 hover:bg-gray-200">
+                      Get Started
+                    </button>
+                  </div>
+                </IterationDeckSlide>
+                <IterationDeckSlide label="Gradient Button">
+                  <div className="bg-white border border-gray-200 rounded-lg p-4">
+                    <h4 className="font-medium text-gray-900">Gradient CTA</h4>
+                    <button className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-4 py-2 rounded mt-2 hover:from-purple-600 hover:to-blue-600">
+                      Get Started
+                    </button>
+                  </div>
+                </IterationDeckSlide>
+              </IterationDeck>
+            </div>
+          </div>
+          
+          <div className="mt-6 bg-gray-50 border border-gray-200 rounded-lg p-4">
+            <h4 className="font-medium text-gray-900 mb-2">💡 Usage Examples</h4>
+            <div className="text-sm text-gray-700 space-y-1">
+              <div><strong>Design Reviews:</strong> Show stakeholders different options in production</div>
+              <div><strong>A/B Testing:</strong> Keep variations available for testing tools</div>
+              <div><strong>Analytics:</strong> Compare performance of different designs live</div>
+              <div><strong>Marketing:</strong> Let teams switch between campaign variations</div>
+            </div>
+          </div>
+        </section>
+
         {/* React-Specific Features */}
         <section className="demo-section">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">React Integration Features</h2>
