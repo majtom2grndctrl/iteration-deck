@@ -185,7 +185,7 @@ Single global toolbar (singleton pattern) with intelligent multi-deck support:
 - **Deck selector dropdown** (appears when multiple IterationDecks are present)
 - Previous/Next navigation for the currently active deck
 - Current slide label display for active deck
-- Keyboard shortcuts (Ctrl/Cmd + [ ] keys) operate on active deck only
+- Keyboard shortcuts (Cmd/Ctrl+Alt+[ or ]) operate on active deck only
 - **ShadowDOM-encapsulated styling** via Lit CSS tagged template literals
 
 ### Multi-Deck Behavior
@@ -361,7 +361,7 @@ import { IterationDeck, IterationDeckSlide } from '@iteration-deck/astro';
 ### Development Mode
 - **Global toolbar**: Single Lit toolbar component for all IterationDeck instances
 - **Multi-deck support**: Dropdown selector when multiple decks present
-- **Keyboard shortcuts**: Ctrl/Cmd + [ ] keys for navigation via Lit event listeners
+- **Keyboard shortcuts**: Cmd/Ctrl+Alt+[ or ] for navigation via Lit event listeners
 - **All slides visible**: Shows active slide based on Zustand state store
 - **MutationObserver**: Automatically detects dynamically added slides
 - **Hot reload support**: Vite development server with instant updates
@@ -392,6 +392,6 @@ https://myapp.com/page?iteration-deck=cards&slide=modern&prompt=make-it-more-min
 1. **Single toolbar** globally across all decks (singleton pattern)
 2. **Production mode** renders only first slide per deck
 3. **Development mode** shows toolbar + slide navigation
-4. **Keyboard shortcuts** (Ctrl/Cmd + [ ] keys) for active deck
+4. **Keyboard shortcuts** (Cmd/Ctrl+Alt+[ or ]) for active deck
 5. **Multi-deck support** via dropdown when >1 deck present
 

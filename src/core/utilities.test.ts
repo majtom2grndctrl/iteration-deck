@@ -9,61 +9,67 @@ import { isNavigationShortcut } from './utilities.js';
 
 describe('Keyboard Navigation', () => {
   describe('isNavigationShortcut', () => {
-    it('should detect Ctrl+[ as previous navigation', () => {
+    it('should detect Ctrl+Alt+[ as previous navigation', () => {
       const event = new KeyboardEvent('keydown', {
-        key: '[',
+        code: 'BracketLeft',
         ctrlKey: true,
-        metaKey: false
+        metaKey: false,
+        altKey: true
       });
       
       expect(isNavigationShortcut(event)).toBe('prev');
     });
 
-    it('should detect Cmd+[ as previous navigation', () => {
+    it('should detect Cmd+Option+[ as previous navigation', () => {
       const event = new KeyboardEvent('keydown', {
-        key: '[',
+        code: 'BracketLeft',
         ctrlKey: false,
-        metaKey: true
+        metaKey: true,
+        altKey: true
       });
       
       expect(isNavigationShortcut(event)).toBe('prev');
     });
 
-    it('should detect Ctrl+] as next navigation', () => {
+    it('should detect Ctrl+Alt+] as next navigation', () => {
       const event = new KeyboardEvent('keydown', {
-        key: ']',
+        code: 'BracketRight',
         ctrlKey: true,
-        metaKey: false
+        metaKey: false,
+        altKey: true
       });
       
       expect(isNavigationShortcut(event)).toBe('next');
     });
 
-    it('should detect Cmd+] as next navigation', () => {
+    it('should detect Cmd+Option+] as next navigation', () => {
       const event = new KeyboardEvent('keydown', {
-        key: ']',
+        code: 'BracketRight',
         ctrlKey: false,
-        metaKey: true
+        metaKey: true,
+        altKey: true
       });
       
       expect(isNavigationShortcut(event)).toBe('next');
     });
 
-    it('should detect Ctrl+Home as first navigation', () => {
+    it('should detect Ctrl+Alt+Home as first navigation', () => {
       const event = new KeyboardEvent('keydown', {
-        key: 'Home',
+        code: 'Home',
         ctrlKey: true,
-        metaKey: false
+        metaKey: false,
+        altKey: true
       });
       
       expect(isNavigationShortcut(event)).toBe('first');
     });
 
-    it('should detect Ctrl+End as last navigation', () => {
+    it('should detect Ctrl+Alt+End as last navigation', () => {
       const event = new KeyboardEvent('keydown', {
-        key: 'End',
+        code: 'End',
         ctrlKey: true,
-        metaKey: false
+        metaKey: false,
+        altKey: true
       });
       
       expect(isNavigationShortcut(event)).toBe('last');
@@ -71,9 +77,21 @@ describe('Keyboard Navigation', () => {
 
     it('should return null for non-modified keys', () => {
       const event = new KeyboardEvent('keydown', {
-        key: '[',
+        code: 'BracketLeft',
         ctrlKey: false,
-        metaKey: false
+        metaKey: false,
+        altKey: false
+      });
+      
+      expect(isNavigationShortcut(event)).toBeNull();
+    });
+    
+    it('should return null for missing alt key', () => {
+      const event = new KeyboardEvent('keydown', {
+        code: 'BracketLeft',
+        ctrlKey: true,
+        metaKey: false,
+        altKey: false
       });
       
       expect(isNavigationShortcut(event)).toBeNull();
@@ -81,9 +99,10 @@ describe('Keyboard Navigation', () => {
 
     it('should return null for unknown keys', () => {
       const event = new KeyboardEvent('keydown', {
-        key: 'a',
+        code: 'KeyA',
         ctrlKey: true,
-        metaKey: false
+        metaKey: false,
+        altKey: true
       });
       
       expect(isNavigationShortcut(event)).toBeNull();

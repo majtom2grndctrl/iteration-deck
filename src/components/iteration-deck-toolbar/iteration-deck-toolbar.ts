@@ -870,8 +870,8 @@ export class IterationDeckToolbar extends LitElement {
               class="nav-button nav-button-first"
               @click=${this.handlePrevSlide}
               ?disabled=${!this.canNavigatePrev()}
-              aria-label="Previous slide (Ctrl/Cmd + [)"
-              title="Previous slide (Ctrl/Cmd + [)"
+              aria-label="Previous slide (Ctrl/Cmd+Alt+[)"
+              title="Previous slide (Ctrl/Cmd+Alt+[)"
             >
               ◀
             </button>
@@ -880,8 +880,8 @@ export class IterationDeckToolbar extends LitElement {
               class="nav-button nav-button-last"
               @click=${this.handleNextSlide}
               ?disabled=${!this.canNavigateNext()}
-              aria-label="Next slide (Ctrl/Cmd + ])"
-              title="Next slide (Ctrl/Cmd + ])"
+              aria-label="Next slide (Ctrl/Cmd+Alt+])"
+              title="Next slide (Ctrl/Cmd+Alt+])"
             >
               ▶
             </button>
