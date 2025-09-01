@@ -16,6 +16,8 @@ export interface DeckMetadata {
   activeSlideId: string;
   /** Optional deck label */
   label?: string;
+  /** Whether this deck should show navigation controls */
+  isInteractive: boolean;
 }
 
 /**
@@ -32,7 +34,7 @@ export interface IterationStore {
   setActiveSlide: (deckId: string, slideId: string) => void;
   
   /** Registers a deck with all its slides */
-  registerDeck: (deckId: string, slideIds: string[], label?: string) => void;
+  registerDeck: (deckId: string, slideIds: string[], label?: string, isInteractive?: boolean) => void;
   
   /** Removes a deck from the store */
   removeDeck: (deckId: string) => void;
@@ -49,6 +51,9 @@ export interface IterationStore {
   /** Gets all registered deck IDs */
   getRegisteredDecks: () => string[];
   
+  /** Gets only interactive deck IDs (for toolbar dropdown) */
+  getInteractiveDecks: () => string[];
+  
   /** Environment flag - true in production builds, false in development */
   isProduction: boolean;
   
@@ -57,14 +62,38 @@ export interface IterationStore {
   
   /** Sets the selected deck for toolbar navigation */
   setSelectedDeck: (deckId: string) => void;
+  
+  /** For testing: Override production mode */
+  _setProductionModeForTesting?: (isProduction: boolean) => void;
 }
 
 // Simple store implementation
 class SimpleStore implements IterationStore {
   activeDecks: Record<string, string> = {};
   deckMetadata: Record<string, DeckMetadata> = {};
-  isProduction = !isDevelopment();
   selectedDeckId?: string;
+  
+  // For testing: allow overriding production mode
+  private _testProductionModeOverride?: boolean;
+  
+  /**
+   * Dynamic production state check to support test mocking
+   */
+  get isProduction(): boolean {
+    if (this._testProductionModeOverride !== undefined) {
+      return this._testProductionModeOverride;
+    }
+    return !isDevelopment();
+  }
+  
+  /**
+   * For testing: Override production mode
+   */
+  _setProductionModeForTesting(isProduction: boolean): void {
+    this._testProductionModeOverride = isProduction;
+    // Notify listeners of the change
+    this.notifyListeners();
+  }
   
   constructor() {
     // Store initialized
@@ -72,12 +101,13 @@ class SimpleStore implements IterationStore {
   
   private listeners: Set<(state: IterationStore) => void> = new Set();
   
-  registerDeck(deckId: string, slideIds: string[], label?: string): void {
+  registerDeck(deckId: string, slideIds: string[], label?: string, isInteractive: boolean = true): void {
     // Store deck metadata
     this.deckMetadata[deckId] = {
       slideIds: [...slideIds],
       activeSlideId: slideIds[0] || '',
-      label
+      label,
+      isInteractive
     };
     
     // Set active slide (use existing if valid, otherwise first slide)
@@ -127,6 +157,12 @@ class SimpleStore implements IterationStore {
   
   getRegisteredDecks(): string[] {
     return Object.keys(this.activeDecks);
+  }
+  
+  getInteractiveDecks(): string[] {
+    return Object.keys(this.deckMetadata).filter(deckId => 
+      this.deckMetadata[deckId]?.isInteractive === true
+    );
   }
   
   setSelectedDeck(deckId: string): void {
