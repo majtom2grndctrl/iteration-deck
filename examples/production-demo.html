@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iteration Deck - Production Demo</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            line-height: 1.6;
+        }
+        
+        .demo-section {
+            margin: 3rem 0;
+            padding: 2rem;
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            background: #fafbfc;
+        }
+        
+        .demo-section h2 {
+            margin-top: 0;
+            color: #0969da;
+        }
+        
+        .card {
+            background: white;
+            border: 1px solid #d1d9e0;
+            border-radius: 6px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .card h3 {
+            margin-top: 0;
+            color: #1f2328;
+        }
+        
+        .button {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .button-primary {
+            background: #0969da;
+            color: white;
+        }
+        
+        .button-primary:hover {
+            background: #0860ca;
+        }
+        
+        .button-secondary {
+            background: #f6f8fa;
+            color: #24292f;
+            border: 1px solid #d1d9e0;
+        }
+        
+        .button-secondary:hover {
+            background: #f3f4f6;
+        }
+        
+        .button-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .button-gradient:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+        }
+        
+        .hero {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 8px;
+            margin: 2rem 0;
+        }
+        
+        .hero h1 {
+            font-size: 2.5rem;
+            margin: 0 0 1rem 0;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            margin: 0 0 2rem 0;
+            opacity: 0.9;
+        }
+        
+        .hero-compact {
+            padding: 2rem;
+            font-size: 0.9rem;
+        }
+        
+        .hero-compact h1 {
+            font-size: 1.8rem;
+        }
+        
+        .hero-split {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            text-align: left;
+            align-items: center;
+        }
+        
+        .production-indicator {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: #d1242f;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            font-weight: bold;
+            z-index: 1000;
+        }
+        
+        .demo-explanation {
+            background: #fff8dc;
+            border: 1px solid #f0c040;
+            border-radius: 6px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .demo-explanation strong {
+            color: #8b4513;
+        }
+    </style>
+</head>
+<body>
+    <div class="production-indicator">🚀 PRODUCTION MODE</div>
+    
+    <header>
+        <h1>🎛️ Iteration Deck - Production Demo</h1>
+        <p>This page simulates a production environment where <code>NODE_ENV=production</code>. 
+           The iteration decks below demonstrate how the <code>enable-in-production</code> attribute works.</p>
+    </header>
+
+    <div class="demo-section">
+        <h2>🚫 Default Behavior (Production Mode)</h2>
+        <div class="demo-explanation">
+            <strong>Expected:</strong> Only the first slide shows, no toolbar appears
+        </div>
+        
+        <h3>Call-to-Action Button Variations</h3>
+        <iteration-deck id="cta-buttons-default" label="CTA Buttons (Default)">
+            <iteration-deck-slide label="Primary Button">
+                <div class="card">
+                    <h3>Primary CTA Button</h3>
+                    <button class="button button-primary">Get Started</button>
+                    <p>Bold and attention-grabbing design for maximum conversion.</p>
+                </div>
+            </iteration-deck-slide>
+            <iteration-deck-slide label="Secondary Button">
+                <div class="card">
+                    <h3>Secondary CTA Button</h3>
+                    <button class="button button-secondary">Get Started</button>
+                    <p>More understated, professional look for subtle calls-to-action.</p>
+                </div>
+            </iteration-deck-slide>
+            <iteration-deck-slide label="Gradient Button">
+                <div class="card">
+                    <h3>Gradient CTA Button</h3>
+                    <button class="button button-gradient">Get Started</button>
+                    <p>Eye-catching gradient design for hero sections.</p>
+                </div>
+            </iteration-deck-slide>
+        </iteration-deck>
+    </div>
+
+    <div class="demo-section">
+        <h2>✅ Production Override Enabled</h2>
+        <div class="demo-explanation">
+            <strong>Expected:</strong> All slides are available, toolbar appears for navigation
+        </div>
+        
+        <h3>Hero Section Variations</h3>
+        <iteration-deck id="hero-sections" label="Hero Sections" enable-in-production="true">
+            <iteration-deck-slide label="Standard Hero">
+                <div class="hero">
+                    <h1>Welcome to Our Platform</h1>
+                    <p>The perfect solution for your business needs</p>
+                    <button class="button button-primary">Get Started Today</button>
+                </div>
+            </iteration-deck-slide>
+            <iteration-deck-slide label="Compact Hero">
+                <div class="hero hero-compact">
+                    <h1>Welcome to Our Platform</h1>
+                    <p>Streamlined design for mobile-first experiences</p>
+                    <button class="button button-primary">Get Started</button>
+                </div>
+            </iteration-deck-slide>
+            <iteration-deck-slide label="Split Hero">
+                <div class="hero hero-split">
+                    <div>
+                        <h1>Welcome to Our Platform</h1>
+                        <p>The perfect solution for your business needs with detailed explanations</p>
+                        <button class="button button-primary">Get Started Today</button>
+                    </div>
+                    <div style="text-align: center; font-size: 4rem;">🚀</div>
+                </div>
+            </iteration-deck-slide>
+        </iteration-deck>
+        
+        <h3>Product Cards Variations</h3>
+        <iteration-deck id="product-cards" label="Product Cards" enable-in-production="true">
+            <iteration-deck-slide label="Standard Card">
+                <div class="card">
+                    <h3>Premium Plan</h3>
+                    <p>Everything you need to get started with our platform.</p>
+                    <ul>
+                        <li>✅ Unlimited projects</li>
+                        <li>✅ 24/7 support</li>
+                        <li>✅ Advanced analytics</li>
+                    </ul>
+                    <button class="button button-primary">Choose Plan</button>
+                </div>
+            </iteration-deck-slide>
+            <iteration-deck-slide label="Compact Card">
+                <div class="card" style="padding: 1rem;">
+                    <h3 style="margin-bottom: 0.5rem;">Premium Plan</h3>
+                    <p style="margin-bottom: 1rem; font-size: 0.9rem;">Essential features for growing teams.</p>
+                    <button class="button button-primary" style="padding: 0.5rem 1rem;">Choose Plan</button>
+                </div>
+            </iteration-deck-slide>
+            <iteration-deck-slide label="Detailed Card">
+                <div class="card">
+                    <h3>Premium Plan - $29/month</h3>
+                    <p>The comprehensive solution for serious businesses who need powerful features and reliable support.</p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;">
+                        <div>
+                            <strong>Features:</strong>
+                            <ul style="margin-top: 0.5rem;">
+                                <li>Unlimited projects</li>
+                                <li>Advanced analytics</li>
+                                <li>Custom integrations</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <strong>Support:</strong>
+                            <ul style="margin-top: 0.5rem;">
+                                <li>24/7 chat support</li>
+                                <li>Phone support</li>
+                                <li>Dedicated account manager</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <button class="button button-gradient" style="width: 100%;">Choose Premium Plan</button>
+                </div>
+            </iteration-deck-slide>
+        </iteration-deck>
+    </div>
+
+    <div class="demo-section">
+        <h2>🔍 How This Works</h2>
+        <div class="demo-explanation">
+            <p><strong>Without <code>enable-in-production</code>:</strong> In production builds (NODE_ENV=production), iteration-deck automatically shows only the first slide and hides the toolbar. This ensures a clean user experience.</p>
+            
+            <p><strong>With <code>enable-in-production</code>:</strong> Even in production builds, all slides remain available and the toolbar appears. This is useful for:</p>
+            <ul>
+                <li>🎨 <strong>Design reviews:</strong> Show stakeholders different options in the live environment</li>
+                <li>🧪 <strong>A/B testing:</strong> Keep multiple variations available for testing tools</li>
+                <li>📊 <strong>Analytics:</strong> Compare performance of different designs in production</li>
+                <li>🎯 <strong>Marketing pages:</strong> Let marketing teams switch between campaign variations</li>
+            </ul>
+            
+            <p><strong>Usage:</strong></p>
+            <pre><code>&lt;iteration-deck id="hero" enable-in-production&gt;
+  &lt;iteration-deck-slide label="Version A"&gt;...&lt;/iteration-deck-slide&gt;
+  &lt;iteration-deck-slide label="Version B"&gt;...&lt;/iteration-deck-slide&gt;
+&lt;/iteration-deck&gt;</code></pre>
+        </div>
+    </div>
+
+    <!-- Import the built library -->
+    <script type="module">
+        // Simulate production environment
+        window.process = { env: { NODE_ENV: 'production' } };
+        
+        // Import the built library and wait for components to be ready
+        async function initializeComponents() {
+            try {
+                await import('./dist/iteration-deck-standalone.js');
+                
+                // Wait for custom elements to be defined
+                await customElements.whenDefined('iteration-deck');
+                await customElements.whenDefined('iteration-deck-slide');
+                await customElements.whenDefined('iteration-deck-toolbar');
+                
+                console.log('✅ Iteration Deck components loaded successfully');
+                
+                // Debug: Check if components are properly registered
+                console.log('Custom elements defined:', {
+                    'iteration-deck': customElements.get('iteration-deck'),
+                    'iteration-deck-slide': customElements.get('iteration-deck-slide'),
+                    'iteration-deck-toolbar': customElements.get('iteration-deck-toolbar')
+                });
+                
+                // Force upgrade of existing elements and trigger re-render
+                document.querySelectorAll('iteration-deck').forEach((deck, index) => {
+                    console.log(`Deck ${index + 1}:`, {
+                        tagName: deck.tagName,
+                        attributes: Array.from(deck.attributes).map(attr => `${attr.name}="${attr.value}"`),
+                        hasEnableInProduction: deck.hasAttribute('enable-in-production'),
+                        childCount: deck.children.length
+                    });
+                    
+                    // Force re-render
+                    if (deck.requestUpdate) {
+                        deck.requestUpdate();
+                    }
+                    
+                    // Also check child slides
+                    deck.querySelectorAll('iteration-deck-slide').forEach((slide, slideIndex) => {
+                        console.log(`  Slide ${slideIndex + 1}:`, slide.getAttribute('label'));
+                        if (slide.requestUpdate) {
+                            slide.requestUpdate();
+                        }
+                    });
+                });
+                
+            } catch (error) {
+                console.error('❌ Failed to load Iteration Deck components:', error);
+            }
+        }
+        
+        initializeComponents();
+    </script>
+</body>
+</html>

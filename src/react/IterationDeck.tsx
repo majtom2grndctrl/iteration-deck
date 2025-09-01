@@ -34,6 +34,8 @@ export interface IterationDeckProps extends CoreIterationDeckProps {
   className?: string;
   /** Optional style object */
   style?: React.CSSProperties;
+  /** Force development mode even in production builds */
+  enableInProduction?: boolean;
   /** Optional callback fired when slide changes */
   onSlideChange?: (event: CustomEvent) => void;
   /** Optional callback fired when deck is registered */
@@ -76,6 +78,7 @@ export const IterationDeck = forwardRef<IterationDeckHandle, IterationDeckProps>
     label,
     prompt,
     description,
+    enableInProduction,
     children,
     className,
     style,
@@ -162,21 +165,28 @@ export const IterationDeck = forwardRef<IterationDeckHandle, IterationDeckProps>
 
     // Render the web component with React children
     // Map React props to web component attributes for proper initialization timing
+    const attributes: any = {
+      ref: elementRef,
+      // Required attributes that must be set before connectedCallback
+      id: id,
+      // Optional attributes
+      label: label,
+      prompt: prompt,
+      description: description,
+      // React-specific props
+      className,
+      style,
+      ...otherProps
+    };
+
+    // Add enable-in-production attribute if enableInProduction is true
+    if (enableInProduction) {
+      attributes['enable-in-production'] = '';
+    }
+
     return React.createElement(
       'iteration-deck',
-      {
-        ref: elementRef,
-        // Required attributes that must be set before connectedCallback
-        id: id,
-        // Optional attributes
-        label: label,
-        prompt: prompt,
-        description: description,
-        // React-specific props
-        className,
-        style,
-        ...otherProps
-      },
+      attributes,
       children
     );
   }

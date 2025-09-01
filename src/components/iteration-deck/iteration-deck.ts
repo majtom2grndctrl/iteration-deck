@@ -94,7 +94,14 @@ export class IterationDeck extends LitElement {
   description?: string;
 
   /**
-   * Current environment mode (automatically detected)
+   * Enable development features in production builds
+   * Allows showing all slides and toolbar in production when set to true
+   */
+  @property({ type: Boolean, attribute: 'enable-in-production' })
+  enableInProduction = false;
+
+  /**
+   * Current environment mode (automatically detected, can be overridden by enableInProduction)
    * @internal
    */
   @state()
@@ -175,12 +182,17 @@ export class IterationDeck extends LitElement {
     this._setupSlotObserver();
     
     // Ensure global toolbar is mounted (development mode only)
-    ensureToolbarMounted();
+    if (this._shouldActivate()) {
+      ensureToolbarMounted();
+    }
+    
+    // Try immediate detection for direct DOM manipulation (like in tests)
+    this._detectSlidesAndRegister();
     
     // Defer store operations to avoid React render conflicts
     setTimeout(() => {
       this._subscribeToStore();
-      this._detectSlidesAndRegister();
+      this._detectSlidesAndRegister(); // Re-check after timeout for React cases
     }, 0);
   }
 
@@ -352,8 +364,11 @@ export class IterationDeck extends LitElement {
     const store = getIterationStoreState();
     const slideIds = this._slides.map(slide => slide.id);
     
-    // Register deck with all slide IDs and label
-    store.registerDeck(this.id, slideIds, this.label);
+    // Calculate if this deck should be interactive
+    const isInteractive = this._shouldActivate();
+    
+    // Register deck with all slide IDs, label, and interactive state
+    store.registerDeck(this.id, slideIds, this.label, isInteractive);
     
     // Get the active slide that was set during registration and update properties safely
     const activeSlideId = store.getActiveSlide(this.id) || slideIds[0];
@@ -390,6 +405,14 @@ export class IterationDeck extends LitElement {
   }
 
   /**
+   * Check if we should behave as development mode (natural or enabled for production)
+   * @internal
+   */
+  private _shouldActivate(): boolean {
+    return !this._isProduction || this.enableInProduction;
+  }
+
+  /**
    * Render method: Show active slide in production, all slides in development
    */
   render() {
@@ -397,10 +420,10 @@ export class IterationDeck extends LitElement {
       return html`<slot></slot>`;
     }
 
-    // Determine container classes based on mode
+    // Determine container classes based on mode (considering enableInProduction override)
     const containerClasses = [
       'iteration-deck-container',
-      this._isProduction ? 'production' : 'development',
+      this._shouldActivate() ? 'development' : 'production',
       'animated'
     ].join(' ');
 
@@ -435,6 +458,11 @@ export class IterationDeck extends LitElement {
    * Public API: Navigate to next slide
    */
   public navigateToNext(): boolean {
+    // Re-detect slides if we don't have any yet
+    if (this._slides.length === 0) {
+      this._detectSlidesAndRegister();
+    }
+    
     if (this._slides.length <= 1) return false;
     
     const currentIndex = this._slides.findIndex(slide => slide.id === this._activeSlideId);
@@ -448,6 +476,11 @@ export class IterationDeck extends LitElement {
    * Public API: Navigate to previous slide
    */
   public navigateToPrev(): boolean {
+    // Re-detect slides if we don't have any yet
+    if (this._slides.length === 0) {
+      this._detectSlidesAndRegister();
+    }
+    
     if (this._slides.length <= 1) return false;
     
     const currentIndex = this._slides.findIndex(slide => slide.id === this._activeSlideId);
@@ -483,6 +516,7 @@ export class IterationDeck extends LitElement {
       slideCount: this._slides.length,
       activeSlideId: this._activeSlideId,
       isProduction: this._isProduction,
+      enableInProduction: this.enableInProduction,
       isRegistered: this._isRegistered
     };
   }

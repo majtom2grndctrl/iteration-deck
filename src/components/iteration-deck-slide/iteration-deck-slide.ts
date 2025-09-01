@@ -93,6 +93,9 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
   private isDevelopment = false;
 
   @state()
+  private parentEnableInProduction = false;
+
+  @state()
   private isInitializing = true;
 
   // Lit-specific slot content query (TypeScript-friendly)
@@ -128,9 +131,21 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
     // Find parent deck element
     this.findParentDeck();
     
-    // If we couldn't find the parent deck, try again after a short delay
-    // This handles cases where React hasn't finished rendering the parent yet
-    if (!this.deckId) {
+    // Generate internal slide ID immediately with available information
+    if (!this._internalSlideId) {
+      this._internalSlideId = this.slideId || 
+                             this.getAttribute('slide-id') ||
+                             generateSlideId(this.deckId || 'unknown', this.label || 'slide');
+    }
+    
+    // Try immediate initialization if deck is found
+    if (this.deckId) {
+      this.subscribeToStore();
+      this.updateActiveState();
+      this.isInitializing = false;
+    } else {
+      // If we couldn't find the parent deck, try again after a short delay
+      // This handles cases where React hasn't finished rendering the parent yet
       setTimeout(() => {
         this.findParentDeck();
         // Regenerate slide ID with proper deck context
@@ -139,8 +154,10 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
                                  this.getAttribute('slide-id') ||
                                  generateSlideId(this.deckId, this.label || 'slide');
           
-          // Update the active state now that we have the correct deck and slide IDs
+          // Now initialize properly
+          this.subscribeToStore();
           this.updateActiveState();
+          this.isInitializing = false;
           
           // Force a re-render to update the visual state
           this.requestUpdate();
@@ -148,20 +165,18 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
       }, 10);
     }
     
-    // Generate internal slide ID now that we have deck context
-    if (!this._internalSlideId) {
-      this._internalSlideId = this.slideId || 
-                             this.getAttribute('slide-id') ||
-                             generateSlideId(this.deckId || 'unknown', this.label || 'slide');
-    }
-    
-    // Defer store subscription to avoid React render conflicts
-    // Use setTimeout to ensure React's render cycle is complete
+    // Always check again after a short delay for enable-in-production updates
+    // since attributes might be set after element creation
     setTimeout(() => {
-      this.subscribeToStore();
-      this.updateActiveState();
-      this.isInitializing = false; // Now ready for proper visibility management
-    }, 0);
+      this.findParentDeck(); // Re-check parent for enable-in-production
+      if (!this.unsubscribeStore && this.deckId) {
+        // If we haven't subscribed yet and now have a deck, initialize
+        this.subscribeToStore();
+        this.updateActiveState();
+        this.isInitializing = false;
+        this.requestUpdate();
+      }
+    }, 10);
   }
 
   /**
@@ -184,9 +199,18 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
     
     if (parent) {
       this.deckId = parent.getAttribute('id');
+      // Check if parent deck has development features enabled in production
+      this.parentEnableInProduction = parent.hasAttribute('enable-in-production');
     } else {
       errorLog(`IterationDeckSlide "${this.label}" is not inside an iteration-deck element`);
     }
+  }
+
+  /**
+   * Check if we should behave as development mode (natural or enabled in production by parent)
+   */
+  private shouldActivate(): boolean {
+    return this.isDevelopment || this.parentEnableInProduction;
   }
 
   /**
@@ -199,6 +223,8 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
       // Update development mode if changed
       if (newIsDevelopment !== this.isDevelopment) {
         this.isDevelopment = newIsDevelopment;
+        // Force a re-render when development mode changes to update cursor styles
+        this.requestUpdate();
       }
       
       // Update active state based on store changes
@@ -309,6 +335,8 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
       confidence: this.confidence,
       isActive: this.isActive,
       deckId: this.deckId,
+      isDevelopment: this.isDevelopment,
+      parentEnableInProduction: this.parentEnableInProduction,
     };
   }
 
@@ -342,7 +370,7 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
    * Handle click events in development mode for manual slide switching
    */
   private handleSlideClick() {
-    if (this.isDevelopment && !this.isActive) {
+    if (this.shouldActivate() && !this.isActive) {
       this.activate();
       this.dispatchSlideEvent('activated', this.getSlideData());
     }
@@ -354,11 +382,13 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
   override updated(changedProperties: Map<string, unknown>) {
     super.updated(changedProperties);
     
-    // Add click listener in development mode
-    if (this.isDevelopment) {
+    // Set cursor and click behavior based on development mode
+    if (this.shouldActivate()) {
+      // In development mode, inactive slides are clickable
       this.style.cursor = this.isActive ? 'default' : 'pointer';
       this.onclick = () => this.handleSlideClick();
     } else {
+      // In production mode, no interactions
       this.style.cursor = 'default';
       this.onclick = null;
     }
