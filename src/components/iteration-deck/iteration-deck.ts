@@ -182,7 +182,7 @@ export class IterationDeck extends LitElement {
     this._setupSlotObserver();
     
     // Ensure global toolbar is mounted (development mode only)
-    if (this._shouldActAsDevelopment()) {
+    if (this._shouldActivate()) {
       ensureToolbarMounted();
     }
     
@@ -364,8 +364,11 @@ export class IterationDeck extends LitElement {
     const store = getIterationStoreState();
     const slideIds = this._slides.map(slide => slide.id);
     
-    // Register deck with all slide IDs and label
-    store.registerDeck(this.id, slideIds, this.label);
+    // Calculate if this deck should be interactive
+    const isInteractive = this._shouldActivate();
+    
+    // Register deck with all slide IDs, label, and interactive state
+    store.registerDeck(this.id, slideIds, this.label, isInteractive);
     
     // Get the active slide that was set during registration and update properties safely
     const activeSlideId = store.getActiveSlide(this.id) || slideIds[0];
@@ -405,7 +408,7 @@ export class IterationDeck extends LitElement {
    * Check if we should behave as development mode (natural or enabled for production)
    * @internal
    */
-  private _shouldActAsDevelopment(): boolean {
+  private _shouldActivate(): boolean {
     return !this._isProduction || this.enableInProduction;
   }
 
@@ -420,7 +423,7 @@ export class IterationDeck extends LitElement {
     // Determine container classes based on mode (considering enableInProduction override)
     const containerClasses = [
       'iteration-deck-container',
-      this._shouldActAsDevelopment() ? 'development' : 'production',
+      this._shouldActivate() ? 'development' : 'production',
       'animated'
     ].join(' ');
 
@@ -514,7 +517,6 @@ export class IterationDeck extends LitElement {
       activeSlideId: this._activeSlideId,
       isProduction: this._isProduction,
       enableInProduction: this.enableInProduction,
-      actingAsDevelopment: this._shouldActAsDevelopment(),
       isRegistered: this._isRegistered
     };
   }

@@ -15,6 +15,7 @@ vi.mock('../../store/iteration-store.js', () => ({
   subscribeToIterationStore: vi.fn(() => () => {}),
   getIterationStoreState: vi.fn(() => ({
     getRegisteredDecks: () => [],
+    getInteractiveDecks: () => [],
     selectedDeckId: undefined
   })),
   isDevelopmentMode: vi.fn(() => true)

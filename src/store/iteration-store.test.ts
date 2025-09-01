@@ -43,7 +43,8 @@ describe('IterationStore - Production Mode Override', () => {
       expect(metadata).toMatchObject({
         slideIds: slideIds,
         activeSlideId: 'slide-1',
-        label: label
+        label: label,
+        isInteractive: true
       });
 
       // Verify active slide is set
@@ -213,6 +214,76 @@ describe('IterationStore - Production Mode Override', () => {
       // Remove last deck should clear selection
       store.removeDeck(deck1Id);
       expect(store.selectedDeckId).toBeUndefined();
+    });
+  });
+
+  describe('Interactive Deck Tracking', () => {
+    test('store tracks interactive vs display-only decks', () => {
+      const interactiveDeckId = 'interactive-deck';
+      const displayOnlyDeckId = 'display-only-deck';
+      const slideIds = ['slide-1', 'slide-2'];
+
+      // Register interactive deck (default behavior)
+      store.registerDeck(interactiveDeckId, slideIds, 'Interactive Deck');
+      
+      // Register display-only deck
+      store.registerDeck(displayOnlyDeckId, slideIds, 'Display Only Deck', false);
+
+      // Verify metadata includes isInteractive flag
+      const interactiveMeta = store.getDeckMetadata(interactiveDeckId);
+      const displayOnlyMeta = store.getDeckMetadata(displayOnlyDeckId);
+
+      expect(interactiveMeta?.isInteractive).toBe(true);
+      expect(displayOnlyMeta?.isInteractive).toBe(false);
+    });
+
+    test('getInteractiveDecks returns only interactive decks', () => {
+      const deck1Id = 'interactive-deck-1';
+      const deck2Id = 'display-only-deck';
+      const deck3Id = 'interactive-deck-2';
+      const slideIds = ['slide-1'];
+
+      // Register mixed deck types
+      store.registerDeck(deck1Id, slideIds, 'Interactive 1', true);
+      store.registerDeck(deck2Id, slideIds, 'Display Only', false);
+      store.registerDeck(deck3Id, slideIds, 'Interactive 2', true);
+
+      // Get all registered decks vs interactive decks
+      const allDecks = store.getRegisteredDecks();
+      const interactiveDecks = store.getInteractiveDecks();
+
+      expect(allDecks).toHaveLength(3);
+      expect(allDecks).toEqual(expect.arrayContaining([deck1Id, deck2Id, deck3Id]));
+
+      expect(interactiveDecks).toHaveLength(2);
+      expect(interactiveDecks).toEqual(expect.arrayContaining([deck1Id, deck3Id]));
+      expect(interactiveDecks).not.toContain(deck2Id);
+    });
+
+    test('registerDeck defaults to interactive when isInteractive parameter is omitted', () => {
+      const deckId = 'default-deck';
+      const slideIds = ['slide-1'];
+
+      // Register without specifying isInteractive (should default to true)
+      store.registerDeck(deckId, slideIds);
+
+      const metadata = store.getDeckMetadata(deckId);
+      expect(metadata?.isInteractive).toBe(true);
+      expect(store.getInteractiveDecks()).toContain(deckId);
+    });
+
+    test('getInteractiveDecks returns empty array when no interactive decks', () => {
+      const deck1Id = 'display-only-1';
+      const deck2Id = 'display-only-2';
+      const slideIds = ['slide-1'];
+
+      // Register only display-only decks
+      store.registerDeck(deck1Id, slideIds, 'Display Only 1', false);
+      store.registerDeck(deck2Id, slideIds, 'Display Only 2', false);
+
+      const interactiveDecks = store.getInteractiveDecks();
+      expect(interactiveDecks).toHaveLength(0);
+      expect(interactiveDecks).toEqual([]);
     });
   });
 

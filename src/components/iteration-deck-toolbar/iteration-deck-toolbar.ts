@@ -96,7 +96,6 @@ export class IterationDeckToolbar extends LitElement {
       border-radius: ${unsafeCSS(spacing.spacing8)}; /* Large border radius */
       background: var(--color-bg-glass);
       backdrop-filter: blur(${unsafeCSS(spacing.spacing2)}); /* 16px blur */
-      border: ${unsafeCSS(spacing.spacing00)} solid var(--color-border-secondary);
       box-shadow: var(--toolbar-shadow);
       
       /* Typography - Mobile-first */
@@ -397,8 +396,8 @@ export class IterationDeckToolbar extends LitElement {
       this.storeState = state;
       this.requestUpdate();
       
-      // Auto-select first deck if none selected and we have decks
-      const deckIds = state.getRegisteredDecks();
+      // Auto-select first deck if none selected and we have interactive decks
+      const deckIds = state.getInteractiveDecks();
       if (deckIds.length > 0 && !state.selectedDeckId) {
         const store = getIterationStoreState();
         store.setSelectedDeck(deckIds[0]);
@@ -518,9 +517,9 @@ export class IterationDeckToolbar extends LitElement {
    * Get the currently selected deck ID
    */
   private getSelectedDeckId(): string | undefined {
-    const deckIds = this.storeState.getRegisteredDecks();
+    const deckIds = this.storeState.getInteractiveDecks();
     
-    // If only one deck, it's implicitly selected
+    // If only one interactive deck, it's implicitly selected
     if (deckIds.length === 1) {
       return deckIds[0];
     }
@@ -828,12 +827,12 @@ export class IterationDeckToolbar extends LitElement {
       return nothing;
     }
 
-    const deckIds = this.storeState.getRegisteredDecks();
+    const deckIds = this.storeState.getInteractiveDecks();
     const selectedDeckId = this.getSelectedDeckId();
     const hasMultipleDecks = deckIds.length > 1;
     const hasAnyDecks = deckIds.length > 0;
     
-    // Don't render if no decks are registered
+    // Don't render if no interactive decks are available
     if (!hasAnyDecks) {
       return nothing;
     }
@@ -947,9 +946,9 @@ export function cleanupToolbarIfEmpty(): void {
   // Small delay to allow for component cleanup
   setTimeout(() => {
     const store = getIterationStoreState();
-    const deckIds = store.getRegisteredDecks();
+    const deckIds = store.getInteractiveDecks();
     
-    // If no decks remain, remove the toolbar
+    // If no interactive decks remain, remove the toolbar
     if (deckIds.length === 0) {
       const toolbar = document.querySelector('iteration-deck-toolbar');
       if (toolbar) {

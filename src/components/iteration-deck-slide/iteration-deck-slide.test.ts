@@ -4,7 +4,7 @@
  * Test suite for the IterationDeckSlide Lit component
  */
 
-import { describe, test, expect, afterEach, beforeEach, vi } from 'vitest';
+import { describe, test, expect, afterEach, beforeEach } from 'vitest';
 import { LitElement } from 'lit';
 import { IterationDeckSlide } from './iteration-deck-slide.js';
 import { createLitElement, removeLitElement, waitForLitElement } from '../../test/test-utilities.js';

@@ -209,7 +209,7 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
   /**
    * Check if we should behave as development mode (natural or enabled in production by parent)
    */
-  private shouldActAsDevelopment(): boolean {
+  private shouldActivate(): boolean {
     return this.isDevelopment || this.parentEnableInProduction;
   }
 
@@ -337,7 +337,6 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
       deckId: this.deckId,
       isDevelopment: this.isDevelopment,
       parentEnableInProduction: this.parentEnableInProduction,
-      actingAsDevelopment: this.shouldActAsDevelopment(),
     };
   }
 
@@ -371,7 +370,7 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
    * Handle click events in development mode for manual slide switching
    */
   private handleSlideClick() {
-    if (this.shouldActAsDevelopment() && !this.isActive) {
+    if (this.shouldActivate() && !this.isActive) {
       this.activate();
       this.dispatchSlideEvent('activated', this.getSlideData());
     }
@@ -384,7 +383,7 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
     super.updated(changedProperties);
     
     // Set cursor and click behavior based on development mode
-    if (this.shouldActAsDevelopment()) {
+    if (this.shouldActivate()) {
       // In development mode, inactive slides are clickable
       this.style.cursor = this.isActive ? 'default' : 'pointer';
       this.onclick = () => this.handleSlideClick();
