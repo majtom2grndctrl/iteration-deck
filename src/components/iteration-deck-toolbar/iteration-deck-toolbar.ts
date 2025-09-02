@@ -37,7 +37,7 @@ import {
   breakpoints,
   duration,
   easing
-} from '../../tokens/index.js';
+} from '../../../shared/tokens-lit.js';
 import type { IterationDeckSlide } from '../iteration-deck-slide/iteration-deck-slide.js';
 
 // ShadowDOM encapsulation for isolated styling

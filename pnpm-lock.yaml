@@ -39,6 +39,9 @@ importers:
       '@types/react':
         specifier: ^19.1.10
         version: 19.1.10
+      '@types/react-dom':
+        specifier: ^19.1.7
+        version: 19.1.7(@types/react@19.1.10)
       '@vitest/ui':
         specifier: ^3.2.4
         version: 3.2.4(vitest@3.2.4)
@@ -63,6 +66,12 @@ importers:
       vitest:
         specifier: ^3.2.4
         version: 3.2.4(@types/debug@4.1.12)(@types/node@24.3.0)(@vitest/ui@3.2.4)(happy-dom@18.0.1)(jiti@1.21.7)(jsdom@26.1.0)(terser@5.43.1)(yaml@2.8.1)
+
+  examples/lit-demo:
+    devDependencies:
+      vite:
+        specifier: ^7.1.2
+        version: 7.1.2(@types/node@24.3.0)(jiti@1.21.7)(terser@5.43.1)(yaml@2.8.1)
 
   examples/react-app:
     dependencies:

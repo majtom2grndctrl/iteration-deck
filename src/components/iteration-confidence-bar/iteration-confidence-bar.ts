@@ -24,7 +24,7 @@ import { LitElement, html, css, unsafeCSS } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
 // Import design tokens
-import { spacing, duration, easing } from '../../tokens/index.js';
+import { spacing, duration, easing } from '../../../shared/tokens-lit.js';
 
 export interface IterationConfidenceBarProps {
   /** AI confidence score (0-1 scale) */

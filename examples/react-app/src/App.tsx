@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { IterationDeck, IterationDeckSlide } from '../../../src/react/index.tsx';
+import { IterationDeck, IterationDeckSlide, useEnsureToolbar, useIterationStore } from 'iteration-deck';
 
 // Import demo components
 import { UserPreferencesVertical, UserPreferencesHorizontal, UserPreferencesCard } from './components/UserPreferences';
@@ -14,6 +14,20 @@ function App() {
     toolbarDefined: false,
     environmentMode: 'unknown'
   });
+
+  // Get store to help with toolbar initialization
+  const store = useIterationStore();
+  
+  // Ensure the toolbar is rendered when there are interactive decks
+  useEnsureToolbar();
+
+  // Set initial selected deck after first render
+  useEffect(() => {
+    const interactiveDecks = store.getInteractiveDecks();
+    if (interactiveDecks.length > 0 && !store.selectedDeckId) {
+      store.setSelectedDeck(interactiveDecks[0]);
+    }
+  }, [store]);
 
   // Function to add debug messages
   const addDebugMessage = useCallback((message: string) => {
@@ -150,8 +164,6 @@ function App() {
             id="react-user-preferences" 
             label="User Preferences (React)"
             prompt="Create a user preferences form with clean, modern styling and good UX"
-            onSlideChange={(e: CustomEvent) => addDebugMessage(`React: Form slide changed to ${e.detail.currentSlideId}`)}
-            onDeckRegistered={(e: CustomEvent) => addDebugMessage(`React: Form deck registered with ${e.detail.slideCount} slides`)}
           >
             <IterationDeckSlide 
               label="Vertical Layout"
@@ -191,7 +203,6 @@ function App() {
             id="react-budget-dashboard" 
             label="Budget Dashboard (React)"
             prompt="Design a personal budget dashboard that helps users understand their spending"
-            onSlideChange={(e: CustomEvent) => addDebugMessage(`React: Budget slide changed to ${e.detail.currentSlideId}`)}
           >
             <IterationDeckSlide 
               label="Simple Summary"
@@ -231,7 +242,6 @@ function App() {
             id="react-contacts-list" 
             label="Contacts List (React)"
             prompt="Design a contacts list that's easy to scan and interact with"
-            onSlideChange={(e: CustomEvent) => addDebugMessage(`React: Contacts slide changed to ${e.detail.currentSlideId}`)}
           >
             <IterationDeckSlide 
               label="Compact List"
@@ -283,7 +293,6 @@ function App() {
               <IterationDeck 
                 id="prod-default" 
                 label="Default (Production)"
-                onSlideChange={(e: CustomEvent) => addDebugMessage(`Prod Default: ${e.detail.currentSlideId}`)}
               >
                 <IterationDeckSlide label="Primary Button">
                   <div className="bg-white border border-gray-200 rounded-lg p-4">
@@ -311,7 +320,6 @@ function App() {
                 id="prod-enabled" 
                 label="Enabled (Production)"
                 enableInProduction={true}
-                onSlideChange={(e: CustomEvent) => addDebugMessage(`Prod Enabled: ${e.detail.currentSlideId}`)}
               >
                 <IterationDeckSlide label="Primary Button">
                   <div className="bg-white border border-gray-200 rounded-lg p-4">

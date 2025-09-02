@@ -109,8 +109,8 @@ describe('React Wrapper Components', () => {
       }
       
       if (slideRef.current) {
-        expect(typeof slideRef.current.activate).toBe('function');
         expect(typeof slideRef.current.getSlideData).toBe('function');
+        expect(slideRef.current.element).toBeTruthy();
       }
     });
   });

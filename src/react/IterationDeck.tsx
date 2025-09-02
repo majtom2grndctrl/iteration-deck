@@ -1,52 +1,34 @@
-/**
- * React wrapper component for iteration-deck Lit web component
- * 
- * Provides a React-friendly interface around the underlying <iteration-deck> 
- * web component with proper TypeScript types, ref forwarding, and Zustand integration.
- */
-
-import React, { 
-  forwardRef, 
-  useEffect, 
-  useRef, 
-  useImperativeHandle,
-  type ReactElement 
-} from 'react';
-
-// TODO: Figure out how to import unset.css into this file so that it unsets externally defined resets
-
-// Import the Lit web components to ensure they're registered
-import '../components/iteration-deck/index.js';
-import '../components/iteration-deck-slide/index.js';
-import '../components/iteration-deck-toolbar/index.js';
-
-// Import types and hooks
-import type { IterationDeckProps as CoreIterationDeckProps, IterationDeckSlideProps } from '../core/types';
-import { useIterationStore, useActiveSlide } from './hooks';
+import React, { forwardRef, useEffect, useRef, useImperativeHandle, useMemo, Children } from 'react';
+import type { IterationDeckProps, IterationDeckSlideProps } from '../../shared/types';
+import { useIterationStore, useDeckNavigation } from './store';
 
 /**
- * React-specific props interface extending the core interface
+ * Extended slide props interface with React-specific additions
  */
-export interface IterationDeckProps extends CoreIterationDeckProps {
+interface ExtendedSlideProps extends IterationDeckSlideProps {
+  slideId?: string;
+  isActive?: boolean;
+  deckId?: string;
+}
+
+/**
+ * React-specific props interface extending the shared interface
+ */
+export interface ReactIterationDeckProps extends IterationDeckProps {
   /** React children - should be IterationDeckSlide components */
-  children?: ReactElement<IterationDeckSlideProps> | ReactElement<IterationDeckSlideProps>[];
+  children?: React.ReactElement<ExtendedSlideProps> | React.ReactElement<ExtendedSlideProps>[];
   /** Optional className for styling */
   className?: string;
   /** Optional style object */
   style?: React.CSSProperties;
-  /** Force development mode even in production builds */
-  enableInProduction?: boolean;
-  /** Optional callback fired when slide changes */
+  /** Optional callback fired when slide changes - matches CustomEvent API */
   onSlideChange?: (event: CustomEvent) => void;
   /** Optional callback fired when deck is registered */
   onDeckRegistered?: (event: CustomEvent) => void;
-  /** Optional callback fired when deck is unregistered */
-  onDeckUnregistered?: (event: CustomEvent) => void;
 }
 
 /**
  * Imperative handle interface for the IterationDeck component
- * Exposes the underlying web component's public API
  */
 export interface IterationDeckHandle {
   /** Navigate to a specific slide by ID */
@@ -56,138 +38,198 @@ export interface IterationDeckHandle {
   /** Navigate to the previous slide */
   navigateToPrev: () => boolean;
   /** Get current slide information */
-  getCurrentSlide: () => any;
+  getCurrentSlide: () => { id: string; index: number; label: string } | null;
   /** Get all slides information */
-  getAllSlides: () => any[];
+  getAllSlides: () => { id: string; index: number; label: string }[];
   /** Get deck metadata */
-  getDeckInfo: () => any;
-  /** Get the underlying DOM element */
-  getElement: () => HTMLElement | null;
+  getDeckInfo: () => { id: string; label?: string; slideCount: number; activeSlideId?: string };
 }
 
 /**
- * React wrapper component for <iteration-deck>
+ * Pure React IterationDeck component
  * 
- * This component creates a thin wrapper around the Lit web component,
- * providing a React-friendly API while delegating all functionality
- * to the underlying web component.
+ * Provides slide deck functionality with development toolbar and keyboard navigation
+ * using standard React patterns without any web component dependencies.
  */
-export const IterationDeck = forwardRef<IterationDeckHandle, IterationDeckProps>(
+export const IterationDeck = forwardRef<IterationDeckHandle, ReactIterationDeckProps>(
   function IterationDeck({
     id,
     label,
     prompt,
     description,
-    enableInProduction,
+    onSlideChange,
+    onDeckRegistered,
+    enableInProduction = false,
     children,
     className,
     style,
-    onSlideChange,
-    onDeckRegistered,
-    onDeckUnregistered,
     ...otherProps
   }, ref) {
-    const elementRef = useRef<HTMLElement>(null);
+    const store = useIterationStore();
+    const navigation = useDeckNavigation(id);
+    const deckRef = useRef<HTMLDivElement>(null);
     
-    // Subscribe to store for reactive updates (ensures component re-renders on state changes)
-    useIterationStore();
-    useActiveSlide(id);
+    // Parse children to extract slide count and labels (stable)
+    const slideInfo = useMemo(() => {
+      const childArray = Children.toArray(children) as React.ReactElement<IterationDeckSlideProps>[];
+      const labels = childArray.map((child) => child.props.label);
+      return {
+        count: childArray.length,
+        labels,
+        labelsString: labels.join('|'), // Stable string representation
+        metadata: childArray.map((child, index) => ({
+          id: `${id}-slide-${index}`,
+          label: child.props.label
+        }))
+      };
+    }, [children, id]);
 
-    // Note: Properties are now set as HTML attributes in createElement for proper timing.
-    // This useEffect is kept for any future complex property handling if needed.
+    // Parse children to extract slide elements (for rendering)
+    const slideElements = useMemo(() => {
+      const childArray = Children.toArray(children) as React.ReactElement<IterationDeckSlideProps>[];
+      return childArray.map((child, index) => ({
+        id: `${id}-slide-${index}`,
+        label: child.props.label,
+        element: child,
+        index
+      }));
+    }, [children, id]);
+
+    // Register this deck with the store
     useEffect(() => {
-      const element = elementRef.current as any;
-      if (!element) return;
+      const slideIds = slideInfo.metadata.map(slide => slide.id);
+      if (slideIds.length > 0) {
+        store.registerDeck(id, slideIds, label, !store.isProduction || enableInProduction);
+      }
 
-      // All basic properties are now set as attributes in createElement
-      // This useEffect is reserved for any complex properties that can't be attributes
-      
-    }, [id, label, prompt, description]);
-
-    // Set up event listeners for web component events
-    useEffect(() => {
-      const element = elementRef.current;
-      if (!element) return;
-
-      const handleSlideChange = (event: Event) => {
-        onSlideChange?.(event as CustomEvent);
-      };
-
-      const handleDeckRegistered = (event: Event) => {
-        onDeckRegistered?.(event as CustomEvent);
-      };
-
-      const handleDeckUnregistered = (event: Event) => {
-        onDeckUnregistered?.(event as CustomEvent);
-      };
-
-      // Add event listeners
-      element.addEventListener('slide-change', handleSlideChange);
-      element.addEventListener('deck-registered', handleDeckRegistered);
-      element.addEventListener('deck-unregistered', handleDeckUnregistered);
-
-      // Cleanup
+      // Cleanup on unmount
       return () => {
-        element.removeEventListener('slide-change', handleSlideChange);
-        element.removeEventListener('deck-registered', handleDeckRegistered);
-        element.removeEventListener('deck-unregistered', handleDeckUnregistered);
+        store.removeDeck(id);
       };
-    }, [onSlideChange, onDeckRegistered, onDeckUnregistered]);
+    }, [id, label, slideInfo.count, slideInfo.labelsString, enableInProduction]);
+
+    // Fire onDeckRegistered callback (separate useEffect to avoid registration loop)
+    useEffect(() => {
+      if (onDeckRegistered && slideInfo.count > 0) {
+        const customEvent = {
+          detail: {
+            deckId: id,
+            slideCount: slideInfo.count,
+            slides: slideInfo.metadata
+          }
+        } as CustomEvent;
+        onDeckRegistered(customEvent);
+      }
+    }, [onDeckRegistered, id, slideInfo.count, slideInfo.labelsString]);
+
+    // Get the current active slide
+    const activeSlideId = store.activeDecks[id];
+    const activeSlideIndex = slideElements.findIndex(slide => slide.id === activeSlideId);
+    const currentSlide = activeSlideIndex >= 0 ? slideElements[activeSlideIndex] : slideElements[0];
+
+    // Handle slide change callbacks
+    useEffect(() => {
+      if (onSlideChange && currentSlide) {
+        // Create CustomEvent-like object to match expected API
+        const customEvent = {
+          detail: {
+            deckId: id,
+            currentSlideId: currentSlide.id,
+            previousSlideId: activeSlideId, // Will be the previous one due to timing
+            slideIndex: currentSlide.index
+          }
+        } as CustomEvent;
+        onSlideChange(customEvent);
+      }
+    }, [onSlideChange, currentSlide, id, activeSlideId]);
 
     // Expose imperative handle for programmatic control
     useImperativeHandle(ref, () => ({
       navigateToSlide: (slideId: string) => {
-        const element = elementRef.current as any;
-        return element?.navigateToSlide?.(slideId) ?? false;
+        const slide = slideElements.find(s => s.id === slideId);
+        if (slide) {
+          store.setActiveSlide(id, slideId);
+          return true;
+        }
+        return false;
       },
-      navigateToNext: () => {
-        const element = elementRef.current as any;
-        return element?.navigateToNext?.() ?? false;
-      },
-      navigateToPrev: () => {
-        const element = elementRef.current as any;
-        return element?.navigateToPrev?.() ?? false;
-      },
+      navigateToNext: () => navigation.navigateNext(),
+      navigateToPrev: () => navigation.navigatePrev(),
       getCurrentSlide: () => {
-        const element = elementRef.current as any;
-        return element?.getCurrentSlide?.() ?? null;
+        if (!currentSlide) return null;
+        return {
+          id: currentSlide.id,
+          index: currentSlide.index,
+          label: currentSlide.label
+        };
       },
-      getAllSlides: () => {
-        const element = elementRef.current as any;
-        return element?.getAllSlides?.() ?? [];
-      },
-      getDeckInfo: () => {
-        const element = elementRef.current as any;
-        return element?.getDeckInfo?.() ?? null;
-      },
-      getElement: () => elementRef.current
-    }), []);
+      getAllSlides: () => slideElements.map(slide => ({
+        id: slide.id,
+        index: slide.index,
+        label: slide.label
+      })),
+      getDeckInfo: () => ({
+        id,
+        label,
+        slideCount: slideElements.length,
+        activeSlideId
+      })
+    }), [id, label, slideElements, currentSlide, activeSlideId, navigation, store]);
 
-    // Render the web component with React children
-    // Map React props to web component attributes for proper initialization timing
-    const attributes: any = {
-      ref: elementRef,
-      // Required attributes that must be set before connectedCallback
-      id: id,
-      // Optional attributes
-      label: label,
-      prompt: prompt,
-      description: description,
-      // React-specific props
-      className,
-      style,
-      ...otherProps
-    };
-
-    // Add enable-in-production attribute if enableInProduction is true
-    if (enableInProduction) {
-      attributes['enable-in-production'] = '';
+    // Production mode: render only the first slide
+    if (store.isProduction && !enableInProduction) {
+      const firstSlide = slideElements[0];
+      if (!firstSlide) return null;
+      
+      return (
+        <div 
+          ref={deckRef}
+          className={className}
+          style={style}
+          data-iteration-deck={id}
+          data-production-mode="true"
+          {...otherProps}
+        >
+          {React.cloneElement(firstSlide.element, {
+            ...firstSlide.element.props,
+            key: firstSlide.id
+          } as any)}
+        </div>
+      );
     }
 
-    return React.createElement(
-      'iteration-deck',
-      attributes,
-      children
+    // Development mode: render all slides but show only the active one
+    return (
+      <div 
+        ref={deckRef}
+        className={className}
+        style={{
+          position: 'relative',
+          ...style
+        }}
+        data-iteration-deck={id}
+        data-development-mode="true"
+        {...otherProps}
+      >
+        {slideElements.map((slide) => {
+          const isActive = slide.id === activeSlideId;
+          
+          return (
+            <div
+              key={slide.id}
+              style={{
+                display: isActive ? 'block' : 'none'
+              }}
+              data-slide-id={slide.id}
+              data-slide-active={isActive}
+            >
+              {React.cloneElement(slide.element, {
+                ...slide.element.props
+              } as any)}
+            </div>
+          );
+        })}
+      </div>
     );
   }
 );

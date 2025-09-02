@@ -1,41 +1,23 @@
 /**
- * Color Design Tokens
+ * Lit CSS Tagged Template Literals for Design Tokens
  * 
- * Color primitives as JSON objects with light/dark themes as CSS tagged template literals.
- * Components use CSS custom properties directly.
+ * This module provides CSS tagged template literals for use in Lit components.
+ * Imports tokens from the main tokens.ts file to ensure consistency.
  */
 
 import { css, unsafeCSS } from 'lit';
+import { 
+  colorPrimitives, 
+  glassPrimitives, 
+  spacingLegacy,
+  breakpoints,
+  duration,
+  easing 
+} from './tokens.js';
 
-// Color primitives - simple JSON object
-export const colorPrimitives = {
-  // Grayscale primitives (50-900 scale)
-  gray050: '#fafafa',   // Lightest
-  gray100: '#f4f4f5',   // Very light
-  gray200: '#e4e4e7',   // Light
-  gray300: '#d4d4d8',   // Light medium
-  gray400: '#a1a1aa',   // Medium
-  gray500: '#71717a',   // Medium dark
-  gray600: '#52525b',   // Dark
-  gray700: '#374151',   // Darker
-  gray800: '#27272a',   // Very dark
-  gray900: '#18181b',   // Darkest
-  
-  // Pure colors
-  white: '#ffffff',
-  black: '#000000',
-} as const;
-
-// Glass effect colors with rgba for backdrop effects
-export const glassPrimitives = {
-  // Light mode glass - subtle white transparency
-  lightGlass: 'rgba(225, 225, 225, 0.8)',
-  lightGlassHover: 'rgba(255, 255, 255, 0.9)',
-  
-  // Dark mode glass - subtle dark transparency  
-  darkGlass: 'rgba(39, 39, 42, 0.8)',
-  darkGlassHover: 'rgba(50, 50, 50, 0.9)',
-} as const;
+// =============================================================================
+// CSS CUSTOM PROPERTIES FOR LIT COMPONENTS
+// =============================================================================
 
 // Unified theme system with automatic light/dark switching
 export const themeTokens = css`
@@ -110,6 +92,18 @@ export const themeTokens = css`
   }
 `;
 
-// Export types for TypeScript usage
-export type ColorPrimitives = typeof colorPrimitives;
-export type GlassPrimitives = typeof glassPrimitives;
+// =============================================================================
+// INDIVIDUAL TOKEN EXPORTS FOR DIRECT USAGE
+// =============================================================================
+
+// Re-export spacing with legacy names for Lit components
+export const spacing = spacingLegacy;
+
+// Re-export other tokens for direct usage in Lit CSS
+export { breakpoints, duration, easing };
+
+// =============================================================================
+// TYPESCRIPT TYPES
+// =============================================================================
+
+export type ThemeTokens = typeof themeTokens;
