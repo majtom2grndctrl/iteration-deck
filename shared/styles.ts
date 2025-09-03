@@ -1,14 +1,15 @@
 /**
- * Shared Tailwind Styling System
+ * Shared Styling System
  * 
  * This file exports Tailwind class strings as TypeScript constants for cross-framework consistency.
- * Used by both React and Lit components to ensure single source of truth for styling.
+ * These styles work with both React components and Lit web components, ensuring visual consistency
+ * across the entire iteration-deck ecosystem.
  * 
  * Benefits:
- * - TypeScript autocomplete and refactoring safety
+ * - Cross-framework consistency (React, Lit, etc.)
+ * - Type safety with TypeScript
  * - Tailwind's build optimization and purging
- * - Framework agnostic styling
- * - Prevents class string duplication
+ * - Single source of truth for component styling
  */
 
 // =============================================================================
@@ -26,12 +27,12 @@ export const toolbarStyles = {
     'flex items-center',
     'min-w-80', // 320px equivalent
     'sm:min-w-96', // 384px equivalent
-    'h-8', // Fixed height to prevent stretching
     'sm:h-10', // Slightly taller on larger screens
-    
+
     // Spacing - mobile first
     'gap-1 px-2 py-1',
     'sm:gap-2 sm:px-1 sm:py-1 sm:bottom-4',
+    'lg:p-3',
     
     // Visual design - signature pill shape
     'rounded-[40px]', // Large border radius
@@ -44,55 +45,125 @@ export const toolbarStyles = {
     
     // Background with glass effect
     'bg-gray-200/80',
-    'dark:bg-gray-900/80 dark:text-gray-200'
+    'dark:bg-gray-900/70 dark:text-gray-200'
+  ].join(' '),
+
+  // Inner container for toolbar content
+  inner: [
+    'flex items-center gap-2 w-full'
   ].join(' '),
   
   // Deck selector dropdown
   selector: {
+    container: [
+      'relative flex items-center'
+    ].join(' '),
+
+    select: [
+      'absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer z-[2]'
+    ].join(' '),
+
     button: [
       // Layout
       'flex items-center justify-between',
-      'h-6 min-w-30',
-      'gap-3 px-3 py-2',
+      'h-7 min-w-30',
+      'gap-3 px-3',
       
-      // Visual design
+      // Visual design with dark mode
       'bg-white border-2 border-gray-300',
+      'dark:bg-gray-800 dark:border-gray-600',
       'rounded-3xl', // 24px border radius
       
-      // Typography
+      // Typography with dark mode
       'text-sm font-normal leading-3',
-      'text-gray-700',
+      'text-gray-700 dark:text-gray-200',
       
-      // Interactive
+      // Interactive with dark mode
       'cursor-pointer select-none',
-      'hover:bg-gray-50',
-      'focus:outline-none focus:ring-2 focus:ring-gray-600'
+      'hover:bg-gray-50 dark:hover:bg-gray-600',
+      'focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400'
     ].join(' '),
-    
-    menu: [
-      // Positioning
-      'absolute bottom-full mb-2 left-0',
-      'min-w-full',
-      
-      // Visual design
-      'bg-white border border-gray-300',
-      'rounded-lg shadow-lg',
-      
-      // Animation
-      'animate-in fade-in duration-150'
+
+    text: [
+      'flex-1 overflow-hidden text-ellipsis whitespace-nowrap'
     ].join(' '),
-    
-    menuItem: [
-      // Layout
-      'block w-full px-3 py-2',
+
+    arrow: [
+      'text-[8px] text-gray-500 dark:text-gray-400 pointer-events-none'
+    ].join(' ')
+  },
+
+  // Separator between elements
+  separator: [
+    'w-px h-5 bg-gray-400/60 dark:bg-gray-500/70 sm:h-4'
+  ].join(' '),
+
+  // Slide navigation section
+  slideNavigation: {
+    container: [
+      'flex items-center gap-0 sm:gap-1'
+    ].join(' '),
+
+    prevButton: [
+      // Shape - left side of segmented control
+      'rounded-l-3xl border-r-0',
       
-      // Typography
-      'text-sm text-left text-gray-700',
+      // Interactive states with dark mode - consistent with main button
+      'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset',
+      'dark:focus:ring-blue-400',
+      'active:bg-gray-100 active:scale-95',
+      'dark:active:bg-gray-500',
       
-      // Interactive
-      'cursor-pointer',
-      'hover:bg-gray-100',
-      'focus:bg-gray-100 focus:outline-none'
+      // Disabled state with dark mode - consistent
+      'disabled:opacity-40 disabled:cursor-not-allowed',
+      'disabled:hover:bg-white disabled:active:scale-100',
+      'dark:disabled:hover:bg-gray-700'
+    ].join(' '),
+
+    nextButton: [
+      // Shape - right side of segmented control  
+      'rounded-r-3xl border-l-0',
+      
+      // Interactive states with dark mode - consistent with main button
+      'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset',
+      'dark:focus:ring-blue-400',
+      'active:bg-gray-100 active:scale-95',
+      'dark:active:bg-gray-500',
+      
+      // Disabled state with dark mode - consistent
+      'disabled:opacity-40 disabled:cursor-not-allowed',
+      'disabled:hover:bg-white disabled:active:scale-100',
+      'dark:disabled:hover:bg-gray-700'
+    ].join(' ')
+  },
+
+  // Slide info section
+  slideInfo: {
+    container: [
+      'flex-1 flex flex-col gap-0 sm:px-2 sm:max-w-4xl lg:max-w-none lg:w-80'
+    ].join(' '),
+
+    label: [
+      'text-gray-700 dark:text-gray-200 text-xs font-medium leading-4 overflow-hidden text-ellipsis whitespace-nowrap sm:text-sm'
+    ].join(' ')
+  },
+
+  // Slide indicators (dots)
+  indicators: {
+    container: [
+      'flex items-center justify-start gap-1 w-full'
+    ].join(' '),
+
+    dot: [
+      'w-1 h-1 rounded-full bg-gray-600 dark:bg-gray-400 transition-opacity duration-200'
+    ].join(' '),
+
+    dotActive: [
+      'opacity-80'
+    ].join(' '),
+
+    dotInactive: [
+      'opacity-40'
     ].join(' ')
   },
   
@@ -101,38 +172,43 @@ export const toolbarStyles = {
     container: [
       // Layout
       'flex items-center',
-      'rounded-3xl', // 24px border radius
+      'rounded-3xl',
+      'border-2 border-gray-300 dark:border-gray-600',
       'overflow-hidden',
+      'h-7',
       
-      // Visual design
-      'bg-white',
-      'shadow-md'
+      // Visual design with dark mode
+      'bg-gray-200 dark:bg-gray-600',
     ].join(' '),
     
     button: [
       // Layout
       'flex items-center justify-center',
-      'w-8 h-6', // 32px x 24px
-      'px-2',
+      'w-8 h-full',
       
-      // Typography
-      'text-gray-600',
+      // Background with dark mode - clean transitions
+      'bg-white dark:bg-gray-800',
+      'transition-all duration-150 ease-out',
       
-      // Interactive
+      // Typography with dark mode
+      'text-gray-600 dark:text-gray-300 text-sm',
+      
+      // Interactive states with dark mode support
       'cursor-pointer select-none',
-      'hover:bg-gray-100 hover:text-gray-700',
-      'disabled:opacity-50 disabled:cursor-not-allowed',
-      'focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-600'
+      'hover:bg-gray-50 hover:text-gray-800',
+      'dark:hover:bg-gray-600 dark:hover:text-gray-100',
+      'active:bg-gray-100 active:scale-95',
+      'dark:active:bg-gray-500',
+      'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset',
+      'dark:focus:ring-blue-400',
+      
+      // Disabled state with dark mode
+      'disabled:opacity-40 disabled:cursor-not-allowed',
+      'disabled:hover:bg-white disabled:hover:text-gray-600',
+      'dark:disabled:hover:bg-gray-700 dark:disabled:hover:text-gray-300',
+      'disabled:active:scale-100'
     ].join(' ')
-  },
-  
-  // Slide counter
-  counter: [
-    // Typography
-    'text-xs font-medium',
-    'text-gray-500',
-    'whitespace-nowrap min-w-[60px] text-center'
-  ].join(' ')
+  }
 } as const;
 
 // =============================================================================
@@ -140,28 +216,10 @@ export const toolbarStyles = {
 // =============================================================================
 
 export const deckStyles = {
-  // Main container
+  // Basic deck container
   container: [
-    'block relative'
-  ].join(' '),
-  
-  // Individual slides
-  slide: {
-    // Base slide wrapper
-    wrapper: [
-      'block'
-    ].join(' '),
-    
-    // Hidden slide (not active)
-    hidden: [
-      'hidden'
-    ].join(' '),
-    
-    // Active slide
-    active: [
-      'block'
-    ].join(' ')
-  }
+    'block min-h-1'
+  ].join(' ')
 } as const;
 
 // =============================================================================
@@ -169,71 +227,18 @@ export const deckStyles = {
 // =============================================================================
 
 export const confidenceStyles = {
-  // Container
-  indicator: [
-    // Layout
-    'inline-block relative',
-    'bg-gray-100 bg-opacity-10',
-    'rounded-8 overflow-hidden', // Large border radius for pill shape
-    
-    // Dark mode
-    'dark:bg-white dark:bg-opacity-20'
+  // Confidence indicator base
+  container: [
+    'inline-block relative'
   ].join(' '),
   
-  // Size variations
-  sizes: {
-    small: 'w-10 h-[3px]',
-    medium: 'w-15 h-1',
-    large: 'w-20 h-[6px]'
-  },
-  
-  // Confidence bar with gradient colors
   bar: [
-    'h-full rounded-8',
-    'bg-gradient-to-r from-red-500 via-yellow-500 to-green-500',
-    'origin-left transition-all duration-slow ease-in-out',
-    
-    // Reduced motion support
-    'motion-reduce:transition-none'
-  ].join(' ')
-} as const;
-
-// =============================================================================
-// ANIMATION UTILITIES
-// =============================================================================
-
-export const animationStyles = {
-  // Fade in animation
-  fadeIn: 'animate-fade-in',
+    'bg-gray-200 rounded-full overflow-hidden relative'
+  ].join(' '),
   
-  // Slide up animation
-  slideUp: 'animate-slide-up',
-  
-  // Glow effect for highlighting
-  glow: [
-    'animate-pulse',
-    'ring-4 ring-blue-300 ring-opacity-75',
-    'transition-all duration-1000'
+  fill: [
+    'h-full bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 rounded-full transition-all duration-500'
   ].join(' ')
-} as const;
-
-// =============================================================================
-// RESPONSIVE UTILITIES
-// =============================================================================
-
-export const responsiveStyles = {
-  // Mobile-first responsive classes
-  mobileFirst: {
-    // Spacing
-    gapSmall: 'gap-1 sm:gap-2',
-    paddingSmall: 'px-2 py-1 sm:px-1 sm:py-1',
-    
-    // Sizing
-    minWidthToolbar: 'min-w-[320px] sm:min-w-[384px]',
-    
-    // Positioning
-    bottomPosition: 'bottom-2 sm:bottom-4'
-  }
 } as const;
 
 // =============================================================================
@@ -243,5 +248,3 @@ export const responsiveStyles = {
 export type ToolbarStyles = typeof toolbarStyles;
 export type DeckStyles = typeof deckStyles;
 export type ConfidenceStyles = typeof confidenceStyles;
-export type AnimationStyles = typeof animationStyles;
-export type ResponsiveStyles = typeof responsiveStyles;

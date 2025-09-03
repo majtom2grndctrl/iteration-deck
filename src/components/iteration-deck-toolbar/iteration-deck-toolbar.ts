@@ -505,10 +505,10 @@ export class IterationDeckToolbar extends LitElement {
     const currentSlideIndex = deck.slideIds.indexOf(deck.activeSlideId);
 
     return html`
-      <div class="flex items-center justify-start gap-1 w-full" aria-hidden="true">
+      <div class="${toolbarStyles.indicators.container}" aria-hidden="true">
         ${deck.slideIds.map((_, index) => html`
           <div
-            class="w-1 h-1 rounded-full bg-gray-600 transition-opacity duration-200 ${index === currentSlideIndex ? 'opacity-80' : 'opacity-40'}"
+            class="${toolbarStyles.indicators.dot} ${index === currentSlideIndex ? toolbarStyles.indicators.dotActive : toolbarStyles.indicators.dotInactive}"
           ></div>
         `)}
       </div>
@@ -555,11 +555,11 @@ export class IterationDeckToolbar extends LitElement {
 
     return html`
       <div class="${toolbarStyles.container}">
-        <div class="flex items-center px-3 gap-2 w-full">
+        <div class="${toolbarStyles.inner}">
           ${hasMultipleDecks ? html`
-            <div class="relative flex items-center">
+            <div class="${toolbarStyles.selector.container}">
               <select 
-                class="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer z-[2]"
+                class="${toolbarStyles.selector.select}"
                 @change=${this.handleDeckSelection}
                 .value=${selectedDeckId || ''}
                 aria-label="Select iteration deck"
@@ -574,17 +574,17 @@ export class IterationDeckToolbar extends LitElement {
                 `)}
               </select>
               <div class="${toolbarStyles.selector.button}">
-                <span class="flex-1 overflow-hidden text-ellipsis whitespace-nowrap">${this.getDeckLabel(selectedDeckId || '')}</span>
-                <span class="text-[8px] text-gray-500 pointer-events-none">▼</span>
+                <span class="${toolbarStyles.selector.text}">${this.getDeckLabel(selectedDeckId || '')}</span>
+                <span class="${toolbarStyles.selector.arrow}">▼</span>
               </div>
             </div>
-            <div class="w-px h-5 bg-gray-400/60 sm:h-4"></div>
+            <div class="${toolbarStyles.separator}"></div>
           ` : ''}
           
-          <div class="flex items-center gap-0 sm:gap-1">
+          <div class="${toolbarStyles.slideNavigation.container}">
             <nav class="${toolbarStyles.navigation.container}">
               <button 
-                class="${toolbarStyles.navigation.button} rounded-l-3xl border-r-0 focus:outline-none focus-visible:outline-2 focus-visible:outline-[#007AFF] focus-visible:outline-offset-2 focus-visible:border-[#007AFF] active:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-gray-300"
+                class="${toolbarStyles.navigation.button} ${toolbarStyles.slideNavigation.prevButton}"
                 @click=${this.handlePrevSlide}
                 ?disabled=${!this.canNavigatePrev()}
                 aria-label="Previous slide (Ctrl/Cmd+Alt+[)"
@@ -594,7 +594,7 @@ export class IterationDeckToolbar extends LitElement {
               </button>
               
               <button 
-                class="${toolbarStyles.navigation.button} rounded-r-3xl border-l-0 focus:outline-none focus-visible:outline-2 focus-visible:outline-[#007AFF] focus-visible:outline-offset-2 focus-visible:border-[#007AFF] active:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-gray-300"
+                class="${toolbarStyles.navigation.button} ${toolbarStyles.slideNavigation.nextButton}"
                 @click=${this.handleNextSlide}
                 ?disabled=${!this.canNavigateNext()}
                 aria-label="Next slide (Ctrl/Cmd+Alt+])"
@@ -604,8 +604,8 @@ export class IterationDeckToolbar extends LitElement {
               </button>
             </nav>
             
-            <div class="flex-1 flex flex-col gap-0 sm:px-2 sm:max-w-4xl lg:max-w-none lg:w-80">
-              <span class="text-gray-700 text-xs font-medium leading-4 overflow-hidden text-ellipsis whitespace-nowrap sm:text-sm" 
+            <div class="${toolbarStyles.slideInfo.container}">
+              <span class="${toolbarStyles.slideInfo.label}" 
                     title=${this.getCurrentSlideLabel()}>
                 ${this.getCurrentSlideLabel()}
               </span>
