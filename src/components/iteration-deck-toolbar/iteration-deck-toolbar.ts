@@ -15,7 +15,7 @@
  * - Dynamic deck registration/unregistration handling
  */
 
-import { LitElement, html, nothing, css, unsafeCSS } from 'lit';
+import { LitElement, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { 
   subscribeToIterationStore, 
@@ -31,19 +31,11 @@ import {
   type NavigationDirection
 } from '../../core/utilities.js';
 import type { DeckRegistration } from '../../core/types.js';
-import { 
-  themeTokens,
-  spacing,
-  breakpoints,
-  duration,
-  easing
-} from '../../../shared/tokens-lit.js';
-// import { toolbarStyles } from '../../../shared/styles.js'; // Available for reference
+import { toolbarStyles } from '../../../shared/styles.js';
 import type { IterationDeckSlide } from '../iteration-deck-slide/iteration-deck-slide.js';
 
-// ShadowDOM encapsulation for isolated styling
-// Note: Shared Tailwind classes are available in toolbarStyles for cross-framework consistency
-// These classes match the styling applied here but can be used in React components
+// Using shared Tailwind classes for cross-framework consistency
+// Classes are imported from shared/styles.ts and work with CDN or build-time Tailwind
 
 /**
  * Singleton instance tracking
@@ -77,294 +69,15 @@ export class IterationDeckToolbar extends LitElement {
    */
   private throttledKeyboardHandler = throttle(this.handleKeyboardNavigation.bind(this), 100);
 
-  static styles = [
-    themeTokens,
-    css`
-    :host {
-      /* Positioning */
-      position: fixed;
-      bottom: ${unsafeCSS(spacing.spacing2)};
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 9999;
-      
-      /* Layout and sizing - Mobile-first approach */
-      display: flex;
-      align-items: center;
-      gap: ${unsafeCSS(spacing.spacing1)};
-      min-width: calc(${unsafeCSS(spacing.spacing8)} * 5); /* 320px equivalent */
-      padding: ${unsafeCSS(spacing.spacing1)} ${unsafeCSS(spacing.spacing2)};
-      
-      /* Visual design - signature pill shape */
-      border-radius: ${unsafeCSS(spacing.spacing8)}; /* Large border radius */
-      background: var(--color-bg-glass);
-      backdrop-filter: blur(${unsafeCSS(spacing.spacing2)}); /* 16px blur */
-      box-shadow: var(--toolbar-shadow);
-      
-      /* Typography - Mobile-first */
-      font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif;
-      font-size: ${unsafeCSS(spacing.spacing1)}; /* 8px - small text */
-      font-weight: 500;
-      line-height: 1;
-      color: var(--color-text-primary);
-    }
-    
-    /* Progressive enhancement for larger screens */
-    @media (min-width: ${unsafeCSS(breakpoints.sm)}) {
-      :host {
-        min-width: calc(${unsafeCSS(spacing.spacing8)} * 6); /* ~384px equivalent */
-        height: auto;
-        padding: ${unsafeCSS(spacing.spacing1)};
-        gap: ${unsafeCSS(spacing.spacing2)};
-        bottom: ${unsafeCSS(spacing.spacing4)};
-        font-size: ${unsafeCSS(spacing.spacing2)}; /* 16px - standard text */
-      }
-    }
+  /**
+   * Disable Shadow DOM to allow external Tailwind CSS to style the component
+   * This is necessary because Tailwind classes from CDN cannot penetrate Shadow DOM
+   */
+  createRenderRoot() {
+    return this;
+  }
 
-    /* Reduced motion support */
-    @media (prefers-reduced-motion: reduce) {
-      :host {
-        transition: none;
-      }
-    }
-    
-    .toolbar-container {
-      display: flex;
-      align-items: center;
-      gap: ${unsafeCSS(spacing.spacing2)};
-      width: 100%;
-    }
-    
-    /* Custom deck selector styles to match button height */
-    .deck-selector {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-    
-    /* Hidden native select for accessibility and functionality */
-    .select-element {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      opacity: 0;
-      cursor: pointer;
-      z-index: 2;
-    }
-    
-    /* Custom select display that matches button styling */
-    .select-display {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: ${unsafeCSS(spacing.spacing6)};
-      gap: ${unsafeCSS(spacing.spacing3)};
-      min-width: 120px;
-      padding: 0 ${unsafeCSS(spacing.spacing3)};
-      
-      background: var(--color-bg-elevated);
-      border: ${unsafeCSS(spacing.spacing00)} solid var(--color-border-secondary);
-      border-radius: 24px;
-      
-      font-size: ${unsafeCSS(spacing.spacing2)}; /* 16px - standard text */
-      font-weight: 500;
-      line-height: ${unsafeCSS(spacing.spacing3)};
-      color: var(--color-text-primary);
-      
-      cursor: pointer;
-      user-select: none;
-        }
-    
-    .select-display:hover {
-      background: var(--color-bg-elevated);
-      border-color: var(--color-border-primary);
-    }
-    
-    .select-text {
-      flex: 1;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    
-    .select-arrow {
-      font-size: 8px;
-      color: var(--color-text-secondary);
-      pointer-events: none;
-    }
-    
-    /* Navigation section - Mobile-first */
-    .slide-selector {
-      display: flex;
-      align-items: center;
-      gap: 0;
-    }
-    
-    /* Progressive enhancement for larger screens */
-    @media (min-width: ${unsafeCSS(breakpoints.sm)}) {
-      .slide-selector {
-        gap: ${unsafeCSS(spacing.spacing1)};
-      }
-    }
-    
-    /* Segmented button group */
-    .segmented-button-group {
-      display: flex;
-      align-items: center;
-      gap: ${unsafeCSS(spacing.spacing00)};
-      overflow: hidden;
-      background: var(--segmented-shadow);
-    }
-    
-    /* Navigation buttons - Mobile-first */
-    .nav-button {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: ${unsafeCSS(spacing.spacing6)};
-      height: ${unsafeCSS(spacing.spacing6)};
-      
-      background: var(--color-bg-elevated);
-      border: ${unsafeCSS(spacing.spacing00)} solid var(--color-border-secondary);
-      
-      color: var(--color-text-secondary);
-      cursor: pointer;
-      outline: none;
-      
-        }
-    
-    .nav-button:hover {
-      background: var(--color-interactive-hover);
-      border-color: var(--color-border-primary);
-      color: var(--color-text-primary);
-    }
-    
-    .nav-button:focus {
-      outline: none;
-    }
-    
-    .nav-button:focus-visible {
-      outline: 2px solid #007AFF;
-      outline-offset: 2px;
-      border-color: #007AFF;
-    }
-    
-    .nav-button:active {
-      opacity: 0.8;
-    }
-    
-    .nav-button:disabled {
-      color: var(--color-text-disabled);
-      cursor: not-allowed;
-      opacity: 0.5;
-    }
-    
-    .nav-button:disabled:hover {
-      background: var(--color-bg-elevated);
-      border-color: var(--color-border-secondary);
-      transform: none;
-      box-shadow: none;
-    }
-    
-    
-    
-    /* First and last button styling for seamless segmented group */
-    .nav-button:first-child {
-      border-radius: 0;
-      border-right: none;
-      border-top-left-radius: ${unsafeCSS(spacing.spacing3)};
-      border-bottom-left-radius: ${unsafeCSS(spacing.spacing3)};
-    }
-    
-    .nav-button:last-child {
-      border-radius: 0;
-      border-left: none;
-      border-top-right-radius: ${unsafeCSS(spacing.spacing3)};
-      border-bottom-right-radius: ${unsafeCSS(spacing.spacing3)};
-    }
-    
-    /* Slide info wrapper - Mobile-first */
-    .slide-info {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: ${unsafeCSS(spacing.spacing0)};
-    }
-    
-    /* Progressive enhancement for larger screens */
-    @media (min-width: ${unsafeCSS(breakpoints.sm)}) {
-      .slide-info {
-        padding: 0 ${unsafeCSS(spacing.spacing2)};
-        max-width: 50rem;
-      }
-    }
-
-    @media (min-width: ${unsafeCSS(breakpoints.lg)}) {
-      .slide-info {
-        max-width: unset;
-        width: 20rem;
-      }
-    }
-    
-    /* Slide label - Mobile-first */
-    .slide-label {
-      color: var(--color-text-primary);
-      font-size: ${unsafeCSS(spacing.spacing3)};
-      font-weight: 500;
-      line-height: ${unsafeCSS(spacing.spacing4)};
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    
-    /* Progressive enhancement for larger screens */
-    @media (min-width: ${unsafeCSS(breakpoints.sm)}) {
-      .slide-label {
-        font-size: 14px;
-      }
-    }
-    
-    /* Carousel indicators */
-    .slide-indicators {
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      gap: ${unsafeCSS(spacing.spacing1)};
-      width: 100%;
-    }
-    
-    .slide-indicator {
-      width: ${unsafeCSS(spacing.spacing0)};
-      height: ${unsafeCSS(spacing.spacing0)};
-      border-radius: 50%;
-      background: var(--color-text-secondary);
-      opacity: 0.4;
-      transition: opacity ${unsafeCSS(duration.normal)};
-    }
-    
-    .slide-indicator.active {
-      opacity: 0.8;
-    }
-    
-    /* Separator - Mobile-first */
-    .separator {
-      width: 1px;
-      height: 20px;
-      background: var(--color-border-primary);
-      opacity: 0.6;
-    }
-    
-    /* Progressive enhancement for larger screens */
-    @media (min-width: ${unsafeCSS(breakpoints.sm)}) {
-      .separator {
-        height: ${unsafeCSS(spacing.spacing4)};
-      }
-    }
-    
-    
-  `];
+  // No static styles - using Tailwind classes in template
 
   constructor() {
     super();
@@ -392,7 +105,7 @@ export class IterationDeckToolbar extends LitElement {
       return;
     }
 
-    // Styles are now embedded via CSS tagged template literals with ShadowDOM encapsulation
+    // Using Tailwind classes from shared styles for cross-framework consistency
 
     // Subscribe to store changes
     this.unsubscribeFromStore = subscribeToIterationStore((state) => {
@@ -654,9 +367,9 @@ export class IterationDeckToolbar extends LitElement {
     style.textContent = `
       /* Iteration Deck Glow Effect Global Styles */
       [data-iteration-glow] {
-        border-radius: ${unsafeCSS(spacing.spacing1)}; /* 8px - small radius */
+        border-radius: 8px;
         position: relative;
-        animation: iteration-deck-glow ${unsafeCSS(duration.slower)} ${unsafeCSS(easing.easeInOut)};
+        animation: iteration-deck-glow 1s ease-in-out;
       }
       
       @keyframes iteration-deck-glow {
@@ -792,10 +505,10 @@ export class IterationDeckToolbar extends LitElement {
     const currentSlideIndex = deck.slideIds.indexOf(deck.activeSlideId);
 
     return html`
-      <div class="slide-indicators" aria-hidden="true">
+      <div class="flex items-center justify-start gap-1 w-full" aria-hidden="true">
         ${deck.slideIds.map((_, index) => html`
           <div
-            class="slide-indicator ${index === currentSlideIndex ? 'active' : ''}"
+            class="w-1 h-1 rounded-full bg-gray-600 transition-opacity duration-200 ${index === currentSlideIndex ? 'opacity-80' : 'opacity-40'}"
           ></div>
         `)}
       </div>
@@ -841,60 +554,63 @@ export class IterationDeckToolbar extends LitElement {
     }
 
     return html`
-      <div class="toolbar-container">
-        ${hasMultipleDecks ? html`
-          <div class="deck-selector">
-            <select 
-              class="select-element"
-              @change=${this.handleDeckSelection}
-              .value=${selectedDeckId || ''}
-              aria-label="Select iteration deck"
-            >
-              ${deckIds.map(deckId => html`
-                <option 
-                  value=${deckId} 
-                  ?selected=${deckId === selectedDeckId}
-                >
-                  ${this.getDeckLabel(deckId)}
-                </option>
-              `)}
-            </select>
-            <div class="select-display">
-              <span class="select-text">${this.getDeckLabel(selectedDeckId || '')}</span>
-              <span class="select-arrow">▼</span>
+      <div class="${toolbarStyles.container}">
+        <div class="flex items-center px-3 gap-2 w-full">
+          ${hasMultipleDecks ? html`
+            <div class="relative flex items-center">
+              <select 
+                class="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer z-[2]"
+                @change=${this.handleDeckSelection}
+                .value=${selectedDeckId || ''}
+                aria-label="Select iteration deck"
+              >
+                ${deckIds.map(deckId => html`
+                  <option 
+                    value=${deckId} 
+                    ?selected=${deckId === selectedDeckId}
+                  >
+                    ${this.getDeckLabel(deckId)}
+                  </option>
+                `)}
+              </select>
+              <div class="${toolbarStyles.selector.button}">
+                <span class="flex-1 overflow-hidden text-ellipsis whitespace-nowrap">${this.getDeckLabel(selectedDeckId || '')}</span>
+                <span class="text-[8px] text-gray-500 pointer-events-none">▼</span>
+              </div>
             </div>
-          </div>
-          <div class="separator"></div>
-        ` : ''}
-        
-        <div class="slide-selector">
-          <nav class="segmented-button-group">
-            <button 
-              class="nav-button nav-button-first"
-              @click=${this.handlePrevSlide}
-              ?disabled=${!this.canNavigatePrev()}
-              aria-label="Previous slide (Ctrl/Cmd+Alt+[)"
-              title="Previous slide (Ctrl/Cmd+Alt+[)"
-            >
-              ◀
-            </button>
-            
-            <button 
-              class="nav-button nav-button-last"
-              @click=${this.handleNextSlide}
-              ?disabled=${!this.canNavigateNext()}
-              aria-label="Next slide (Ctrl/Cmd+Alt+])"
-              title="Next slide (Ctrl/Cmd+Alt+])"
-            >
-              ▶
-            </button>
-          </nav>
+            <div class="w-px h-5 bg-gray-400/60 sm:h-4"></div>
+          ` : ''}
           
-          <div class="slide-info">
-            <span class="slide-label" title=${this.getCurrentSlideLabel()}>
-              ${this.getCurrentSlideLabel()}
-            </span>
-            ${this.renderSlideIndicators()}
+          <div class="flex items-center gap-0 sm:gap-1">
+            <nav class="${toolbarStyles.navigation.container}">
+              <button 
+                class="${toolbarStyles.navigation.button} rounded-l-3xl border-r-0 focus:outline-none focus-visible:outline-2 focus-visible:outline-[#007AFF] focus-visible:outline-offset-2 focus-visible:border-[#007AFF] active:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-gray-300"
+                @click=${this.handlePrevSlide}
+                ?disabled=${!this.canNavigatePrev()}
+                aria-label="Previous slide (Ctrl/Cmd+Alt+[)"
+                title="Previous slide (Ctrl/Cmd+Alt+[)"
+              >
+                ◀
+              </button>
+              
+              <button 
+                class="${toolbarStyles.navigation.button} rounded-r-3xl border-l-0 focus:outline-none focus-visible:outline-2 focus-visible:outline-[#007AFF] focus-visible:outline-offset-2 focus-visible:border-[#007AFF] active:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-gray-300"
+                @click=${this.handleNextSlide}
+                ?disabled=${!this.canNavigateNext()}
+                aria-label="Next slide (Ctrl/Cmd+Alt+])"
+                title="Next slide (Ctrl/Cmd+Alt+])"
+              >
+                ▶
+              </button>
+            </nav>
+            
+            <div class="flex-1 flex flex-col gap-0 sm:px-2 sm:max-w-4xl lg:max-w-none lg:w-80">
+              <span class="text-gray-700 text-xs font-medium leading-4 overflow-hidden text-ellipsis whitespace-nowrap sm:text-sm" 
+                    title=${this.getCurrentSlideLabel()}>
+                ${this.getCurrentSlideLabel()}
+              </span>
+              ${this.renderSlideIndicators()}
+            </div>
           </div>
         </div>
       </div>

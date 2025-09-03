@@ -26,6 +26,8 @@ export const toolbarStyles = {
     'flex items-center',
     'min-w-80', // 320px equivalent
     'sm:min-w-96', // 384px equivalent
+    'h-8', // Fixed height to prevent stretching
+    'sm:h-10', // Slightly taller on larger screens
     
     // Spacing - mobile first
     'gap-1 px-2 py-1',
@@ -41,7 +43,7 @@ export const toolbarStyles = {
     'text-gray-700',
     
     // Background with glass effect
-    'bg-white/80',
+    'bg-gray-200/80',
     'dark:bg-gray-900/80 dark:text-gray-200'
   ].join(' '),
   

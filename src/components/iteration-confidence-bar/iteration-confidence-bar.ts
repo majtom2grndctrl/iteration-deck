@@ -20,11 +20,11 @@
  * @author Claude Code (claude.ai/code)
  */
 
-import { LitElement, html, css, unsafeCSS } from 'lit';
+import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
-// Import design tokens
-import { spacing, duration, easing } from '../../../shared/tokens-lit.js';
+// Import shared styles for Tailwind consistency
+import { confidenceStyles } from '../../../shared/styles.js';
 
 export interface IterationConfidenceBarProps {
   /** AI confidence score (0-1 scale) */
@@ -40,64 +40,6 @@ export interface IterationConfidenceBarProps {
  */
 @customElement('iteration-confidence-bar')
 export class IterationConfidenceBar extends LitElement {
-  
-  static styles = css`
-    :host {
-      display: inline-block;
-      position: relative;
-    }
-    
-    :host([hidden]) {
-      display: none;
-    }
-    
-    /* Base confidence indicator styling */
-    .confidence-indicator {
-      background: rgba(0, 0, 0, 0.1);
-      border-radius: ${unsafeCSS(spacing.spacing8)}; /* Large border radius for pill shape */
-      overflow: hidden;
-      position: relative;
-    }
-    
-    /* Size variations */
-    .confidence-indicator.small {
-      width: 40px;
-      height: 3px;
-    }
-    
-    .confidence-indicator.medium {
-      width: 60px;
-      height: 4px;
-    }
-    
-    .confidence-indicator.large {
-      width: 80px;
-      height: 6px;
-    }
-    
-    /* Confidence bar with gradient colors */
-    .confidence-bar {
-      height: 100%;
-      background: linear-gradient(90deg, #ef4444 0%, #f59e0b 50%, #10b981 100%);
-      border-radius: ${unsafeCSS(spacing.spacing8)}; /* Large border radius for pill shape */
-      transform-origin: left center;
-      transition: width ${unsafeCSS(duration.slow)} ${unsafeCSS(easing.easeInOut)};
-    }
-    
-    /* Dark mode support */
-    @media (prefers-color-scheme: dark) {
-      .confidence-indicator {
-        background: rgba(255, 255, 255, 0.2);
-      }
-    }
-    
-    /* Accessibility: respect reduced motion */
-    @media (prefers-reduced-motion: reduce) {
-      .confidence-bar {
-        transition: none;
-      }
-    }
-  `;
 
   @property({ type: Number })
   confidence?: number;
@@ -171,9 +113,14 @@ export class IterationConfidenceBar extends LitElement {
     const confidenceLevel = this.getConfidenceLevel();
     const percentage = Math.round(confidence * 100);
     
+    const indicatorClasses = [
+      confidenceStyles.indicator, // Base pill styling
+      confidenceStyles.sizes[this.size] // Size variant
+    ].join(' ');
+    
     return html`
       <div 
-        class="confidence-indicator ${this.size}"
+        class="${indicatorClasses}"
         role="progressbar"
         aria-valuenow="${percentage}"
         aria-valuemin="0" 
@@ -182,7 +129,7 @@ export class IterationConfidenceBar extends LitElement {
         title="${this.getAriaLabel()}"
       >
         <div 
-          class="confidence-bar"
+          class="${confidenceStyles.bar}"
           style="width: ${percentage}%"
           data-level="${confidenceLevel}"
         ></div>

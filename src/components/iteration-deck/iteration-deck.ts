@@ -14,7 +14,7 @@
  * - Multi-deck support with automatic cleanup
  */
 
-import { LitElement, html, css, type PropertyValues } from 'lit';
+import { LitElement, html, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
 // Import core types and utilities
@@ -36,6 +36,9 @@ import {
   getIterationStoreState, 
   type IterationStore 
 } from '../../store/iteration-store.js';
+
+// Import shared styles for Tailwind consistency
+import { deckStyles } from '../../../shared/styles.js';
 
 // Import toolbar integration
 import { ensureToolbarMounted, cleanupToolbarIfEmpty } from '../iteration-deck-toolbar';
@@ -140,26 +143,6 @@ export class IterationDeck extends LitElement {
    */
   private _slotObserver?: MutationObserver;
 
-  /**
-   * ShadowDOM-encapsulated styles using Lit CSS tagged template literals
-   * with design tokens for type-safe styling
-   */
-  static styles = css`
-    :host {
-      display: block;
-      min-height: 1px; /* Prevent total collapse */
-    }
-    
-    .iteration-deck-container {
-      display: block;
-      min-height: inherit;
-    }
-    
-    .iteration-deck-content {
-      display: block;
-      min-height: inherit;
-    }
-  `;
 
   /**
    * Component lifecycle: Initialize store subscription and register deck
@@ -420,17 +403,17 @@ export class IterationDeck extends LitElement {
       return html`<slot></slot>`;
     }
 
-    // Determine container classes based on mode (considering enableInProduction override)
+    // Use shared Tailwind styles for consistency
     const containerClasses = [
-      'iteration-deck-container',
+      deckStyles.container, // 'block relative'
       this._shouldActivate() ? 'development' : 'production',
       'animated'
     ].join(' ');
 
     // Simply render the default slot - the slide components will handle their own visibility
     return html`
-      <div class="${containerClasses}">
-        <div class="iteration-deck-content">
+      <div class="${containerClasses} min-h-[1px]">
+        <div class="block min-h-inherit">
           <slot></slot>
         </div>
       </div>

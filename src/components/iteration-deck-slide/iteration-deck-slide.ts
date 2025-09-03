@@ -6,7 +6,7 @@
  * Fully integrated with Zustand store for cross-component reactivity.
  */
 
-import { LitElement, html, css } from 'lit';
+import { LitElement, html } from 'lit';
 import { customElement, property, state, queryAssignedElements } from 'lit/decorators.js';
 import type { IterationDeckSlideProps } from '../../core/types.js';
 import { 
@@ -18,6 +18,9 @@ import {
   generateSlideId, 
   errorLog 
 } from '../../core/utilities.js';
+
+// Import shared styles for Tailwind consistency
+import { deckStyles } from '../../../shared/styles.js';
 
 /**
  * Custom element for individual iteration deck slides
@@ -33,35 +36,6 @@ import {
 @customElement('iteration-deck-slide')
 export class IterationDeckSlide extends LitElement implements IterationDeckSlideProps {
   
-  /**
-   * ShadowDOM-encapsulated styles using Lit CSS tagged template literals
-   * with design tokens for consistent styling and theme support
-   */
-  static styles = css`
-    :host {
-      display: block;
-    }
-    
-    .slide-container {
-      display: block;
-      min-height: inherit;
-    }
-    
-    .slide-container.active {
-      display: block;
-    }
-    
-    /* Hide inactive slides properly once deck IDs are resolved */
-    .slide-container.inactive {
-      display: none;
-    }
-    
-    .slide-content {
-      display: block;
-      min-height: inherit;
-    }
-    
-  `;
 
   // Public properties from IterationDeckSlideProps interface
   @property({ type: String, reflect: true })
@@ -269,15 +243,17 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
    * Render the slide content with metadata overlay in development
    */
   override render() {
+    // Use shared Tailwind styles for consistency
     const containerClasses = [
-      'slide-container',
-      this.isActive ? 'active' : 'inactive',
-      this.isInitializing ? 'initializing' : ''
+      deckStyles.slide.wrapper, // 'block'
+      this.isActive ? deckStyles.slide.active : deckStyles.slide.hidden, // 'block' or 'hidden'
+      this.isInitializing ? 'initializing' : '',
+      'min-h-inherit' // Maintain min-height behavior
     ].filter(Boolean).join(' ');
 
     return html`
       <div class="${containerClasses}">
-        <div class="slide-content">
+        <div class="block min-h-inherit">
           <slot @slotchange=${this.handleSlotChange}></slot>
         </div>
       </div>
