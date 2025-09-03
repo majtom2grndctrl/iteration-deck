@@ -14,4 +14,8 @@ export default defineConfig({
       '/src': resolve(__dirname, '../../src'),
     },
   },
+  css: {
+    // Disable PostCSS processing since we're using Tailwind from CDN
+    postcss: false,
+  },
 });

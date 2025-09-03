@@ -8,24 +8,46 @@
     <!-- Tailwind CSS from CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Configure Tailwind with design system colors -->
+    <!-- Configure Tailwind to match our shared theme -->
     <script>
       tailwind.config = {
         theme: {
           extend: {
             colors: {
-              primary: {
-                50: '#f0f9ff',
-                100: '#e0f2fe',
-                200: '#bae6fd',
-                300: '#7dd3fc',
-                400: '#38bdf8',
-                500: '#0ea5e9',
-                600: '#0284c7',
-                700: '#0369a1',
-                800: '#075985',
-                900: '#0c4a6e'
+              // Glass colors from shared theme
+              glass: {
+                light: 'rgb(225 225 225 / 0.8)',
+                'light-hover': 'rgb(255 255 255 / 0.9)',
+                dark: 'rgb(39 39 42 / 0.8)',
+                'dark-hover': 'rgb(50 50 50 / 0.9)',
               }
+            },
+            spacing: {
+              // Match shared spacing scale
+              '0': '2px',
+              '1': '4px',
+              '2': '8px', 
+              '3': '12px',
+              '4': '16px',
+              '5': '20px',
+              '6': '24px',
+              '7': '32px',
+              '8': '40px',
+              '9': '48px',
+              '10': '56px',
+              '11': '64px',
+            },
+            boxShadow: {
+              // Match shared shadows
+              'toolbar': '0 8px 32px rgb(0 0 0 / 0.1), 0 2px 8px rgb(0 0 0 / 0.05)',
+              'segmented': 'radial-gradient(ellipse 4px 44px at center, rgb(0 0 0 / 0.15) 40%, rgb(0 0 0 / 0.05) 60%, transparent 100%)',
+            },
+            backdropBlur: {
+              'xs': '2px',
+              'sm': '4px',
+              'md': '8px',
+              'lg': '12px', 
+              'xl': '16px',
             }
           }
         }

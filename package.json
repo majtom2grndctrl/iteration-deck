@@ -69,7 +69,6 @@
     "custom-elements"
   ],
   "scripts": {
-    "dev": "vite",
     "dev:react": "cd examples/react-app && pnpm dev",
     "dev:lit": "cd examples/lit-demo && pnpm install && pnpm dev",
     "clean": "rm -rf dist",
@@ -110,6 +109,7 @@
   },
   "devDependencies": {
     "@open-wc/testing-helpers": "^3.0.1",
+    "@tailwindcss/typography": "^0.5.16",
     "@testing-library/jest-dom": "^6.7.0",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
@@ -118,9 +118,12 @@
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
     "@vitest/ui": "^3.2.4",
+    "autoprefixer": "^10.4.21",
     "happy-dom": "^18.0.1",
     "jsdom": "^26.1.0",
+    "postcss": "^8.5.6",
     "react": "^19.1.1",
+    "tailwindcss": "^4.1.12",
     "terser": "^5.43.1",
     "typescript": "~5.8.3",
     "vite": "^7.1.2",

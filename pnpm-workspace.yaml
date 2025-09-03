@@ -5,4 +5,5 @@ packages:
   - website-2
 
 onlyBuiltDependencies:
+  - '@tailwindcss/oxide'
   - esbuild

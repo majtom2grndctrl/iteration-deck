@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+/* Ensure iteration deck components have proper display */
+iteration-deck,
+iteration-deck-slide {
+  display: block;
+}
+
+/* Remove test CSS */

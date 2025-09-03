@@ -38,9 +38,12 @@ import {
   duration,
   easing
 } from '../../../shared/tokens-lit.js';
+// import { toolbarStyles } from '../../../shared/styles.js'; // Available for reference
 import type { IterationDeckSlide } from '../iteration-deck-slide/iteration-deck-slide.js';
 
 // ShadowDOM encapsulation for isolated styling
+// Note: Shared Tailwind classes are available in toolbarStyles for cross-framework consistency
+// These classes match the styling applied here but can be used in React components
 
 /**
  * Singleton instance tracking

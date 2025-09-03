@@ -8,6 +8,7 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { tokens } from '../../shared';
+import { toolbarStyles } from '../../shared/styles';
 import { useIterationStore } from './store';
 
 /**
@@ -16,8 +17,6 @@ import { useIterationStore } from './store';
 export interface IterationDeckToolbarProps {
   /** Optional className for the toolbar container */
   className?: string;
-  /** Optional style overrides */
-  style?: React.CSSProperties;
   /** Whether to show keyboard shortcut hints */
   showKeyboardHints?: boolean;
 }
@@ -100,58 +99,12 @@ const DeckSelector: React.FC<{
   const selectedDeck = decks.find(d => d.id === selectedDeckId);
   const displayLabel = selectedDeck ? (selectedDeck.label || selectedDeck.id) : 'Select Deck';
 
-  const dropdownStyle = useMemo(() => ({
-    position: 'relative' as const,
-  }), []);
+  // Use shared Tailwind classes for consistent styling
+  const dropdownClasses = 'relative';
+  const buttonClasses = toolbarStyles.selector.button;
 
-  const buttonStyle = useMemo(() => ({
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'spaceBetween',
-    height: tokens.spacing[6], // 24px - matching nav buttons
-    gap: tokens.spacing[3], // 12px
-    minWidth: '120px',
-    padding: `${tokens.spacing[2]} ${tokens.spacing[3]}`,
-    
-    background: tokens.colors.white, // var(--color-bg-elevated)
-    border: `${tokens.spacing[0]} solid ${tokens.colors.gray[300]}`, // 2px border matching Lit
-    borderRadius: '24px', // Matching Lit's select-display border-radius
-    
-    fontSize: tokens.spacing[3], // 8px - matching Lit's select-display
-    fontWeight: 400,
-    lineHeight: tokens.spacing[3], // 12px
-    color: tokens.colors.gray[700],
-    
-    cursor: 'pointer',
-    userSelect: 'none' as const,
-  }), []);
-
-  const menuStyle = useMemo(() => ({
-    position: 'absolute' as const,
-    bottom: '100%',
-    left: 0,
-    right: 0,
-    marginBottom: tokens.spacing[2],
-    backgroundColor: tokens.colors.white,
-    border: `1px solid ${tokens.colors.gray[300]}`,
-    borderRadius: tokens.borderRadius.md,
-    boxShadow: tokens.shadows.toolbar,
-    zIndex: 1001,
-    maxHeight: '200px',
-    overflowY: 'auto' as const,
-  }), []);
-
-  const menuItemStyle = useCallback((isSelected: boolean) => ({
-    padding: `${tokens.spacing[2]} ${tokens.spacing[3]}`,
-    cursor: 'pointer',
-    backgroundColor: isSelected ? tokens.colors.gray[100] : 'transparent',
-    color: tokens.colors.gray[700],
-    fontSize: '14px',
-    borderBottom: `1px solid ${tokens.colors.gray[200]}`,
-    ':hover': {
-      backgroundColor: tokens.colors.gray[50]
-    }
-  }), []);
+  const menuClasses = `${toolbarStyles.selector.menu} max-h-[200px] overflow-y-auto`;
+  const menuItemClasses = toolbarStyles.selector.menuItem;
 
   useEffect(() => {
     const handleClickOutside = () => {
@@ -167,9 +120,9 @@ const DeckSelector: React.FC<{
   if (decks.length <= 1) return null;
 
   return (
-    <div style={dropdownStyle}>
+    <div className={dropdownClasses}>
       <button
-        style={buttonStyle}
+        className={buttonClasses}
         onClick={(e) => {
           e.stopPropagation();
           setIsOpen(!isOpen);
@@ -181,30 +134,20 @@ const DeckSelector: React.FC<{
           e.currentTarget.style.backgroundColor = tokens.colors.white;
         }}
       >
-        <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{displayLabel}</span>
-        <span style={{ fontSize: '8px', color: tokens.colors.gray[500], pointerEvents: 'none' }}>{isOpen ? '▲' : '▼'}</span>
+        <span className="flex-1 overflow-hidden text-ellipsis whitespace-nowrap">{displayLabel}</span>
+        <span className="text-xs text-gray-500 pointer-events-none">{isOpen ? '▲' : '▼'}</span>
       </button>
       
       {isOpen && (
-        <div style={menuStyle}>
+        <div className={menuClasses}>
           {decks.map((deck) => (
             <div
               key={deck.id}
-              style={menuItemStyle(deck.id === selectedDeckId)}
+              className={`${menuItemClasses} ${deck.id === selectedDeckId ? 'bg-gray-100' : ''}`}
               onClick={(e) => {
                 e.stopPropagation();
                 onSelect(deck.id);
                 setIsOpen(false);
-              }}
-              onMouseEnter={(e) => {
-                if (deck.id !== selectedDeckId) {
-                  e.currentTarget.style.backgroundColor = tokens.colors.gray[50];
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (deck.id !== selectedDeckId) {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                }
               }}
             >
               {deck.label || deck.id}
@@ -360,7 +303,6 @@ function addGlowEffect(deckElement: HTMLElement) {
  */
 export const IterationDeckToolbar: React.FC<IterationDeckToolbarProps> = ({
   className,
-  style,
   showKeyboardHints = true
 }) => {
   const store = useIterationStore();
@@ -465,36 +407,15 @@ export const IterationDeckToolbar: React.FC<IterationDeckToolbarProps> = ({
     return null;
   }
 
-  const toolbarStyle = useMemo(() => ({
-    // Positioning - exactly like Lit version
-    position: 'fixed' as const,
-    bottom: tokens.spacing[2], // 8px on mobile
-    left: '50%',
-    transform: 'translateX(-50%)',
-    zIndex: 9999, // Match Lit version exactly
-    
-    // Layout - Mobile-first approach like Lit
-    display: 'flex',
-    alignItems: 'center',
-    gap: tokens.spacing[1], // 4px on mobile
-    minWidth: `calc(${tokens.spacing[8]} * 5)`, // 320px equivalent
-    padding: `${tokens.spacing[1]} ${tokens.spacing[2]}`, // 4px 8px on mobile
-    
-    // Visual design - signature pill shape matching Lit
-    borderRadius: tokens.spacing[8], // Large border radius like Lit (40px)
-    background: tokens.colors.glass.lightGlass,
-    backdropFilter: `blur(${tokens.spacing[2]})`, // 8px blur
-    boxShadow: tokens.shadows.toolbar,
-    
-    // Typography - Mobile-first like Lit
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-    fontSize: tokens.spacing[1], // 4px - small text on mobile
-    fontWeight: 500,
-    lineHeight: 1,
-    color: tokens.colors.gray[700],
-    
-    ...style
-  }), [style]);
+  // Use shared Tailwind classes for consistent styling
+  const toolbarClasses = `${toolbarStyles.container} ${className || ''}`;
+  
+  // Debug styling
+  console.log('🎨 Toolbar styling:', {
+    toolbarClasses,
+    containerStyles: toolbarStyles.container,
+    toolbarRoot: toolbarRoot?.id
+  });
 
   const slideCounterStyle = useMemo(() => ({
     fontSize: '12px',
@@ -508,7 +429,28 @@ export const IterationDeckToolbar: React.FC<IterationDeckToolbarProps> = ({
   if (!toolbarRoot) return null;
 
   return createPortal(
-    <div style={toolbarStyle} className={className}>
+    <div 
+      className={toolbarClasses}
+      style={{
+        // Fallback inline styles in case Tailwind classes don't work
+        position: 'fixed',
+        bottom: '8px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        zIndex: 9999,
+        display: 'flex',
+        alignItems: 'center',
+        gap: '4px',
+        padding: '4px 8px',
+        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        backdropFilter: 'blur(12px)',
+        borderRadius: '40px',
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+        minWidth: '320px',
+        fontSize: '14px',
+        color: '#374151'
+      }}
+    >
       <DeckSelector
         decks={interactiveDecks}
         selectedDeckId={selectedDeckId}

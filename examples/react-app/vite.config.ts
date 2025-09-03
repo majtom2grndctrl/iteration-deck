@@ -13,11 +13,15 @@ export default defineConfig({
       '@': resolve(__dirname, '../../src'),
     }
   },
+  css: {
+    postcss: './postcss.config.js',
+  },
   server: {
     port: 3001,
     open: true
   },
   define: {
-    __DEV__: 'true'
+    __DEV__: 'true',
+    'process.env.NODE_ENV': JSON.stringify('development')
   }
 })

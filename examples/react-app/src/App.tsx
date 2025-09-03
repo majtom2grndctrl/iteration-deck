@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useEffect } from 'react';
 import { IterationDeck, IterationDeckSlide, useEnsureToolbar, useIterationStore } from 'iteration-deck';
 
 // Import demo components
@@ -7,16 +7,19 @@ import { BudgetSummary, BudgetDetailed, BudgetVisual } from './components/Budget
 import { ContactsCompact, ContactsDetailed, ContactsGrid } from './components/ContactsList';
 
 function App() {
-  const [debugInfo, setDebugInfo] = useState<string[]>([]);
-  const [componentStatus, setComponentStatus] = useState({
-    deckDefined: false,
-    slideDefined: false,
-    toolbarDefined: false,
-    environmentMode: 'unknown'
-  });
 
   // Get store to help with toolbar initialization
   const store = useIterationStore();
+  
+  // Debug toolbar state
+  useEffect(() => {
+    console.log('🔍 Toolbar Debug:', {
+      isProduction: store.isProduction,
+      interactiveDecks: store.getInteractiveDecks(),
+      allDecks: store.getRegisteredDecks(),
+      deckMetadata: store.deckMetadata
+    });
+  }, [store.isProduction, store.deckMetadata]);
   
   // Ensure the toolbar is rendered when there are interactive decks
   useEnsureToolbar();
@@ -29,53 +32,22 @@ function App() {
     }
   }, [store]);
 
-  // Function to add debug messages
-  const addDebugMessage = useCallback((message: string) => {
-    setDebugInfo(prev => [...prev.slice(-4), `${new Date().toLocaleTimeString()}: ${message}`]);
-  }, []);
-
-  // Check component registration status
-  useEffect(() => {
-    const checkStatus = () => {
-      setComponentStatus({
-        deckDefined: !!customElements.get('iteration-deck'),
-        slideDefined: !!customElements.get('iteration-deck-slide'),
-        toolbarDefined: !!customElements.get('iteration-deck-toolbar'),
-        environmentMode: window.location.hostname.includes('localhost') ? 'development' : 'production'
-      });
-    };
-
-    // Check immediately and then periodically
-    checkStatus();
-    const interval = setInterval(checkStatus, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  // Listen to iteration deck events
-  useEffect(() => {
-    const handleSlideChange = (event: Event) => {
-      const customEvent = event as CustomEvent;
-      addDebugMessage(`Slide changed in deck "${customEvent.detail.deckId}": ${customEvent.detail.previousSlideId} → ${customEvent.detail.currentSlideId}`);
-    };
-
-    const handleDeckRegistered = (event: Event) => {
-      const customEvent = event as CustomEvent;
-      addDebugMessage(`Deck registered: "${customEvent.detail.deckId}" with ${customEvent.detail.slideCount} slides`);
-    };
-
-    // Add event listeners to document for global events
-    document.addEventListener('slide-change', handleSlideChange);
-    document.addEventListener('deck-registered', handleDeckRegistered);
-
-    return () => {
-      document.removeEventListener('slide-change', handleSlideChange);
-      document.removeEventListener('deck-registered', handleDeckRegistered);
-    };
-  }, [addDebugMessage]);
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Debug Panel */}
+      <div className="bg-yellow-100 border-b-2 border-yellow-300 px-6 py-2">
+        <details className="text-sm">
+          <summary className="cursor-pointer font-mono text-yellow-800">🔍 Debug Info (click to expand)</summary>
+          <div className="mt-2 p-2 bg-yellow-50 rounded text-xs font-mono space-y-1">
+            <div><strong>isProduction:</strong> {String(store.isProduction)}</div>
+            <div><strong>Interactive Decks:</strong> {store.getInteractiveDecks().join(', ')}</div>
+            <div><strong>All Decks:</strong> {store.getRegisteredDecks().join(', ')}</div>
+            <div><strong>Toolbar Element:</strong> {document.getElementById('iteration-deck-toolbar-singleton') ? '✅ Found' : '❌ Missing'}</div>
+          </div>
+        </details>
+      </div>
+      
       {/* Header */}
       <header className="bg-white border-b border-gray-200 px-6 py-4">
         <div className="max-w-6xl mx-auto">
@@ -112,48 +84,6 @@ function App() {
           </div>
         </section>
 
-        {/* Component Status */}
-        <section className="mb-8">
-          <div className="bg-gray-100 border rounded-lg p-4">
-            <h3 className="font-semibold mb-2">🔧 Component Status</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-              <div>
-                <strong>iteration-deck:</strong>{' '}
-                <span className={componentStatus.deckDefined ? 'text-green-600' : 'text-red-600'}>
-                  {componentStatus.deckDefined ? '✅ Registered' : '❌ Not found'}
-                </span>
-              </div>
-              <div>
-                <strong>iteration-deck-slide:</strong>{' '}
-                <span className={componentStatus.slideDefined ? 'text-green-600' : 'text-red-600'}>
-                  {componentStatus.slideDefined ? '✅ Registered' : '❌ Not found'}
-                </span>
-              </div>
-              <div>
-                <strong>iteration-deck-toolbar:</strong>{' '}
-                <span className={componentStatus.toolbarDefined ? 'text-green-600' : 'text-red-600'}>
-                  {componentStatus.toolbarDefined ? '✅ Registered' : '❌ Not found'}
-                </span>
-              </div>
-              <div>
-                <strong>Environment:</strong>{' '}
-                <span className="font-mono">{componentStatus.environmentMode}</span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Debug Info */}
-        {debugInfo.length > 0 && (
-          <section className="mb-8">
-            <div className="debug-panel">
-              <h3>🐛 Debug Events</h3>
-              {debugInfo.map((info, index) => (
-                <div key={index} className="opacity-80">{info}</div>
-              ))}
-            </div>
-          </section>
-        )}
 
         {/* Demo 1: User Preferences Form */}
         <section className="demo-section">
