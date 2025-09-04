@@ -1,9 +1,12 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
 
-export default defineConfig({
-  plugins: [],
-  build: {
+export default defineConfig(({ command }) => {
+  const isDev = command === 'serve';
+  
+  return {
+    plugins: [],
+    build: isDev ? undefined : {
     lib: {
       entry: {
         index: resolve(__dirname, 'src/index.ts'), // React as default export
@@ -82,8 +85,9 @@ export default defineConfig({
       '@': resolve(__dirname, './src'),
     },
   },
-  // Optimization for production builds
-  define: {
-    __DEV__: JSON.stringify(process.env.NODE_ENV !== 'production')
-  }
+    // Optimization for production builds
+    define: {
+      __DEV__: JSON.stringify(process.env.NODE_ENV !== 'production')
+    }
+  };
 });

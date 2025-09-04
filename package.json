@@ -69,7 +69,7 @@
     "custom-elements"
   ],
   "scripts": {
-    "dev:react": "cd examples/react-app && pnpm dev",
+    "dev:react": "vite --config vite.dev.config.ts --port 3004",
     "dev:lit": "cd examples/lit-demo && pnpm install && pnpm dev",
     "clean": "rm -rf dist",
     "prebuild": "pnpm run clean",
@@ -109,7 +109,9 @@
   },
   "devDependencies": {
     "@open-wc/testing-helpers": "^3.0.1",
+    "@tailwindcss/postcss": "^4.1.12",
     "@tailwindcss/typography": "^0.5.16",
+    "@tailwindcss/vite": "^4.1.12",
     "@testing-library/jest-dom": "^6.7.0",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
@@ -117,6 +119,7 @@
     "@types/node": "^24.3.0",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
+    "@vitejs/plugin-react": "^5.0.2",
     "@vitest/ui": "^3.2.4",
     "autoprefixer": "^10.4.21",
     "happy-dom": "^18.0.1",

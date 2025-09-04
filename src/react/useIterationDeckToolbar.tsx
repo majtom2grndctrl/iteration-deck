@@ -86,12 +86,6 @@ export function useEnsureToolbar() {
   useEffect(() => {
     const shouldShowToolbar = !isProduction && interactiveDeckCount > 0;
     
-    console.log('🔧 useEnsureToolbar:', {
-      isProduction,
-      interactiveDeckCount,
-      shouldShowToolbar,
-      existingToolbar: !!document.getElementById('iteration-deck-toolbar-singleton')
-    });
     
     if (shouldShowToolbar && !document.getElementById('iteration-deck-toolbar-singleton')) {
       const toolbarRoot = document.createElement('div');
@@ -102,6 +96,8 @@ export function useEnsureToolbar() {
       import('react-dom/client').then(({ createRoot }) => {
         const root = createRoot(toolbarRoot);
         root.render(<IterationDeckToolbar />);
+      }).catch(err => {
+        console.error('❌ Error creating toolbar:', err);
       });
     }
   }, [isProduction, interactiveDeckCount]);
