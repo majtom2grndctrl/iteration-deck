@@ -33,9 +33,6 @@ import {
 import type { DeckRegistration } from '../../core/types.js';
 import type { IterationDeckSlide } from '../iteration-deck-slide/iteration-deck-slide.js';
 
-// Using shared Tailwind classes for cross-framework consistency
-// Classes are imported from shared/styles.ts and work with CDN or build-time Tailwind
-
 /**
  * Singleton instance tracking
  */
@@ -47,38 +44,6 @@ let toolbarInstance: IterationDeckToolbar | null = null;
  * This component automatically mounts when the first IterationDeck is registered
  * and handles all deck navigation for the entire application.
  */
-// Minimal styles object to prevent render failures
-const toolbarStyles = {
-  container: 'toolbar-container',
-  inner: 'toolbar-inner',
-  separator: 'toolbar-separator',
-  selector: {
-    container: 'selector-container',
-    select: 'selector-select',
-    button: 'selector-button',
-    text: 'selector-text',
-    arrow: 'selector-arrow'
-  },
-  slideNavigation: {
-    container: 'slide-nav-container',
-    prevButton: 'prev-button',
-    nextButton: 'next-button'
-  },
-  navigation: {
-    container: 'nav-container',
-    button: 'nav-button'
-  },
-  slideInfo: {
-    container: 'slide-info-container',
-    label: 'slide-info-label'
-  },
-  indicators: {
-    container: 'indicators-container',
-    dot: 'indicator-dot',
-    dotActive: 'dot-active',
-    dotInactive: 'dot-inactive'
-  }
-};
 
 @customElement('iteration-deck-toolbar')
 export class IterationDeckToolbar extends LitElement {
@@ -102,14 +67,321 @@ export class IterationDeckToolbar extends LitElement {
   private throttledKeyboardHandler = throttle(this.handleKeyboardNavigation.bind(this), 100);
 
   /**
-   * Disable Shadow DOM to allow external Tailwind CSS to style the component
-   * This is necessary because Tailwind classes from CDN cannot penetrate Shadow DOM
+   * Lit CSS styles - matches React version styling exactly
    */
-  createRenderRoot() {
-    return this;
-  }
+  static styles = css`
+    :host {
+      position: fixed;
+      bottom: 0.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      min-width: 20rem;
+      gap: 0.25rem;
+      padding: 0.5rem;
+      border-radius: 2.5rem;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+      font-weight: 500;
+      font-size: 0.875rem;
+      line-height: 1;
+      color: rgb(55 65 81);
+      background-color: rgb(229 231 235 / 0.8);
+    }
 
-  // No static styles - using Tailwind classes in template
+    @media (prefers-color-scheme: dark) {
+      :host {
+        background-color: rgb(17 24 39 / 0.7);
+        color: rgb(229 231 235);
+      }
+    }
+
+    @media (min-width: 640px) {
+      :host {
+        bottom: 1rem;
+        min-width: 24rem;
+        height: 2.5rem;
+        gap: 0.5rem;
+        padding: 0.25rem;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      :host {
+        padding: 0.75rem;
+      }
+    }
+
+    .toolbar-inner {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      width: 100%;
+    }
+
+    .toolbar-separator {
+      width: 1px;
+      height: 1.25rem;
+      background-color: rgb(156 163 175 / 0.6);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .toolbar-separator {
+        background-color: rgb(107 114 128 / 0.7);
+      }
+    }
+
+    @media (min-width: 640px) {
+      .toolbar-separator {
+        height: 1rem;
+      }
+    }
+
+    /* Deck Selector */
+    .selector-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .selector-select {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    .selector-button {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 1.75rem;
+      min-width: 7.5rem;
+      gap: 0.75rem;
+      padding: 0 0.75rem;
+      background-color: white;
+      border: 2px solid rgb(209 213 219);
+      border-radius: 1.5rem;
+      font-size: 0.875rem;
+      font-weight: 400;
+      line-height: 0.75rem;
+      color: rgb(55 65 81);
+      cursor: pointer;
+      user-select: none;
+      transition: all 150ms ease-out;
+    }
+
+    .selector-button:hover {
+      background-color: rgb(249 250 251);
+      color: rgb(31 41 55);
+    }
+
+    .selector-button:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px rgb(59 130 246);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .selector-button {
+        background-color: rgb(31 41 55);
+        border-color: rgb(75 85 99);
+        color: rgb(229 231 235);
+      }
+
+      .selector-button:hover {
+        background-color: rgb(75 85 99);
+        color: rgb(243 244 246);
+      }
+
+      .selector-button:focus {
+        box-shadow: 0 0 0 2px rgb(96 165 250);
+      }
+    }
+
+    .selector-text {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .selector-arrow {
+      font-size: 0.5rem;
+      color: rgb(107 114 128);
+      pointer-events: none;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .selector-arrow {
+        color: rgb(156 163 175);
+      }
+    }
+
+    /* Slide Navigation */
+    .slide-nav-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2rem;
+      height: 100%;
+      background-color: white;
+      transition: all 150ms ease-out;
+      color: rgb(75 85 99);
+      font-size: 0.875rem;
+      cursor: pointer;
+      user-select: none;
+      border: none;
+      outline: none;
+    }
+
+    .nav-button:hover:not(:disabled) {
+      background-color: rgb(249 250 251);
+      color: rgb(31 41 55);
+    }
+
+    .nav-button:active:not(:disabled) {
+      background-color: rgb(243 244 246);
+      transform: scale(0.95);
+    }
+
+    .nav-button:focus:not(:disabled) {
+      box-shadow: inset 0 0 0 2px rgb(59 130 246);
+    }
+
+    .nav-button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .nav-button:disabled:hover {
+      background-color: white;
+      color: rgb(75 85 99);
+      transform: none;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .nav-button {
+        background-color: rgb(31 41 55);
+        color: rgb(209 213 219);
+      }
+
+      .nav-button:hover:not(:disabled) {
+        background-color: rgb(75 85 99);
+        color: rgb(243 244 246);
+      }
+
+      .nav-button:active:not(:disabled) {
+        background-color: rgb(107 114 128);
+      }
+
+      .nav-button:focus:not(:disabled) {
+        box-shadow: inset 0 0 0 2px rgb(96 165 250);
+      }
+
+      .nav-button:disabled:hover {
+        background-color: rgb(55 65 81);
+        color: rgb(209 213 219);
+      }
+    }
+
+    .prev-button {
+      border-top-left-radius: 1.5rem;
+      border-bottom-left-radius: 1.5rem;
+      border-right: 0;
+    }
+
+    .next-button {
+      border-top-right-radius: 1.5rem;
+      border-bottom-right-radius: 1.5rem;
+      border-left: 0;
+    }
+
+    /* Slide Info */
+    .slide-info-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      padding: 0 0.5rem;
+      max-width: 16rem;
+    }
+
+    @media (min-width: 640px) {
+      .slide-info-container {
+        max-width: 16rem;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .slide-info-container {
+        max-width: none;
+        width: 20rem;
+      }
+    }
+
+    .slide-info-label {
+      color: rgb(55 65 81);
+      font-size: 0.75rem;
+      font-weight: 500;
+      line-height: 1rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .slide-info-label {
+        color: rgb(229 231 235);
+      }
+    }
+
+    @media (min-width: 640px) {
+      .slide-info-label {
+        font-size: 0.875rem;
+      }
+    }
+
+    /* Slide Indicators */
+    .indicators-container {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 0.25rem;
+      width: 100%;
+    }
+
+    .indicator-dot {
+      width: 0.25rem;
+      height: 0.25rem;
+      border-radius: 50%;
+      background-color: rgb(156 163 175);
+      transition: opacity 200ms;
+    }
+
+    .dot-active {
+      opacity: 0.9;
+    }
+
+    .dot-inactive {
+      opacity: 0.5;
+    }
+  `;
 
   constructor() {
     super();
@@ -537,10 +809,10 @@ export class IterationDeckToolbar extends LitElement {
     const currentSlideIndex = deck.slideIds.indexOf(deck.activeSlideId);
 
     return html`
-      <div class="${toolbarStyles.indicators.container}" aria-hidden="true">
+      <div class="indicators-container" aria-hidden="true">
         ${deck.slideIds.map((_, index) => html`
           <div
-            class="${toolbarStyles.indicators.dot} ${index === currentSlideIndex ? toolbarStyles.indicators.dotActive : toolbarStyles.indicators.dotInactive}"
+            class="indicator-dot ${index === currentSlideIndex ? 'dot-active' : 'dot-inactive'}"
           ></div>
         `)}
       </div>
@@ -586,12 +858,12 @@ export class IterationDeckToolbar extends LitElement {
     }
 
     return html`
-      <div class="${toolbarStyles.container}">
-        <div class="${toolbarStyles.inner}">
+      <div>
+        <div class="toolbar-inner">
           ${hasMultipleDecks ? html`
-            <div class="${toolbarStyles.selector.container}">
+            <div class="selector-container">
               <select 
-                class="${toolbarStyles.selector.select}"
+                class="selector-select"
                 @change=${this.handleDeckSelection}
                 .value=${selectedDeckId || ''}
                 aria-label="Select iteration deck"
@@ -605,39 +877,43 @@ export class IterationDeckToolbar extends LitElement {
                   </option>
                 `)}
               </select>
-              <div class="${toolbarStyles.selector.button}">
-                <span class="${toolbarStyles.selector.text}">${this.getDeckLabel(selectedDeckId || '')}</span>
-                <span class="${toolbarStyles.selector.arrow}">▼</span>
+              <div class="selector-button">
+                <span class="selector-text">${this.getDeckLabel(selectedDeckId || '')}</span>
+                <span class="selector-arrow">▼</span>
               </div>
             </div>
-            <div class="${toolbarStyles.separator}"></div>
+            <div class="toolbar-separator"></div>
           ` : ''}
           
-          <div class="${toolbarStyles.slideNavigation.container}">
-            <nav class="${toolbarStyles.navigation.container}">
+          <div class="slide-nav-container">
+            <nav class="nav-container">
               <button 
-                class="${toolbarStyles.navigation.button} ${toolbarStyles.slideNavigation.prevButton}"
+                class="nav-button prev-button"
                 @click=${this.handlePrevSlide}
                 ?disabled=${!this.canNavigatePrev()}
                 aria-label="Previous slide (Ctrl/Cmd+Alt+[)"
                 title="Previous slide (Ctrl/Cmd+Alt+[)"
               >
-                ◀
+                <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor" aria-hidden="true">
+                  <path d="M7 6l6-4v8l-6-4z" />
+                </svg>
               </button>
               
               <button 
-                class="${toolbarStyles.navigation.button} ${toolbarStyles.slideNavigation.nextButton}"
+                class="nav-button next-button"
                 @click=${this.handleNextSlide}
                 ?disabled=${!this.canNavigateNext()}
                 aria-label="Next slide (Ctrl/Cmd+Alt+])"
                 title="Next slide (Ctrl/Cmd+Alt+])"
               >
-                ▶
+                <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor" aria-hidden="true">
+                  <path d="M11 6l-6 4V2l6 4z" />
+                </svg>
               </button>
             </nav>
             
-            <div class="${toolbarStyles.slideInfo.container}">
-              <span class="${toolbarStyles.slideInfo.label}" 
+            <div class="slide-info-container">
+              <span class="slide-info-label" 
                     title=${this.getCurrentSlideLabel()}>
                 ${this.getCurrentSlideLabel()}
               </span>
