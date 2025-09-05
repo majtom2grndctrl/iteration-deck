@@ -15,7 +15,7 @@
  * - Dynamic deck registration/unregistration handling
  */
 
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, css } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { 
   subscribeToIterationStore, 
@@ -31,7 +31,6 @@ import {
   type NavigationDirection
 } from '../../core/utilities.js';
 import type { DeckRegistration } from '../../core/types.js';
-import { toolbarStyles } from '../../../shared/styles.js';
 import type { IterationDeckSlide } from '../iteration-deck-slide/iteration-deck-slide.js';
 
 // Using shared Tailwind classes for cross-framework consistency
@@ -48,6 +47,39 @@ let toolbarInstance: IterationDeckToolbar | null = null;
  * This component automatically mounts when the first IterationDeck is registered
  * and handles all deck navigation for the entire application.
  */
+// Minimal styles object to prevent render failures
+const toolbarStyles = {
+  container: 'toolbar-container',
+  inner: 'toolbar-inner',
+  separator: 'toolbar-separator',
+  selector: {
+    container: 'selector-container',
+    select: 'selector-select',
+    button: 'selector-button',
+    text: 'selector-text',
+    arrow: 'selector-arrow'
+  },
+  slideNavigation: {
+    container: 'slide-nav-container',
+    prevButton: 'prev-button',
+    nextButton: 'next-button'
+  },
+  navigation: {
+    container: 'nav-container',
+    button: 'nav-button'
+  },
+  slideInfo: {
+    container: 'slide-info-container',
+    label: 'slide-info-label'
+  },
+  indicators: {
+    container: 'indicators-container',
+    dot: 'indicator-dot',
+    dotActive: 'dot-active',
+    dotInactive: 'dot-inactive'
+  }
+};
+
 @customElement('iteration-deck-toolbar')
 export class IterationDeckToolbar extends LitElement {
   /**

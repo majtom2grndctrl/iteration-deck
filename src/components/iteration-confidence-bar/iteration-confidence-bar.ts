@@ -20,11 +20,8 @@
  * @author Claude Code (claude.ai/code)
  */
 
-import { LitElement, html } from 'lit';
+import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-
-// Import shared styles for Tailwind consistency
-import { confidenceStyles } from '../../../shared/styles.js';
 
 export interface IterationConfidenceBarProps {
   /** AI confidence score (0-1 scale) */
@@ -40,6 +37,52 @@ export interface IterationConfidenceBarProps {
  */
 @customElement('iteration-confidence-bar')
 export class IterationConfidenceBar extends LitElement {
+  
+  static styles = css`
+    :host {
+      display: inline-block;
+    }
+    
+    .indicator {
+      background: #f3f4f6;
+      border-radius: 9999px;
+      overflow: hidden;
+      border: 1px solid #e5e7eb;
+    }
+    
+    .indicator.small {
+      height: 8px;
+      width: 60px;
+    }
+    
+    .indicator.medium {
+      height: 12px;
+      width: 80px;
+    }
+    
+    .indicator.large {
+      height: 16px;
+      width: 120px;
+    }
+    
+    .bar {
+      height: 100%;
+      transition: width 0.3s ease;
+      border-radius: inherit;
+    }
+    
+    .bar[data-level="low"] {
+      background: linear-gradient(90deg, #ef4444, #f59e0b);
+    }
+    
+    .bar[data-level="medium"] {
+      background: linear-gradient(90deg, #f59e0b, #eab308);
+    }
+    
+    .bar[data-level="high"] {
+      background: linear-gradient(90deg, #22c55e, #16a34a);
+    }
+  `;
 
   @property({ type: Number })
   confidence?: number;
@@ -113,14 +156,9 @@ export class IterationConfidenceBar extends LitElement {
     const confidenceLevel = this.getConfidenceLevel();
     const percentage = Math.round(confidence * 100);
     
-    const indicatorClasses = [
-      confidenceStyles.indicator, // Base pill styling
-      confidenceStyles.sizes[this.size] // Size variant
-    ].join(' ');
-    
     return html`
       <div 
-        class="${indicatorClasses}"
+        class="indicator ${this.size}"
         role="progressbar"
         aria-valuenow="${percentage}"
         aria-valuemin="0" 
@@ -129,7 +167,7 @@ export class IterationConfidenceBar extends LitElement {
         title="${this.getAriaLabel()}"
       >
         <div 
-          class="${confidenceStyles.bar}"
+          class="bar"
           style="width: ${percentage}%"
           data-level="${confidenceLevel}"
         ></div>

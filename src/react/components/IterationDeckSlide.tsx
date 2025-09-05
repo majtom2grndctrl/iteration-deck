@@ -7,7 +7,7 @@
  */
 
 import { forwardRef, useRef, useImperativeHandle } from 'react';
-import type { IterationDeckSlideProps } from '../shared/types';
+import type { IterationDeckSlideProps } from '../../shared/types';
 
 /**
  * React props interface extending the core props with React-specific types

@@ -1,5 +1,5 @@
 import React, { forwardRef, useEffect, useRef, useImperativeHandle, useMemo, Children } from 'react';
-import type { IterationDeckProps, IterationDeckSlideProps } from '../shared/types';
+import type { IterationDeckProps, IterationDeckSlideProps } from '../../shared/types';
 import { useIterationStore, useDeckNavigation } from './store';
 import { useEnsureToolbar } from './useIterationDeckToolbar';
 

@@ -425,7 +425,7 @@ describe('Production Override Feature', () => {
       expect(slideElements).toHaveLength(3);
 
       // First slide should be active initially
-      const firstSlideContainer = slides[0].shadowRoot?.querySelector('.slide-container');
+      const firstSlideContainer = slides[0].shadowRoot?.querySelector('.slide-wrapper');
       expect(firstSlideContainer).toHaveClass('active');
 
       // Should be able to navigate to different slides

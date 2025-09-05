@@ -19,8 +19,8 @@ import {
   errorLog 
 } from '../../core/utilities.js';
 
-// Import shared styles for Tailwind consistency
-import { deckStyles } from '../../../shared/styles.js';
+// Inline styles for ShadowDOM encapsulation
+import { css } from 'lit';
 
 /**
  * Custom element for individual iteration deck slides
@@ -36,6 +36,31 @@ import { deckStyles } from '../../../shared/styles.js';
 @customElement('iteration-deck-slide')
 export class IterationDeckSlide extends LitElement implements IterationDeckSlideProps {
   
+  static styles = css`
+    :host {
+      display: block;
+    }
+    
+    .slide-wrapper {
+      display: block;
+    }
+    
+    .slide-wrapper.active {
+      display: block;
+    }
+    
+    .slide-wrapper.hidden {
+      display: none;
+    }
+    
+    .min-h-inherit {
+      min-height: inherit;
+    }
+    
+    .initializing {
+      opacity: 0.5;
+    }
+  `;
 
   // Public properties from IterationDeckSlideProps interface
   @property({ type: String, reflect: true })
@@ -243,17 +268,17 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
    * Render the slide content with metadata overlay in development
    */
   override render() {
-    // Use shared Tailwind styles for consistency
+    // Use inline styles for ShadowDOM encapsulation
     const containerClasses = [
-      deckStyles.slide.wrapper, // 'block'
-      this.isActive ? deckStyles.slide.active : deckStyles.slide.hidden, // 'block' or 'hidden'
+      'slide-wrapper',
+      this.isActive ? 'active' : 'hidden',
       this.isInitializing ? 'initializing' : '',
-      'min-h-inherit' // Maintain min-height behavior
+      'min-h-inherit'
     ].filter(Boolean).join(' ');
 
     return html`
       <div class="${containerClasses}">
-        <div class="block min-h-inherit">
+        <div class="slide-wrapper min-h-inherit">
           <slot @slotchange=${this.handleSlotChange}></slot>
         </div>
       </div>

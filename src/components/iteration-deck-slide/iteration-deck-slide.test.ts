@@ -202,8 +202,8 @@ describe('IterationDeckSlide - Production Mode Override', () => {
       await waitForLitElement(slide2);
 
       // In production, second slide should be hidden
-      const slide2Container = slide2.shadowRoot?.querySelector('.slide-container');
-      expect(slide2Container).toHaveClass('inactive');
+      const slide2Container = slide2.shadowRoot?.querySelector('.slide-wrapper');
+      expect(slide2Container).toHaveClass('hidden');
 
       const slide2Styles = getComputedStyle(slide2Container as Element);
       expect(slide2Styles.display).toBe('none');
@@ -243,8 +243,8 @@ describe('IterationDeckSlide - Production Mode Override', () => {
       slide2.click();
       await waitForLitElement(slide2);
 
-      const slide2Container = slide2.shadowRoot?.querySelector('.slide-container');
-      expect(slide2Container).toHaveClass('inactive');
+      const slide2Container = slide2.shadowRoot?.querySelector('.slide-wrapper');
+      expect(slide2Container).toHaveClass('hidden');
 
       await removeLitElement(deck);
     });
@@ -277,11 +277,11 @@ describe('IterationDeckSlide - Production Mode Override', () => {
       await waitForLitElement(slide2);
 
       // With override, both slides should be rendered (though second is initially inactive)
-      const slide1Container = slide1.shadowRoot?.querySelector('.slide-container');
-      const slide2Container = slide2.shadowRoot?.querySelector('.slide-container');
+      const slide1Container = slide1.shadowRoot?.querySelector('.slide-wrapper');
+      const slide2Container = slide2.shadowRoot?.querySelector('.slide-wrapper');
 
       expect(slide1Container).toHaveClass('active');
-      expect(slide2Container).toHaveClass('inactive');
+      expect(slide2Container).toHaveClass('hidden');
 
       // Both slides should be in the DOM and available for interaction
       expect(slide1Container).toBeInTheDocument();
@@ -324,10 +324,10 @@ describe('IterationDeckSlide - Production Mode Override', () => {
       await waitForLitElement(slide2);
       await waitForLitElement(slide1);
 
-      const slide1Container = slide1.shadowRoot?.querySelector('.slide-container');
-      const slide2Container = slide2.shadowRoot?.querySelector('.slide-container');
+      const slide1Container = slide1.shadowRoot?.querySelector('.slide-wrapper');
+      const slide2Container = slide2.shadowRoot?.querySelector('.slide-wrapper');
 
-      expect(slide1Container).toHaveClass('inactive');
+      expect(slide1Container).toHaveClass('hidden');
       expect(slide2Container).toHaveClass('active');
 
       await removeLitElement(deck);
@@ -365,10 +365,10 @@ describe('IterationDeckSlide - Production Mode Override', () => {
       await waitForLitElement(slide1);
       await waitForLitElement(slide2);
 
-      const slide1Container = slide1.shadowRoot?.querySelector('.slide-container');
-      const slide2Container = slide2.shadowRoot?.querySelector('.slide-container');
+      const slide1Container = slide1.shadowRoot?.querySelector('.slide-wrapper');
+      const slide2Container = slide2.shadowRoot?.querySelector('.slide-wrapper');
 
-      expect(slide1Container).toHaveClass('inactive');
+      expect(slide1Container).toHaveClass('hidden');
       expect(slide2Container).toHaveClass('active');
 
       // Verify the slide reports itself as active
@@ -413,7 +413,7 @@ describe('IterationDeckSlide - Production Mode Override', () => {
       slide2.click();
       await waitForLitElement(slide2);
 
-      const slide2Container = slide2.shadowRoot?.querySelector('.slide-container');
+      const slide2Container = slide2.shadowRoot?.querySelector('.slide-wrapper');
       expect(slide2Container).toHaveClass('active');
 
       await removeLitElement(deck);
