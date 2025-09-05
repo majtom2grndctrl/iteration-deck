@@ -5,7 +5,7 @@
  * Uses standard React + Tailwind CSS patterns for maintainability and hot reload.
  */
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useIterationStore } from './store';
 
@@ -144,6 +144,7 @@ export const IterationDeckToolbar: React.FC<IterationDeckToolbarProps> = ({
 }) => {
   const store = useIterationStore();
   const [isVisible, setIsVisible] = useState(false);
+  const glowStylesInjected = useRef(false);
 
   // Get interactive decks and current selection
   const interactiveDecks = store.getInteractiveDecks().map(id => ({
@@ -191,6 +192,8 @@ export const IterationDeckToolbar: React.FC<IterationDeckToolbarProps> = ({
 
   const handleDeckSelect = useCallback((deckId: string) => {
     store.setSelectedDeck(deckId);
+    // Auto-scroll to deck and highlight it
+    scrollToDeckAndHighlight(deckId);
   }, [store]);
 
   const handlePrevious = useCallback(() => {
@@ -212,6 +215,166 @@ export const IterationDeckToolbar: React.FC<IterationDeckToolbarProps> = ({
     
     store.setActiveSlide(selectedDeckId, slideIds[nextIndex]);
   }, [selectedDeckId, store]);
+
+  /**
+   * Inject global CSS for deck glow animations (called once)
+   */
+  const ensureGlowStyles = useCallback(() => {
+    if (glowStylesInjected.current) return; // Already injected
+    
+    const styleId = 'iteration-deck-glow-styles';
+    if (document.getElementById(styleId)) {
+      glowStylesInjected.current = true;
+      return; // Already injected
+    }
+    
+    const style = document.createElement('style');
+    style.id = styleId;
+    style.textContent = `
+      /* Iteration Deck Glow Effect Global Styles */
+      [data-iteration-glow] {
+        border-radius: 8px;
+        position: relative;
+        animation: iteration-deck-glow 1s ease-in-out;
+      }
+      
+      @keyframes iteration-deck-glow {
+        0% {
+          box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.2), 0 0 25px rgba(236, 72, 153, 0.1);
+          outline: 2px solid rgba(236, 72, 153, 0.2);
+        }
+        50% {
+          box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.4), 0 0 25px rgba(236, 72, 153, 0.3);
+          outline: 2px solid rgba(236, 72, 153, 0.6);
+        }
+        100% {
+          box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.2), 0 0 25px rgba(236, 72, 153, 0.1);
+          outline: 2px solid rgba(236, 72, 153, 0);
+        }
+      }
+      
+      /* Accessibility: respect reduced motion preference */
+      @media (prefers-reduced-motion: reduce) {
+        [data-iteration-glow] {
+          animation: none;
+          border: 2px solid rgba(236, 72, 153, 0.6);
+          box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.3), 0 0 25px rgba(236, 72, 153, 0.2);
+        }
+      }
+    `;
+    document.head.appendChild(style);
+    glowStylesInjected.current = true;
+  }, []);
+
+  /**
+   * Wait for scroll animation to complete and then execute callback
+   */
+  const waitForScrollComplete = useCallback((targetY: number, callback: () => void) => {
+    let scrollTimeout: number;
+    let maxWaitTimeout: number;
+    
+    const onScroll = () => {
+      clearTimeout(scrollTimeout);
+      
+      // Check if we're close enough to the target (within 5px tolerance)
+      scrollTimeout = window.setTimeout(() => {
+        const currentY = window.scrollY;
+        const tolerance = 5;
+        
+        if (Math.abs(currentY - targetY) <= tolerance) {
+          // Scroll has stopped at the target position
+          window.removeEventListener('scroll', onScroll);
+          clearTimeout(maxWaitTimeout);
+          callback();
+        }
+      }, 150); // Wait 150ms of no scroll movement to consider it "stopped"
+    };
+    
+    // Safety timeout - trigger after 3 seconds maximum, even if scroll detection fails
+    maxWaitTimeout = window.setTimeout(() => {
+      window.removeEventListener('scroll', onScroll);
+      clearTimeout(scrollTimeout);
+      callback();
+    }, 3000);
+    
+    // Start listening for scroll events
+    window.addEventListener('scroll', onScroll);
+    
+    // Also trigger immediately if we're already at the target position
+    const currentY = window.scrollY;
+    if (Math.abs(currentY - targetY) <= 5) {
+      window.removeEventListener('scroll', onScroll);
+      clearTimeout(maxWaitTimeout);
+      setTimeout(callback, 100); // Small delay to ensure DOM is settled
+    }
+  }, []);
+
+  /**
+   * Add temporary glow effect to deck element using CSS classes
+   */
+  const addGlowEffect = useCallback((deckElement: HTMLElement) => {
+    // Ensure global styles are injected
+    ensureGlowStyles();
+    
+    // Add glow data attribute to trigger CSS animation
+    deckElement.setAttribute('data-iteration-glow', '');
+    
+    // Remove glow attribute after animation completes
+    setTimeout(() => {
+      deckElement.removeAttribute('data-iteration-glow');
+    }, 800);
+  }, [ensureGlowStyles]);
+
+  /**
+   * Find the best element to highlight within a slide
+   * Targets the first child which is typically the actual content component
+   */
+  const findBestHighlightTarget = useCallback((slideElement: HTMLElement): HTMLElement => {
+    // Look for the first child element (the actual slide content)
+    const firstChild = slideElement.firstElementChild as HTMLElement;
+    
+    if (firstChild) {
+      return firstChild;
+    }
+    
+    // Fallback to slide element if no children
+    return slideElement;
+  }, []);
+
+  /**
+   * Scroll to deck and add glow effect
+   */
+  const scrollToDeckAndHighlight = useCallback((deckId: string) => {
+    const deckElement = document.querySelector(`[data-iteration-deck="${deckId}"]`) as HTMLElement;
+    
+    if (!deckElement) {
+      return;
+    }
+    
+    // Find the active slide content to highlight
+    const activeSlide = deckElement.querySelector('[data-slide-active="true"]') as HTMLElement;
+    let elementToHighlight = activeSlide || deckElement;
+    
+    // If we found an active slide, try to find a better highlight target within it
+    if (activeSlide) {
+      elementToHighlight = findBestHighlightTarget(activeSlide);
+    }
+
+    const rect = deckElement.getBoundingClientRect();
+    const currentScrollY = window.scrollY;
+    const elementTop = rect.top + currentScrollY;
+    const targetScrollY = elementTop - (window.innerHeight * 0.15);
+
+    const finalScrollY = Math.max(0, targetScrollY);
+    window.scrollTo({
+      top: finalScrollY,
+      behavior: 'smooth'
+    });
+
+    waitForScrollComplete(finalScrollY, () => {
+      addGlowEffect(elementToHighlight);
+    });
+  }, [waitForScrollComplete, addGlowEffect, findBestHighlightTarget]);
 
   // Don't render if no interactive decks or in production without enable
   if (!isVisible) return null;
