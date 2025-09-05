@@ -5,12 +5,12 @@
  * without configuration, web components, or external dependencies beyond React itself.
  */
 
-// Export main components
+// Export main components (toolbar automatically managed by IterationDeck)
 export { IterationDeck } from './IterationDeck';
 export { IterationDeckSlide } from './IterationDeckSlide';
-export { IterationDeckToolbar } from './IterationDeckToolbar';
+import { IterationDeck } from './IterationDeck';
 
-// Export React-specific types (avoid re-exporting shared types here to prevent duplicates)
+// Export React-specific types
 export type {
   ReactIterationDeckProps,
   IterationDeckHandle,
@@ -21,11 +21,7 @@ export type {
   IterationDeckSlideRef,
 } from './IterationDeckSlide';
 
-export type {
-  IterationDeckToolbarProps,
-} from './IterationDeckToolbar';
-
-// Export store and hooks
+// Export store hooks for advanced usage
 export {
   useIterationStore,
   useActiveSlide,
@@ -36,33 +32,5 @@ export {
   type DeckMetadata,
 } from './store';
 
-// Export toolbar management hooks
-export {
-  useIterationDeckToolbar,
-  useEnsureToolbar,
-} from './useIterationDeckToolbar';
-
-/**
- * Enhanced IterationDeck that automatically manages the toolbar
- * 
- * This is the recommended component for most use cases as it handles
- * toolbar rendering automatically.
- */
-import React from 'react';
-import { IterationDeck as BaseIterationDeck } from './IterationDeck';
-import type { ReactIterationDeckProps } from './IterationDeck';
-import { useEnsureToolbar } from './useIterationDeckToolbar';
-
-export const IterationDeckWithToolbar = React.forwardRef<any, ReactIterationDeckProps>(
-  function IterationDeckWithToolbar(props, ref) {
-    // Ensure toolbar is rendered when needed
-    useEnsureToolbar();
-    
-    return React.createElement(BaseIterationDeck, { ...props, ref } as any);
-  }
-);
-
-IterationDeckWithToolbar.displayName = 'IterationDeckWithToolbar';
-
-// Default export
-export { IterationDeckWithToolbar as default };
+// Default export for convenience
+export default IterationDeck;
