@@ -69,7 +69,7 @@
     "custom-elements"
   ],
   "scripts": {
-    "dev:react": "cd src/react/dev && vite --port 3004",
+    "dev:react": "cd src/react && vite dev --port 3004",
     "dev:lit": "cd examples/lit-demo && pnpm install && pnpm dev",
     "clean": "rm -rf dist",
     "prebuild": "pnpm run clean",

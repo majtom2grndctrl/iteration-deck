@@ -4,18 +4,14 @@ import { resolve } from 'path';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
+  root: './dev',
   plugins: [
     react(), 
-    tailwindcss({
-      content: [
-        '../**/*.{ts,tsx}',
-        './**/*.{html,js,ts,jsx,tsx}'
-      ]
-    })
+    tailwindcss()
   ],
   resolve: {
     alias: {
-      '@': resolve(__dirname, '../../..'),
+      '@': resolve(__dirname, '../..'),
     },
   },
   server: {
