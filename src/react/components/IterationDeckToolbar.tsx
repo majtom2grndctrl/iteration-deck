@@ -49,7 +49,7 @@ const DeckSelector: React.FC<{
         ))}
       </select>
       
-      <div className="flex items-center justify-between h-7 min-w-[120px] gap-3 px-3 bg-white border-2 border-gray-300 dark:bg-gray-800 dark:border-gray-600 rounded-3xl text-sm font-normal leading-3 text-gray-700 dark:text-gray-200 cursor-pointer select-none hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
+      <div className="flex items-center justify-between h-7 min-w-[120px] gap-3 px-3 bg-white border-2 border-gray-300 dark:bg-gray-800 dark:border-gray-600 rounded-3xl text-sm font-normal text-gray-700 dark:text-gray-200 cursor-pointer select-none hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
         <span className="flex-1 overflow-hidden text-ellipsis whitespace-nowrap">{displayLabel}</span>
         <span className="text-[8px] text-gray-500 dark:text-gray-400 pointer-events-none">▼</span>
       </div>
@@ -107,7 +107,7 @@ const SlideInfo: React.FC<{
   // Debug logging
   
   return (
-    <div className="flex-1 flex flex-col gap-0 sm:px-2 sm:max-w-4xl lg:max-w-none lg:w-80">
+    <div className="flex-1 flex flex-col gap-1 sm:px-2 sm:max-w-4xl lg:max-w-none lg:w-80">
       <span className="text-gray-700 dark:text-gray-200 text-xs font-medium leading-4 overflow-hidden text-ellipsis whitespace-nowrap sm:text-sm">
         {currentSlide?.label || 'No slide selected'}
       </span>
@@ -374,13 +374,13 @@ export const IterationDeckToolbar: React.FC<IterationDeckToolbarProps> = ({
     waitForScrollComplete(finalScrollY, () => {
       addGlowEffect(elementToHighlight);
     });
-  }, [waitForScrollComplete, addGlowEffect, findBestHighlightTarget]);
+  }, [waitForScrollComplete, addGlowEffect]);
 
   // Don't render if no interactive decks or in production without enable
   if (!isVisible) return null;
 
   const toolbarContent = (
-    <div className={`fixed bottom-2 left-1/2 -translate-x-1/2 z-[9999] flex items-center min-w-80 sm:min-w-96 sm:h-10 gap-1 px-2 py-1 sm:gap-2 sm:px-1 sm:py-1 sm:bottom-4 lg:p-3 rounded-[40px] backdrop-blur-md shadow-lg font-medium text-sm leading-none text-gray-700 bg-gray-200/80 dark:bg-gray-900/70 dark:text-gray-200 ${className || ''}`}>
+    <div className={`fixed bottom-2 left-1/2 -translate-x-1/2 z-[9999] flex items-center min-w-80 sm:min-w-96 gap-1 px-2 py-1 sm:gap-2 sm:px-1 sm:py-1 sm:bottom-4 lg:p-3 rounded-[40px] backdrop-blur-md shadow-lg font-medium text-sm leading-none text-gray-700 bg-gray-200/80 dark:bg-gray-900/70 dark:text-gray-200 ${className || ''}`}>
       {/* Inner container */}
       <div className="flex items-center gap-2 w-full">
         {/* Deck selector */}
@@ -396,7 +396,7 @@ export const IterationDeckToolbar: React.FC<IterationDeckToolbarProps> = ({
         )}
 
         {/* Navigation controls */}
-        <div className="flex items-center gap-0 sm:gap-1">
+        <div className="flex items-center gap-0">
           <SlideNavigation
             onPrevious={handlePrevious}
             onNext={handleNext}
@@ -404,9 +404,6 @@ export const IterationDeckToolbar: React.FC<IterationDeckToolbarProps> = ({
             canGoNext={totalSlides > 1}
           />
         </div>
-
-        {/* Separator */}
-        <div className="w-px h-5 bg-gray-400/60 dark:bg-gray-500/70 sm:h-4" />
 
         {/* Slide info */}
         <SlideInfo
