@@ -325,21 +325,6 @@ export const IterationDeckToolbar: React.FC<IterationDeckToolbarProps> = ({
     }, 800);
   }, [ensureGlowStyles]);
 
-  /**
-   * Find the best element to highlight within a slide
-   * Targets the first child which is typically the actual content component
-   */
-  const findBestHighlightTarget = useCallback((slideElement: HTMLElement): HTMLElement => {
-    // Look for the first child element (the actual slide content)
-    const firstChild = slideElement.firstElementChild as HTMLElement;
-    
-    if (firstChild) {
-      return firstChild;
-    }
-    
-    // Fallback to slide element if no children
-    return slideElement;
-  }, []);
 
   /**
    * Scroll to deck and add glow effect
@@ -351,14 +336,14 @@ export const IterationDeckToolbar: React.FC<IterationDeckToolbarProps> = ({
       return;
     }
     
-    // Find the active slide content to highlight
+    // Find the active slide content to highlight - matches Lit version logic
     const activeSlide = deckElement.querySelector('[data-slide-active="true"]') as HTMLElement;
-    let elementToHighlight = activeSlide || deckElement;
     
-    // If we found an active slide, try to find a better highlight target within it
-    if (activeSlide) {
-      elementToHighlight = findBestHighlightTarget(activeSlide);
-    }
+    // Get the actual React component content inside the slide
+    const slottedContent = activeSlide?.firstElementChild as HTMLElement;
+    
+    // Priority: actual content -> slide wrapper -> deck container (matches Lit version)
+    const elementToHighlight = slottedContent || activeSlide || deckElement;
 
     const rect = deckElement.getBoundingClientRect();
     const currentScrollY = window.scrollY;
