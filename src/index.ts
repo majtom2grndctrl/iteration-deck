@@ -6,7 +6,7 @@
  */
 
 // Primary React implementation 
-export * from './react';
+export * from './react/components';
 
 // Re-export shared types and utilities that aren't already exported by React implementation
-export { tokens, isDevelopmentMode } from '../shared';
+export { isDevelopmentMode } from './shared';

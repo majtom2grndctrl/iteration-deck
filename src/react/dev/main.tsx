@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 
 // Import directly from our source - no build step needed!
-import { IterationDeck, IterationDeckSlide, useEnsureToolbar } from '../src/react';
+import { IterationDeck, IterationDeckSlide, useEnsureToolbar } from '../components';
 
 // Demo components
 function SimpleButton({ variant, children }: { variant: string; children: React.ReactNode }) {

@@ -4,7 +4,7 @@
  */
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
-import { isDevelopmentMode } from '../shared';
+import { isDevelopmentMode } from '../../shared';
 
 /**
  * Deck metadata for store management

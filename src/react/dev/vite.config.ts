@@ -8,15 +8,14 @@ export default defineConfig({
     react(), 
     tailwindcss({
       content: [
-        './src/**/*.{ts,tsx}',
-        './dev/**/*.{html,js,ts,jsx,tsx}',
-        './index.html'
+        '../**/*.{ts,tsx}',
+        './**/*.{html,js,ts,jsx,tsx}'
       ]
     })
   ],
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src'),
+      '@': resolve(__dirname, '../../..'),
     },
   },
   server: {
