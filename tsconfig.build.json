@@ -9,8 +9,8 @@
     "allowImportingTsExtensions": false,
     "verbatimModuleSyntax": false
   },
-  "include": [
-    "src/**/*"
+  "files": [
+    "src/index.ts"
   ],
   "exclude": [
     "src/**/*.test.ts",

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iteration Deck Web Components Test</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            padding: 2rem;
+            background: #f9fafb;
+        }
+        
+        .example {
+            margin: 2rem 0;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1, h2 {
+            color: #374151;
+        }
+        
+        .demo-content {
+            padding: 2rem;
+            text-align: center;
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        
+        .variant-a { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .variant-b { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; }
+        .variant-c { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; }
+    </style>
+</head>
+<body>
+    <h1>Iteration Deck Web Components</h1>
+    <p>Testing the reorganized web components that use shared design tokens.</p>
+
+    <div class="example">
+        <h2>Basic Usage</h2>
+        <iteration-deck id="demo-deck" label="Design Variations">
+            <iteration-deck-slide label="Variant A" ai-prompt="Make it bold and modern">
+                <div class="demo-content variant-a">
+                    <h3>Modern Bold Design</h3>
+                    <p>This is the first design variation with a bold, modern approach.</p>
+                </div>
+            </iteration-deck-slide>
+            
+            <iteration-deck-slide label="Variant B" ai-prompt="More colorful and fun" notes="Team favorite">
+                <div class="demo-content variant-b">
+                    <h3>Colorful & Fun</h3>
+                    <p>A more playful approach with vibrant colors and friendly feel.</p>
+                </div>
+            </iteration-deck-slide>
+            
+            <iteration-deck-slide label="Variant C" ai-prompt="Clean and minimal" confidence="0.95">
+                <div class="demo-content variant-c">
+                    <h3>Clean & Minimal</h3>
+                    <p>A minimalist design focusing on clarity and simplicity.</p>
+                </div>
+            </iteration-deck-slide>
+        </iteration-deck>
+    </div>
+
+    <!-- Script to load and test web components -->
+    <script type="module">
+        // Import the web components
+        import '../wc/index.js';
+        
+        console.log('Web components loaded successfully!');
+        
+        // Test that components are registered
+        const deck = document.querySelector('iteration-deck');
+        const slides = document.querySelectorAll('iteration-deck-slide');
+        
+        console.log('Found deck:', deck?.id);
+        console.log('Found slides:', slides.length);
+        
+        // Log component information
+        if (deck) {
+            console.log('Deck properties:', {
+                id: deck.id,
+                label: deck.label,
+                enableInProduction: deck.enableInProduction
+            });
+        }
+        
+        slides.forEach((slide, index) => {
+            console.log(`Slide ${index + 1}:`, {
+                label: slide.label,
+                aiPrompt: slide.aiPrompt,
+                notes: slide.notes,
+                confidence: slide.confidence
+            });
+        });
+    </script>
+</body>
+</html>

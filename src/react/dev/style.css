@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+@source "../components";
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+  color: #374151;
+}

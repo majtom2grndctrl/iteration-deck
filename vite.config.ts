@@ -1,13 +1,16 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
 
-export default defineConfig({
-  plugins: [],
-  build: {
+export default defineConfig(({ command }) => {
+  const isDev = command === 'serve';
+  
+  return {
+    plugins: [],
+    build: isDev ? undefined : {
     lib: {
       entry: {
-        core: resolve(__dirname, 'src/index.ts'),
-        react: resolve(__dirname, 'src/react/index.tsx'),
+        index: resolve(__dirname, 'src/index.ts'), // React as default export
+        wc: resolve(__dirname, 'src/wc/index.ts'), // Web components at /wc
       },
       name: 'IterationDeck'
     },
@@ -19,6 +22,8 @@ export default defineConfig({
           entryFileNames: '[name].js',
           chunkFileNames: 'chunks/[name]-[hash].js',
           assetFileNames: 'assets/[name]-[hash][extname]',
+          // Disable chunking completely to avoid import path issues in NPM packages
+          manualChunks: undefined,
           globals: {
             react: 'React',
             'react-dom': 'ReactDOM',
@@ -31,6 +36,8 @@ export default defineConfig({
           entryFileNames: '[name].cjs',
           chunkFileNames: 'chunks/[name]-[hash].cjs',
           assetFileNames: 'assets/[name]-[hash][extname]',
+          // Disable chunking completely to avoid import path issues in NPM packages
+          manualChunks: undefined,
           globals: {
             react: 'React',
             'react-dom': 'ReactDOM',
@@ -78,8 +85,9 @@ export default defineConfig({
       '@': resolve(__dirname, './src'),
     },
   },
-  // Optimization for production builds
-  define: {
-    __DEV__: JSON.stringify(process.env.NODE_ENV !== 'production')
-  }
+    // Optimization for production builds
+    define: {
+      __DEV__: JSON.stringify(process.env.NODE_ENV !== 'production')
+    }
+  };
 });

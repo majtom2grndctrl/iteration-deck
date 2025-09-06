@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+/* Component base styles for React components */
+.iteration-deck {
+  display: block;
+  min-height: 1px;
+}
+
+.iteration-deck-slide {
+  display: block;
+  min-height: inherit;
+}

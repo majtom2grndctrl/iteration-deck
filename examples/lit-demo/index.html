@@ -1,0 +1,741 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Iteration Deck Demo - AI-First Prototyping</title>
+    
+    <!-- Tailwind CSS from CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Configure Tailwind to match our shared theme -->
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              // Glass colors from shared theme
+              glass: {
+                light: 'rgb(225 225 225 / 0.8)',
+                'light-hover': 'rgb(255 255 255 / 0.9)',
+                dark: 'rgb(39 39 42 / 0.8)',
+                'dark-hover': 'rgb(50 50 50 / 0.9)',
+              }
+            },
+            spacing: {
+              // Match shared spacing scale
+              '0': '2px',
+              '1': '4px',
+              '2': '8px', 
+              '3': '12px',
+              '4': '16px',
+              '5': '20px',
+              '6': '24px',
+              '7': '32px',
+              '8': '40px',
+              '9': '48px',
+              '10': '56px',
+              '11': '64px',
+            },
+            boxShadow: {
+              // Match shared shadows
+              'toolbar': '0 8px 32px rgb(0 0 0 / 0.1), 0 2px 8px rgb(0 0 0 / 0.05)',
+              'segmented': 'radial-gradient(ellipse 4px 44px at center, rgb(0 0 0 / 0.15) 40%, rgb(0 0 0 / 0.05) 60%, transparent 100%)',
+            },
+            backdropBlur: {
+              'xs': '2px',
+              'sm': '4px',
+              'md': '8px',
+              'lg': '12px', 
+              'xl': '16px',
+            }
+          }
+        }
+      }
+    </script>
+    
+    <!-- Import the Lit components -->
+    <script type="module" src="../../src/wc/index.ts"></script>
+    
+    <style>
+      /* Additional custom styles */
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      }
+      
+      /* Demo specific styling */
+      .demo-section {
+        margin: 2rem 0;
+        padding: 2rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        background: #fafafa;
+      }
+      
+      .demo-content {
+        background: white;
+        border-radius: 0.375rem;
+        padding: 1.5rem;
+        margin: 1rem 0;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+      }
+      
+      /* Form styling */
+      .form-container {
+        max-width: 400px;
+      }
+      
+      /* Dashboard styling */
+      .dashboard-container {
+        max-width: 800px;
+      }
+      
+      /* Contacts styling */
+      .contacts-container {
+        max-width: 600px;
+      }
+      
+      /* Budget chart placeholder */
+      .chart-placeholder {
+        height: 200px;
+        background: linear-gradient(45deg, #f3f4f6, #e5e7eb);
+        border-radius: 0.375rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6b7280;
+        font-size: 0.875rem;
+      }
+      
+      /* Contact avatar */
+      .contact-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, #3b82f6, #1d4ed8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 0.875rem;
+      }
+      
+      /* Demo badges */
+      .demo-badge {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        background: #dbeafe;
+        color: #1e40af;
+        border-radius: 0.25rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        margin-right: 0.5rem;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white border-b border-gray-200 px-6 py-4">
+      <div class="max-w-6xl mx-auto">
+        <h1 class="text-2xl font-bold text-gray-900">Iteration Deck Demo</h1>
+        <p class="text-gray-600 mt-1">AI-first prototyping with interactive UI variations</p>
+        <div class="mt-2">
+          <span class="demo-badge">🎨 Design Variations</span>
+          <span class="demo-badge">🤖 AI-Generated</span>
+          <span class="demo-badge">⚡ Live Switching</span>
+          <span class="demo-badge">🔄 Multi-Deck Support</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-6 py-8">
+      
+      <!-- Introduction -->
+      <section class="mb-8">
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+          <h2 class="text-lg font-semibold text-blue-900 mb-2">How to Use This Demo</h2>
+          <p class="text-blue-800 mb-3">
+            This demo shows three different iteration decks with multiple design variations. 
+            Use the toolbar at the bottom to switch between different variations and compare them live.
+          </p>
+          <ul class="text-blue-800 text-sm space-y-1">
+            <li>• <strong>Keyboard Navigation:</strong> Use Ctrl/Cmd + Arrow keys to navigate</li>
+            <li>• <strong>Multiple Decks:</strong> The toolbar dropdown lets you switch between different components</li>
+            <li>• <strong>Development Mode:</strong> You're seeing the full development experience</li>
+            <li>• <strong>Production Mode:</strong> In production, only the first variation renders</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Demo 1: User Preferences Form -->
+      <section class="demo-section">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">1. User Preferences Form</h2>
+        <p class="text-gray-600 mb-4">Three different layout approaches for a user preferences form - compare vertical vs horizontal vs card layouts.</p>
+        
+        <iteration-deck 
+          id="user-preferences" 
+          label="User Preferences Form"
+          prompt="Create a user preferences form with clean, modern styling and good UX"
+        >
+          <!-- Variation 1: Vertical Layout -->
+          <iteration-deck-slide 
+            label="Vertical Layout"
+            ai-prompt="Design a clean vertical form layout with good spacing"
+            notes="Designer feedback: Good for mobile, clear hierarchy"
+            confidence="0.92"
+          >
+            <div class="demo-content form-container">
+              <h3 class="text-lg font-semibold mb-4">Account Preferences</h3>
+              <form class="space-y-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                  <input type="text" value="Sarah Johnson" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Email Notifications</label>
+                  <div class="space-y-2">
+                    <label class="flex items-center">
+                      <input type="checkbox" checked class="mr-2">
+                      <span class="text-sm">Product updates</span>
+                    </label>
+                    <label class="flex items-center">
+                      <input type="checkbox" class="mr-2">
+                      <span class="text-sm">Marketing emails</span>
+                    </label>
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Theme Preference</label>
+                  <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option>Light</option>
+                    <option>Dark</option>
+                    <option>System</option>
+                  </select>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors">
+                  Save Preferences
+                </button>
+              </form>
+            </div>
+          </iteration-deck-slide>
+
+          <!-- Variation 2: Horizontal Layout -->
+          <iteration-deck-slide 
+            label="Horizontal Layout"
+            ai-prompt="Create a horizontal layout with fields side by side for desktop"
+            notes="Good for wide screens, efficient use of space"
+            confidence="0.87"
+          >
+            <div class="demo-content">
+              <h3 class="text-lg font-semibold mb-4">Account Preferences</h3>
+              <form class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                    <input type="text" value="Sarah Johnson" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Theme Preference</label>
+                    <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                      <option>Light</option>
+                      <option>Dark</option>
+                      <option>System</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Email Notifications</label>
+                  <div class="grid grid-cols-2 gap-4">
+                    <label class="flex items-center">
+                      <input type="checkbox" checked class="mr-2">
+                      <span class="text-sm">Product updates</span>
+                    </label>
+                    <label class="flex items-center">
+                      <input type="checkbox" class="mr-2">
+                      <span class="text-sm">Marketing emails</span>
+                    </label>
+                  </div>
+                </div>
+                <div class="flex justify-end">
+                  <button type="submit" class="bg-blue-600 text-white py-2 px-6 rounded-md hover:bg-blue-700 transition-colors">
+                    Save Preferences
+                  </button>
+                </div>
+              </form>
+            </div>
+          </iteration-deck-slide>
+
+          <!-- Variation 3: Card Layout -->
+          <iteration-deck-slide 
+            label="Card Layout"
+            ai-prompt="Design using separate cards for each preference section"
+            notes="PM feedback: Easier to scan, good visual separation"
+            confidence="0.95"
+          >
+            <div class="demo-content space-y-4">
+              <h3 class="text-lg font-semibold mb-4">Account Preferences</h3>
+              
+              <!-- Profile Card -->
+              <div class="bg-gray-50 p-4 rounded-lg">
+                <h4 class="font-medium mb-3">Profile Information</h4>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                  <input type="text" value="Sarah Johnson" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+              </div>
+
+              <!-- Notifications Card -->
+              <div class="bg-gray-50 p-4 rounded-lg">
+                <h4 class="font-medium mb-3">Email Notifications</h4>
+                <div class="space-y-2">
+                  <label class="flex items-center">
+                    <input type="checkbox" checked class="mr-2">
+                    <span class="text-sm">Product updates</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" class="mr-2">
+                    <span class="text-sm">Marketing emails</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Appearance Card -->
+              <div class="bg-gray-50 p-4 rounded-lg">
+                <h4 class="font-medium mb-3">Appearance</h4>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Theme Preference</label>
+                  <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option>Light</option>
+                    <option>Dark</option>
+                    <option>System</option>
+                  </select>
+                </div>
+              </div>
+
+              <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors">
+                Save All Preferences
+              </button>
+            </div>
+          </iteration-deck-slide>
+        </iteration-deck>
+      </section>
+
+      <!-- Demo 2: Budgeting Dashboard -->
+      <section class="demo-section">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">2. Budgeting Dashboard</h2>
+        <p class="text-gray-600 mb-4">Three different approaches to displaying budget information - simple summary vs detailed breakdown vs visual chart focus.</p>
+        
+        <iteration-deck 
+          id="budget-dashboard" 
+          label="Budget Dashboard"
+          prompt="Design a personal budget dashboard that helps users understand their spending"
+        >
+          <!-- Variation 1: Simple Summary -->
+          <iteration-deck-slide 
+            label="Simple Summary"
+            ai-prompt="Create a clean, minimal dashboard focusing on key metrics"
+            notes="Great for quick overview, less cognitive load"
+            confidence="0.89"
+          >
+            <div class="demo-content dashboard-container">
+              <h3 class="text-lg font-semibold mb-4">Budget Overview</h3>
+              
+              <div class="grid grid-cols-3 gap-4 mb-6">
+                <div class="text-center">
+                  <div class="text-2xl font-bold text-green-600">$2,847</div>
+                  <div class="text-sm text-gray-500">Income</div>
+                </div>
+                <div class="text-center">
+                  <div class="text-2xl font-bold text-red-600">$2,156</div>
+                  <div class="text-sm text-gray-500">Expenses</div>
+                </div>
+                <div class="text-center">
+                  <div class="text-2xl font-bold text-blue-600">$691</div>
+                  <div class="text-sm text-gray-500">Remaining</div>
+                </div>
+              </div>
+
+              <div class="space-y-3">
+                <div class="flex justify-between items-center">
+                  <span>Housing</span>
+                  <span class="font-medium">$1,200</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span>Food</span>
+                  <span class="font-medium">$450</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span>Transportation</span>
+                  <span class="font-medium">$320</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span>Other</span>
+                  <span class="font-medium">$186</span>
+                </div>
+              </div>
+            </div>
+          </iteration-deck-slide>
+
+          <!-- Variation 2: Detailed Breakdown -->
+          <iteration-deck-slide 
+            label="Detailed Breakdown"
+            ai-prompt="Show more detailed spending categories with progress bars"
+            notes="Power users like the detail, good for budget tracking"
+            confidence="0.84"
+          >
+            <div class="demo-content dashboard-container">
+              <h3 class="text-lg font-semibold mb-4">Budget Breakdown</h3>
+              
+              <!-- Summary Cards -->
+              <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="bg-green-50 p-4 rounded-lg">
+                  <div class="text-sm text-green-600">Total Income</div>
+                  <div class="text-xl font-bold text-green-700">$2,847</div>
+                </div>
+                <div class="bg-red-50 p-4 rounded-lg">
+                  <div class="text-sm text-red-600">Total Expenses</div>
+                  <div class="text-xl font-bold text-red-700">$2,156</div>
+                </div>
+              </div>
+
+              <!-- Category Breakdown -->
+              <div class="space-y-4">
+                <div>
+                  <div class="flex justify-between items-center mb-1">
+                    <span class="font-medium">Housing</span>
+                    <span class="text-sm text-gray-500">$1,200 / $1,300</span>
+                  </div>
+                  <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div class="bg-blue-600 h-2 rounded-full" style="width: 92%"></div>
+                  </div>
+                </div>
+                
+                <div>
+                  <div class="flex justify-between items-center mb-1">
+                    <span class="font-medium">Food & Dining</span>
+                    <span class="text-sm text-gray-500">$450 / $500</span>
+                  </div>
+                  <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div class="bg-green-500 h-2 rounded-full" style="width: 90%"></div>
+                  </div>
+                </div>
+                
+                <div>
+                  <div class="flex justify-between items-center mb-1">
+                    <span class="font-medium">Transportation</span>
+                    <span class="text-sm text-gray-500">$320 / $400</span>
+                  </div>
+                  <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div class="bg-yellow-500 h-2 rounded-full" style="width: 80%"></div>
+                  </div>
+                </div>
+                
+                <div>
+                  <div class="flex justify-between items-center mb-1">
+                    <span class="font-medium">Entertainment</span>
+                    <span class="text-sm text-gray-500">$120 / $200</span>
+                  </div>
+                  <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div class="bg-purple-500 h-2 rounded-full" style="width: 60%"></div>
+                  </div>
+                </div>
+                
+                <div>
+                  <div class="flex justify-between items-center mb-1">
+                    <span class="font-medium">Utilities</span>
+                    <span class="text-sm text-gray-500">$66 / $150</span>
+                  </div>
+                  <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div class="bg-indigo-500 h-2 rounded-full" style="width: 44%"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </iteration-deck-slide>
+
+          <!-- Variation 3: Visual Chart Focus -->
+          <iteration-deck-slide 
+            label="Visual Chart Focus"
+            ai-prompt="Emphasize visual representation with charts and graphs"
+            notes="Great for visual learners, makes trends obvious"
+            confidence="0.91"
+          >
+            <div class="demo-content dashboard-container">
+              <h3 class="text-lg font-semibold mb-4">Budget Visualization</h3>
+              
+              <!-- Chart Placeholder -->
+              <div class="chart-placeholder mb-6">
+                📊 Interactive Budget Chart<br>
+                <small>(Spending trends over time)</small>
+              </div>
+
+              <!-- Quick Stats -->
+              <div class="grid grid-cols-2 gap-4 mb-4">
+                <div class="text-center bg-gray-50 p-3 rounded">
+                  <div class="text-lg font-bold text-green-600">24%</div>
+                  <div class="text-xs text-gray-500">Savings Rate</div>
+                </div>
+                <div class="text-center bg-gray-50 p-3 rounded">
+                  <div class="text-lg font-bold text-blue-600">76%</div>
+                  <div class="text-xs text-gray-500">Budget Used</div>
+                </div>
+              </div>
+
+              <!-- Visual Category List -->
+              <div class="space-y-2">
+                <div class="flex items-center">
+                  <div class="w-4 h-4 bg-blue-500 rounded mr-3"></div>
+                  <span class="flex-1">Housing</span>
+                  <span class="font-medium">42%</span>
+                </div>
+                <div class="flex items-center">
+                  <div class="w-4 h-4 bg-green-500 rounded mr-3"></div>
+                  <span class="flex-1">Food</span>
+                  <span class="font-medium">21%</span>
+                </div>
+                <div class="flex items-center">
+                  <div class="w-4 h-4 bg-yellow-500 rounded mr-3"></div>
+                  <span class="flex-1">Transport</span>
+                  <span class="font-medium">15%</span>
+                </div>
+                <div class="flex items-center">
+                  <div class="w-4 h-4 bg-purple-500 rounded mr-3"></div>
+                  <span class="flex-1">Other</span>
+                  <span class="font-medium">22%</span>
+                </div>
+              </div>
+            </div>
+          </iteration-deck-slide>
+        </iteration-deck>
+      </section>
+
+      <!-- Demo 3: Contacts List -->
+      <section class="demo-section">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">3. Contacts List</h2>
+        <p class="text-gray-600 mb-4">Three different ways to present contact information - compact list vs detailed cards vs grid layout.</p>
+        
+        <iteration-deck 
+          id="contacts-list" 
+          label="Contacts List"
+          prompt="Design a contacts list that's easy to scan and interact with"
+        >
+          <!-- Variation 1: Compact List -->
+          <iteration-deck-slide 
+            label="Compact List"
+            ai-prompt="Create a dense, scannable list view for many contacts"
+            notes="Efficient for large contact lists, quick scanning"
+            confidence="0.88"
+          >
+            <div class="demo-content contacts-container">
+              <h3 class="text-lg font-semibold mb-4">Contacts</h3>
+              
+              <div class="space-y-1">
+                <div class="flex items-center py-2 px-3 hover:bg-gray-50 rounded">
+                  <div class="contact-avatar mr-3">AJ</div>
+                  <div class="flex-1">
+                    <div class="font-medium">Alice Johnson</div>
+                    <div class="text-sm text-gray-500">alice@company.com</div>
+                  </div>
+                  <div class="text-sm text-gray-400">Designer</div>
+                </div>
+                
+                <div class="flex items-center py-2 px-3 hover:bg-gray-50 rounded">
+                  <div class="contact-avatar mr-3">BS</div>
+                  <div class="flex-1">
+                    <div class="font-medium">Bob Smith</div>
+                    <div class="text-sm text-gray-500">bob.smith@email.com</div>
+                  </div>
+                  <div class="text-sm text-gray-400">Developer</div>
+                </div>
+                
+                <div class="flex items-center py-2 px-3 hover:bg-gray-50 rounded">
+                  <div class="contact-avatar mr-3">CD</div>
+                  <div class="flex-1">
+                    <div class="font-medium">Carol Davis</div>
+                    <div class="text-sm text-gray-500">carol.d@startup.io</div>
+                  </div>
+                  <div class="text-sm text-gray-400">PM</div>
+                </div>
+                
+                <div class="flex items-center py-2 px-3 hover:bg-gray-50 rounded">
+                  <div class="contact-avatar mr-3">DW</div>
+                  <div class="flex-1">
+                    <div class="font-medium">David Wilson</div>
+                    <div class="text-sm text-gray-500">d.wilson@tech.com</div>
+                  </div>
+                  <div class="text-sm text-gray-400">Engineer</div>
+                </div>
+                
+                <div class="flex items-center py-2 px-3 hover:bg-gray-50 rounded">
+                  <div class="contact-avatar mr-3">EB</div>
+                  <div class="flex-1">
+                    <div class="font-medium">Emma Brown</div>
+                    <div class="text-sm text-gray-500">emma@creative.agency</div>
+                  </div>
+                  <div class="text-sm text-gray-400">Creative</div>
+                </div>
+              </div>
+            </div>
+          </iteration-deck-slide>
+
+          <!-- Variation 2: Detailed Cards -->
+          <iteration-deck-slide 
+            label="Detailed Cards"
+            ai-prompt="Show more information in card format with actions"
+            notes="Good for CRM use case, shows more context"
+            confidence="0.85"
+          >
+            <div class="demo-content contacts-container">
+              <h3 class="text-lg font-semibold mb-4">Contacts</h3>
+              
+              <div class="space-y-4">
+                <div class="border border-gray-200 rounded-lg p-4">
+                  <div class="flex items-start">
+                    <div class="contact-avatar mr-4">AJ</div>
+                    <div class="flex-1">
+                      <h4 class="font-medium">Alice Johnson</h4>
+                      <p class="text-sm text-gray-600">Senior Product Designer</p>
+                      <p class="text-sm text-gray-500 mt-1">alice@company.com</p>
+                      <p class="text-sm text-gray-500">+1 (555) 123-4567</p>
+                      <div class="flex mt-3 space-x-2">
+                        <button class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Email</button>
+                        <button class="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">Call</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="border border-gray-200 rounded-lg p-4">
+                  <div class="flex items-start">
+                    <div class="contact-avatar mr-4">BS</div>
+                    <div class="flex-1">
+                      <h4 class="font-medium">Bob Smith</h4>
+                      <p class="text-sm text-gray-600">Full Stack Developer</p>
+                      <p class="text-sm text-gray-500 mt-1">bob.smith@email.com</p>
+                      <p class="text-sm text-gray-500">+1 (555) 987-6543</p>
+                      <div class="flex mt-3 space-x-2">
+                        <button class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Email</button>
+                        <button class="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">Call</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="border border-gray-200 rounded-lg p-4">
+                  <div class="flex items-start">
+                    <div class="contact-avatar mr-4">CD</div>
+                    <div class="flex-1">
+                      <h4 class="font-medium">Carol Davis</h4>
+                      <p class="text-sm text-gray-600">Product Manager</p>
+                      <p class="text-sm text-gray-500 mt-1">carol.d@startup.io</p>
+                      <p class="text-sm text-gray-500">+1 (555) 456-7890</p>
+                      <div class="flex mt-3 space-x-2">
+                        <button class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Email</button>
+                        <button class="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">Call</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </iteration-deck-slide>
+
+          <!-- Variation 3: Grid Layout -->
+          <iteration-deck-slide 
+            label="Grid Layout"
+            ai-prompt="Arrange contacts in a grid for visual browsing"
+            notes="Visual approach, good for team directories"
+            confidence="0.82"
+          >
+            <div class="demo-content contacts-container">
+              <h3 class="text-lg font-semibold mb-4">Team Directory</h3>
+              
+              <div class="grid grid-cols-2 gap-4">
+                <div class="text-center border border-gray-200 rounded-lg p-4">
+                  <div class="contact-avatar mx-auto mb-3" style="width: 60px; height: 60px; font-size: 1.2rem;">AJ</div>
+                  <h4 class="font-medium">Alice Johnson</h4>
+                  <p class="text-sm text-gray-600">Designer</p>
+                  <p class="text-xs text-gray-500 mt-1">alice@company.com</p>
+                  <button class="mt-2 text-xs bg-blue-600 text-white px-3 py-1 rounded">Contact</button>
+                </div>
+
+                <div class="text-center border border-gray-200 rounded-lg p-4">
+                  <div class="contact-avatar mx-auto mb-3" style="width: 60px; height: 60px; font-size: 1.2rem;">BS</div>
+                  <h4 class="font-medium">Bob Smith</h4>
+                  <p class="text-sm text-gray-600">Developer</p>
+                  <p class="text-xs text-gray-500 mt-1">bob.smith@email.com</p>
+                  <button class="mt-2 text-xs bg-blue-600 text-white px-3 py-1 rounded">Contact</button>
+                </div>
+
+                <div class="text-center border border-gray-200 rounded-lg p-4">
+                  <div class="contact-avatar mx-auto mb-3" style="width: 60px; height: 60px; font-size: 1.2rem;">CD</div>
+                  <h4 class="font-medium">Carol Davis</h4>
+                  <p class="text-sm text-gray-600">PM</p>
+                  <p class="text-xs text-gray-500 mt-1">carol.d@startup.io</p>
+                  <button class="mt-2 text-xs bg-blue-600 text-white px-3 py-1 rounded">Contact</button>
+                </div>
+
+                <div class="text-center border border-gray-200 rounded-lg p-4">
+                  <div class="contact-avatar mx-auto mb-3" style="width: 60px; height: 60px; font-size: 1.2rem;">DW</div>
+                  <h4 class="font-medium">David Wilson</h4>
+                  <p class="text-sm text-gray-600">Engineer</p>
+                  <p class="text-xs text-gray-500 mt-1">d.wilson@tech.com</p>
+                  <button class="mt-2 text-xs bg-blue-600 text-white px-3 py-1 rounded">Contact</button>
+                </div>
+              </div>
+            </div>
+          </iteration-deck-slide>
+        </iteration-deck>
+      </section>
+
+      <!-- Usage Instructions -->
+      <section class="demo-section">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">Development Features</h2>
+        <div class="space-y-4">
+          <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+            <h3 class="font-medium text-green-900 mb-2">✨ What You're Seeing</h3>
+            <ul class="text-green-800 text-sm space-y-1">
+              <li>• <strong>Three iteration decks</strong> with multiple variations each</li>
+              <li>• <strong>Global toolbar</strong> at the bottom for navigation</li>
+              <li>• <strong>Multi-deck support</strong> with dropdown selector</li>
+              <li>• <strong>Keyboard shortcuts</strong> for quick navigation</li>
+              <li>• <strong>AI metadata</strong> including prompts, notes, and confidence scores</li>
+            </ul>
+          </div>
+          
+          <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <h3 class="font-medium text-yellow-900 mb-2">🎯 AI-First Workflow</h3>
+            <p class="text-yellow-800 text-sm">
+              Each variation represents a different AI prompt refinement. Designers and PMs can compare 
+              live prototypes side-by-side, gather feedback, and iterate quickly without losing context.
+            </p>
+          </div>
+          
+          <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
+            <h3 class="font-medium text-purple-900 mb-2">🚀 Production Mode</h3>
+            <p class="text-purple-800 text-sm">
+              In production builds, only the first variation renders, ensuring clean deployments 
+              while maintaining the development iteration experience.
+            </p>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 px-6 py-8 mt-12">
+      <div class="max-w-6xl mx-auto text-center">
+        <p class="text-gray-600">
+          Built with <strong>Lit</strong>, <strong>Zustand</strong>, and <strong>@vanilla-extract/css</strong> 
+          for universal framework compatibility.
+        </p>
+        <p class="text-sm text-gray-500 mt-2">
+          Check the browser console for debug logs and component events.
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>
