@@ -7,7 +7,7 @@
 import { describe, test, expect, afterEach, beforeEach } from 'vitest';
 import { LitElement } from 'lit';
 import { IterationDeckSlide } from './iteration-deck-slide.js';
-import { createLitElement, removeLitElement, waitForLitElement } from '../../test/test-utilities.js';
+import { createLitElement, removeLitElement, waitForLitElement } from '../../test-utils/test-utilities.js';
 import { getIterationStoreState } from '../../store/iteration-store.js';
 
 // Import components

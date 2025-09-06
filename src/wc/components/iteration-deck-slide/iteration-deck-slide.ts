@@ -8,7 +8,7 @@
 
 import { LitElement, html } from 'lit';
 import { customElement, property, state, queryAssignedElements } from 'lit/decorators.js';
-import type { IterationDeckSlideProps } from '../../core/types.js';
+import type { IterationDeckSlideProps } from '../../types/index.js';
 import { 
   subscribeToIterationStore, 
   getIterationStoreState,
@@ -17,7 +17,7 @@ import {
 import { 
   generateSlideId, 
   errorLog 
-} from '../../core/utilities.js';
+} from '../../utils/index.js';
 
 // Inline styles for ShadowDOM encapsulation
 import { css } from 'lit';
@@ -400,7 +400,7 @@ export class IterationDeckSlide extends LitElement implements IterationDeckSlide
 export type { IterationDeckSlideProps };
 
 // Re-export utilities for convenience
-export { generateSlideId } from '../../core/utilities.js';
+export { generateSlideId } from '../../utils/index.js';
 
 declare global {
   interface HTMLElementTagNameMap {

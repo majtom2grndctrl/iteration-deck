@@ -4,7 +4,7 @@
  */
 
 // Re-export utility types
-export type { Environment, NavigationDirection } from './utilities.js';
+export type { Environment, NavigationDirection } from '../utils/index.js';
 
 /**
  * Props interface for IterationDeck component

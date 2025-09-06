@@ -21,8 +21,8 @@ vi.mock('../../store/iteration-store.js', () => ({
   isDevelopmentMode: vi.fn(() => true)
 }));
 
-vi.mock('../../core/utilities.js', async () => {
-  const actual = await vi.importActual('../../core/utilities.js');
+vi.mock('../../utils/index.js', async () => {
+  const actual = await vi.importActual('../../utils/index.js');
   return {
     ...actual,
     warnLog: vi.fn(),
@@ -48,7 +48,7 @@ describe('IterationDeckToolbar Essential Tests', () => {
 
   describe('Singleton Pattern', () => {
     it('should enforce singleton pattern', async () => {
-      const { warnLog } = await import('../../core/utilities.js');
+      const { warnLog } = await import('../../utils/index.js');
       
       // Create first toolbar
       toolbar = document.createElement('iteration-deck-toolbar') as IterationDeckToolbar;

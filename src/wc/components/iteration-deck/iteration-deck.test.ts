@@ -8,7 +8,7 @@ import { describe, test, expect, beforeEach, afterEach, vi } from 'vitest';
 import { LitElement } from 'lit';
 import { IterationDeck } from './iteration-deck.js';
 import { getIterationStoreState } from '../../store/iteration-store.js';
-import { createLitElement, removeLitElement, waitForLitElement } from '../../test/test-utilities.js';
+import { createLitElement, removeLitElement, waitForLitElement } from '../../test-utils/test-utilities.js';
 
 
 // Import the component to register it

@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { isNavigationShortcut } from './utilities.js';
+import { isNavigationShortcut } from './index.js';
 
 describe('Keyboard Navigation', () => {
   describe('isNavigationShortcut', () => {

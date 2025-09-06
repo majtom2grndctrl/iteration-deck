@@ -29,8 +29,8 @@ import {
   errorLog,
   throttle,
   type NavigationDirection
-} from '../../core/utilities.js';
-import type { DeckRegistration } from '../../core/types.js';
+} from '../../utils/index.js';
+import type { DeckRegistration } from '../../types/index.js';
 import type { IterationDeckSlide } from '../iteration-deck-slide/iteration-deck-slide.js';
 
 /**

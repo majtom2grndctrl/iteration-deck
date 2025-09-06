@@ -4,7 +4,7 @@
  * Basic state management for iteration decks and their active slides.
  */
 
-import { isDevelopment } from '../core/utilities.js';
+import { isDevelopment } from '../utils/index.js';
 
 /**
  * Deck metadata for store management

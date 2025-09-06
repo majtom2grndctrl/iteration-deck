@@ -21,14 +21,14 @@ import { customElement, property, state } from 'lit/decorators.js';
 import type { 
   SlideChangeEvent, 
   DeckRegistrationEvent 
-} from '../../core/types.js';
+} from '../../types/index.js';
 import { 
   isDevelopment, 
   generateSlideId, 
   validateDeckId, 
   errorLog, 
   warnLog 
-} from '../../core/utilities.js';
+} from '../../utils/index.js';
 
 // Import store integration
 import { 
@@ -38,7 +38,7 @@ import {
 } from '../../store/iteration-store.js';
 
 // Import shared styles for Tailwind consistency
-import { deckStyles } from '../../../shared/styles.js';
+import { deckStyles } from '../../../../shared/styles.js';
 
 // Import toolbar integration
 import { ensureToolbarMounted, cleanupToolbarIfEmpty } from '../iteration-deck-toolbar';
