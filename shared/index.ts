@@ -20,22 +20,20 @@ export type {
 
 // Environment detection utility
 export function isDevelopmentMode(): boolean {
-  // Try Vite's import.meta.env.DEV first (more reliable in Vite)
-  if (typeof import.meta !== 'undefined' && import.meta.env) {
-    const isDev = import.meta.env.DEV === true;
-    console.log('🌍 Environment check (Vite):', { 
-      'import.meta.env.DEV': import.meta.env.DEV, 
-      'import.meta.env.MODE': import.meta.env.MODE,
-      isDev 
-    });
-    return isDev;
+  // In a browser environment, check if we're in development
+  if (typeof window !== 'undefined') {
+    return window.location.hostname === 'localhost' || 
+           window.location.hostname === '127.0.0.1' ||
+           window.location.port !== '';
   }
   
-  // Fallback to NODE_ENV
-  const nodeEnv = process.env.NODE_ENV;
-  const isDev = nodeEnv !== 'production';
-  console.log('🌍 Environment check (Node):', { nodeEnv, isDev });
-  return isDev;
+  // In Node.js environment, check NODE_ENV
+  if (typeof process !== 'undefined' && process.env) {
+    return process.env.NODE_ENV !== 'production';
+  }
+  
+  // Default to development mode if unsure
+  return true;
 }
 
 // Utility function to get token values with TypeScript safety (legacy)

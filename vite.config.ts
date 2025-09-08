@@ -6,6 +6,12 @@ export default defineConfig(({ command }) => {
   
   return {
     plugins: [],
+    css: {
+      modules: {
+        localsConvention: 'camelCase',
+        generateScopedName: '[name]__[local]___[hash:base64:5]',
+      },
+    },
     build: isDev ? undefined : {
     lib: {
       entry: {
@@ -15,18 +21,22 @@ export default defineConfig(({ command }) => {
       name: 'IterationDeck'
     },
     rollupOptions: {
-      external: ['react', 'react-dom', 'lit', 'zustand'],
+      external: (id) => {
+        // External modules - these won't be bundled
+        return ['react', 'react-dom', 'react/jsx-runtime', 'lit', 'zustand'].some(dep => 
+          id === dep || id.startsWith(dep + '/')
+        );
+      },
       output: [
         {
           format: 'es',
           entryFileNames: '[name].js',
-          chunkFileNames: 'chunks/[name]-[hash].js',
-          assetFileNames: 'assets/[name]-[hash][extname]',
-          // Disable chunking completely to avoid import path issues in NPM packages
-          manualChunks: undefined,
+          // Prevent chunking for library builds
+          manualChunks: () => null,
           globals: {
             react: 'React',
             'react-dom': 'ReactDOM',
+            'react/jsx-runtime': 'ReactJSXRuntime',
             lit: 'lit',
             zustand: 'zustand'
           }
@@ -34,13 +44,12 @@ export default defineConfig(({ command }) => {
         {
           format: 'cjs',
           entryFileNames: '[name].cjs',
-          chunkFileNames: 'chunks/[name]-[hash].cjs',
-          assetFileNames: 'assets/[name]-[hash][extname]',
-          // Disable chunking completely to avoid import path issues in NPM packages
-          manualChunks: undefined,
+          // Prevent chunking for library builds
+          manualChunks: () => null,
           globals: {
             react: 'React',
             'react-dom': 'ReactDOM',
+            'react/jsx-runtime': 'ReactJSXRuntime',
             lit: 'lit',
             zustand: 'zustand'
           }

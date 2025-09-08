@@ -4,7 +4,6 @@
  */
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
-import { isDevelopmentMode } from '../../shared';
 
 /**
  * Deck metadata for store management
@@ -32,9 +31,6 @@ export interface StoreState {
   
   /** Currently selected deck for toolbar navigation */
   selectedDeckId?: string;
-  
-  /** Environment flag - true in production builds, false in development */
-  isProduction: boolean;
 }
 
 /**
@@ -69,38 +65,46 @@ export interface StoreActions {
   getInteractiveDecks: () => string[];
 }
 
+// Create store state object
+function createStoreState(): StoreState {
+  return {
+    activeDecks: {},
+    deckMetadata: {},
+    selectedDeckId: undefined
+  };
+}
+
 // Global store state
-let globalState: StoreState = {
-  activeDecks: {},
-  deckMetadata: {},
-  selectedDeckId: undefined,
-  isProduction: !isDevelopmentMode()
-};
+let globalState: StoreState = createStoreState();
 
 // Store listeners
 const listeners = new Set<(state: StoreState) => void>();
 
 // Notify all listeners of state changes
 function notifyListeners() {
-  listeners.forEach(listener => listener(globalState));
+  // Create a new object reference to trigger React re-renders
+  const newState = {
+    ...globalState,
+    activeDecks: { ...globalState.activeDecks },
+    deckMetadata: { ...globalState.deckMetadata }
+  };
+  console.log('[Store DEBUG] Notifying listeners:', {
+    listenerCount: listeners.size,
+    activeDecks: newState.activeDecks,
+    interactiveDeckCount: Object.values(newState.deckMetadata).filter(meta => meta?.isInteractive === true).length
+  });
+  listeners.forEach(listener => listener(newState));
 }
 
 // Store actions
 export const storeActions: StoreActions = {
   setActiveSlide: (deckId: string, slideId: string) => {
-    globalState = {
-      ...globalState,
-      activeDecks: {
-        ...globalState.activeDecks,
-        [deckId]: slideId
-      },
-      deckMetadata: {
-        ...globalState.deckMetadata,
-        [deckId]: globalState.deckMetadata[deckId] 
-          ? { ...globalState.deckMetadata[deckId], activeSlideId: slideId }
-          : { slideIds: [slideId], activeSlideId: slideId, isInteractive: true }
-      }
-    };
+    globalState.activeDecks[deckId] = slideId;
+    if (globalState.deckMetadata[deckId]) {
+      globalState.deckMetadata[deckId].activeSlideId = slideId;
+    } else {
+      globalState.deckMetadata[deckId] = { slideIds: [slideId], activeSlideId: slideId, isInteractive: true };
+    }
     notifyListeners();
   },
 
@@ -108,53 +112,31 @@ export const storeActions: StoreActions = {
     const currentActive = globalState.activeDecks[deckId];
     const validActiveSlide = slideIds.includes(currentActive) ? currentActive : slideIds[0];
     
-    globalState = {
-      ...globalState,
-      activeDecks: {
-        ...globalState.activeDecks,
-        [deckId]: validActiveSlide
-      },
-      deckMetadata: {
-        ...globalState.deckMetadata,
-        [deckId]: {
-          slideIds: [...slideIds],
-          activeSlideId: validActiveSlide,
-          label,
-          isInteractive
-        }
-      }
+    globalState.activeDecks[deckId] = validActiveSlide;
+    globalState.deckMetadata[deckId] = {
+      slideIds: [...slideIds],
+      activeSlideId: validActiveSlide,
+      label,
+      isInteractive
     };
     
     notifyListeners();
   },
 
   removeDeck: (deckId: string) => {
-    const newActiveDecks = { ...globalState.activeDecks };
-    const newDeckMetadata = { ...globalState.deckMetadata };
+    delete globalState.activeDecks[deckId];
+    delete globalState.deckMetadata[deckId];
     
-    delete newActiveDecks[deckId];
-    delete newDeckMetadata[deckId];
-    
-    let newSelectedDeckId = globalState.selectedDeckId;
-    if (newSelectedDeckId === deckId) {
-      const remainingDecks = Object.keys(newActiveDecks);
-      newSelectedDeckId = remainingDecks.length > 0 ? remainingDecks[0] : undefined;
+    if (globalState.selectedDeckId === deckId) {
+      const remainingDecks = Object.keys(globalState.activeDecks);
+      globalState.selectedDeckId = remainingDecks.length > 0 ? remainingDecks[0] : undefined;
     }
     
-    globalState = {
-      ...globalState,
-      activeDecks: newActiveDecks,
-      deckMetadata: newDeckMetadata,
-      selectedDeckId: newSelectedDeckId
-    };
     notifyListeners();
   },
 
   setSelectedDeck: (deckId: string) => {
-    globalState = {
-      ...globalState,
-      selectedDeckId: deckId
-    };
+    globalState.selectedDeckId = deckId;
     notifyListeners();
   },
 
@@ -195,6 +177,9 @@ export function useIterationStore(): StoreState & StoreActions {
     };
     
     listeners.add(unsubscribe);
+    
+    // Set initial state
+    setState(globalState);
 
     // Cleanup subscription on unmount
     return () => {
@@ -268,11 +253,3 @@ export function useDeckNavigation(deckId: string) {
   };
 }
 
-/**
- * Hook for development mode detection
- * Returns true if in development mode, false in production
- */
-export function useIsDevelopment(): boolean {
-  const store = useIterationStore();
-  return !store.isProduction;
-}

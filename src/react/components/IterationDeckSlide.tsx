@@ -12,7 +12,7 @@ import type { IterationDeckSlideProps } from '../../shared/types';
 /**
  * React props interface extending the core props with React-specific types
  */
-export interface ReactIterationDeckSlideProps extends IterationDeckSlideProps {
+export interface ReactIterationDeckSlideProps extends IterationDeckSlideProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'children' | 'className' | 'style'> {
   /** React children to render inside the slide */
   children?: React.ReactNode;
   /** Optional className for additional styling */

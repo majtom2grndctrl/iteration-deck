@@ -26,7 +26,6 @@ export {
   useIterationStore,
   useActiveSlide,
   useDeckNavigation,
-  useIsDevelopment,
   type StoreState,
   type StoreActions,
   type DeckMetadata,

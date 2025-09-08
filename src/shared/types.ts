@@ -15,8 +15,6 @@ export interface IterationDeckProps {
   prompt?: string;
   /** Additional context for stakeholder presentations */
   description?: string;
-  /** Enable functionality even in production builds */
-  enableInProduction?: boolean;
 }
 
 /**

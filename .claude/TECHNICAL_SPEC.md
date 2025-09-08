@@ -6,24 +6,38 @@ Universal web components built with Lit for **AI-first prototyping workflows** t
 
 **Core Philosophy:** Provide the "duplicate frame" equivalent for AI-generated code variations, allowing live comparison of interactive prototypes directly in product context.
 
-**Architecture:** Lit web components with manual React wrappers, Zustand for state management, and ShadowDOM-encapsulated CSS using Lit's tagged template literals with design tokens. Works with any framework (React, Vue, Angular, Astro, vanilla HTML).
+**Architecture:** Single package with dual exports - pure React components as default export, Lit web components at `/wc` export. Shared design tokens and types ensure consistency. Zustand for state management across both implementations.
 
 ## Architecture Deep Dive
 
-### Lit Web Components Foundation
-The core functionality is implemented as Lit components with excellent performance and developer experience:
-- `<iteration-deck>`: Main container component with Zustand state integration
-- `<iteration-deck-slide>`: Individual slide wrapper with Lit @property decorators
-- `<iteration-deck-toolbar>`: Development toolbar (singleton) with Zustand state
+### Single Package, Dual Exports
+- **Primary Export (`.`)**: Pure React components that work immediately in any React environment
+- **Secondary Export (`./wc`)**: Lit web components for web standards enthusiasts and non-React frameworks
+- **Shared Foundation**: Common design tokens and types ensure visual/functional consistency
 
-### ShadowDOM Styling System
-ShadowDOM-encapsulated CSS using Lit's tagged template literals with design token integration:
-- **Design Tokens**: TypeScript constants for static values (colors, spacing, typography scales) in `src/util/tokens/`
-- **CSS Custom Properties**: Runtime-dynamic values (theme switching, user preferences) defined within components
-- **ShadowDOM Encapsulation**: All styles isolated within component shadow roots for universal compatibility
-- **Embedded Styles**: CSS defined within Lit components using `css` tagged template literals
+### Pure React Implementation
+Primary implementation using standard React patterns:
+- `IterationDeck`: Pure React component with CSS-in-JS styling
+- `IterationDeckSlide`: Pure React component for individual slides
+- `IterationDeckToolbar`: Automatically managed by IterationDeck (singleton pattern)
+- **No web components**: Standard React hooks and components only
+- **CSS-in-JS**: Styled using React patterns, not ShadowDOM
+
+### Lit Web Components (Secondary)
+Alternative implementation for web standards enthusiasts:
+- `<iteration-deck>`: Main container component with Zustand state integration
+- `<iteration-deck-slide>`: Individual slide wrapper with Lit @property decorators  
+- `<iteration-deck-toolbar>`: Development toolbar (singleton) with Zustand state
+- **ShadowDOM Encapsulation**: All styles isolated within component shadow roots
+
+### Shared Design System
+Common foundation used by both implementations:
+- **Shared Types**: TypeScript interfaces in `src/shared/types.ts` 
+- **Environment Detection**: Utilities in `src/shared/index.ts`
+- **Design Tokens**: Consistent styling values (colors, spacing, etc.)
 
 ### Zustand State Management
+Shared state management across both implementations:
 ```typescript
 interface IterationStore {
   activeDecks: Record<string, string>; // deckId -> activeSlideId
@@ -31,29 +45,14 @@ interface IterationStore {
   isProduction: boolean;
 }
 ```
-- Lit components subscribe via `store.subscribe()`
-- React components use `useIterationStore()` hook
+- React: `useIterationStore()` hook and store utilities
+- Web Components: Direct store subscription via `store.subscribe()`
 
-### Manual React Wrapper Components
-Thin React wrapper components for seamless integration:
-```tsx
-// Manual React wrapper around Lit component
-import { IterationDeck } from '@iteration-deck/react';
-
-// Direct web component usage for other frameworks
-import '@iteration-deck/core';
-
-// Astro integration
-import { IterationDeck } from '@iteration-deck/astro';
-```
-
-### Universal Framework Support
-- **React**: Manual React wrapper components with Zustand integration and proper TypeScript types
-- **Vue**: Direct web component usage with reactive property binding
-- **Angular**: Direct web component usage with proper change detection
-- **Astro**: Custom Astro integration with SSR support
-- **Vanilla HTML**: Import and use web components directly
-- **Other frameworks**: Web components work universally with Lit optimizations
+### Framework Support
+- **React**: Pure React implementation (primary) - works everywhere React works
+- **Vanilla HTML**: Web components (secondary) - universal custom elements
+- **Vue/Angular/Svelte**: Web components (secondary) - standard web components integration
+- **Astro**: Web components (secondary) - SSR-friendly custom elements
 
 ## Component API
 
@@ -197,23 +196,27 @@ Single global toolbar (singleton pattern) with intelligent multi-deck support:
 ### Component Structure
 ```
 src/
-├── lit/
-│   ├── iteration-deck.ts           # Lit component with embedded CSS
-│   ├── iteration-deck-slide.ts     # Lit component with embedded CSS
-│   └── iteration-deck-toolbar.ts   # Lit component with embedded CSS
-├── react/
-│   ├── IterationDeck.tsx
-│   └── IterationDeckSlide.tsx
-├── util/
-│   ├── tokens/
-│   │   ├── index.ts
-│   │   ├── colors.ts
-│   │   ├── spacing.ts
-│   │   └── typography.ts
-│   └── store/
-│       └── iteration-store.ts
-└── example/
-    └── demo.html
+├── index.ts                     # Main entry: pure React components (default export)
+├── react/                       # Pure React implementation
+│   ├── components/
+│   │   ├── IterationDeck.tsx
+│   │   ├── IterationDeckSlide.tsx
+│   │   ├── IterationDeckToolbar.tsx
+│   │   ├── store.ts            # React store hooks
+│   │   └── index.tsx           # React component exports
+│   └── dev/                    # React development demo
+├── wc/                         # Web Components implementation  
+│   ├── index.ts                # WC entry: Lit components (./wc export)
+│   ├── components/
+│   │   ├── iteration-deck/
+│   │   ├── iteration-deck-slide/
+│   │   └── iteration-deck-toolbar/
+│   ├── store/                  # Zustand store for WC
+│   └── utils/                  # WC-specific utilities
+├── shared/                     # Shared between React and WC
+│   ├── index.ts                # Environment detection utilities
+│   └── types.ts                # Common TypeScript interfaces
+└── styles/                     # Global styling utilities (if needed)
 ```
 
 ## Production Behavior
@@ -278,21 +281,18 @@ export class IterationDeck extends LitElement {
 
 ### Installation
 ```bash
-# Framework-specific packages
-pnpm add @iteration-deck/react     # For React projects (manual wrappers)
-pnpm add @iteration-deck/astro     # For Astro projects with SSR support
-
-# Universal web components package
-pnpm add @iteration-deck/core      # For vanilla HTML and other frameworks
+# Single package with dual exports
+pnpm add iteration-deck
 ```
 
 ### Import and Usage
 
-#### React Usage (Manual Wrappers)
+#### React Usage (Primary - Default Export)
 ```tsx
-import { IterationDeck, IterationDeckSlide } from '@iteration-deck/react';
+// Pure React components (default export)
+import { IterationDeck, IterationDeckSlide } from 'iteration-deck';
 
-// Manual React wrapper components with Zustand integration
+// Works immediately in any React environment
 <IterationDeck id="hero-layouts" label="Hero Sections">
   <IterationDeckSlide label="Layout 1">
     <HeroLayout1 />
@@ -306,39 +306,11 @@ import { IterationDeck, IterationDeckSlide } from '@iteration-deck/react';
 </IterationDeck>
 ```
 
-#### Astro Usage (Custom Integration)
-```astro
----
-// Component script - runs on the server
-import { IterationDeck, IterationDeckSlide } from '@iteration-deck/astro';
----
-
-<!-- SSR with client hydration for interactivity -->
-<IterationDeck id="hero-layouts" label="Hero Sections" client:load>
-  <IterationDeckSlide label="Layout 1">
-    <MyHeroLayout variant="1" />
-  </IterationDeckSlide>
-  <IterationDeckSlide label="Layout 2">
-    <MyHeroLayout variant="2" />
-  </IterationDeckSlide>
-  <IterationDeckSlide label="Layout 3">
-    <MyHeroLayout variant="3" />
-  </IterationDeckSlide>
-</IterationDeck>
-
-<style>
-  /* Astro scoped styles work seamlessly */
-  iteration-deck {
-    margin: 2rem 0;
-  }
-</style>
-```
-
-#### Vanilla HTML Usage
+#### Web Components Usage (Secondary - /wc Export)
 ```html
-<!-- Direct web component usage in vanilla HTML -->
+<!-- Vanilla HTML with web components -->
 <script type="module">
-  import '@iteration-deck/core';
+  import 'iteration-deck/wc';
 </script>
 
 <iteration-deck id="components" label="Component Variations">
@@ -349,6 +321,18 @@ import { IterationDeck, IterationDeckSlide } from '@iteration-deck/astro';
     <div class="my-component variant-2">Content 2</div>
   </iteration-deck-slide>
 </iteration-deck>
+```
+
+#### Framework Integration
+```tsx
+// React (primary)
+import { IterationDeck } from 'iteration-deck';
+
+// Vue/Svelte/Angular (web components)
+import 'iteration-deck/wc';
+
+// Astro (web components with SSR)
+import 'iteration-deck/wc';
 ```
 
 ## Build Configuration

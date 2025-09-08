@@ -65,6 +65,9 @@ export interface IterationStore {
   
   /** For testing: Override production mode */
   _setProductionModeForTesting?: (isProduction: boolean) => void;
+  
+  /** Runtime environment detection update */
+  updateEnvironmentDetection?: () => void;
 }
 
 // Simple store implementation
@@ -76,14 +79,41 @@ class SimpleStore implements IterationStore {
   // For testing: allow overriding production mode
   private _testProductionModeOverride?: boolean;
   
+  // Environment detection state - lazy initialization
+  private _environmentDetected: boolean = false;
+  private _cachedIsProduction: boolean = true; // Conservative default
+  
   /**
-   * Dynamic production state check to support test mocking
+   * Lazy environment detection - happens on first access
+   */
+  private _ensureEnvironmentDetected(): void {
+    if (!this._environmentDetected && typeof window !== 'undefined') {
+      this._cachedIsProduction = !isDevelopment();
+      this._environmentDetected = true;
+    }
+  }
+  
+  /**
+   * Dynamic production state check with lazy detection
    */
   get isProduction(): boolean {
     if (this._testProductionModeOverride !== undefined) {
       return this._testProductionModeOverride;
     }
-    return !isDevelopment();
+    
+    // Lazy detection on first access
+    this._ensureEnvironmentDetected();
+    return this._cachedIsProduction;
+  }
+  
+  /**
+   * Update environment detection at runtime (for backward compatibility)
+   * @deprecated Use lazy detection instead
+   */
+  updateEnvironmentDetection(): void {
+    // Force re-detection
+    this._environmentDetected = false;
+    this._ensureEnvironmentDetected();
   }
   
   /**
@@ -96,7 +126,7 @@ class SimpleStore implements IterationStore {
   }
   
   constructor() {
-    // Store initialized
+    // Store initialized with lazy environment detection
   }
   
   private listeners: Set<(state: IterationStore) => void> = new Set();
