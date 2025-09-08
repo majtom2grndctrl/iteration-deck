@@ -10,7 +10,8 @@
     "verbatimModuleSyntax": false
   },
   "files": [
-    "src/index.ts"
+    "src/index.ts",
+    "src/wc/index.ts"
   ],
   "exclude": [
     "src/**/*.test.ts",

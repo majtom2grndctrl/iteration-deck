@@ -8,7 +8,7 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useIterationStore } from './store';
-
+import { iterationDeckStyles, injectIterationDeckStyles } from '../utils/injectCSS';
 
 /**
  * Toolbar component props
@@ -32,9 +32,9 @@ const DeckSelector: React.FC<{
   if (decks.length <= 1) return null;
 
   return (
-    <div className="relative flex items-center">
+    <div className={iterationDeckStyles.selectorContainer}>
       <select 
-        className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer z-[2]"
+        className={iterationDeckStyles.hiddenSelect}
         onChange={(e) => onSelect(e.target.value)}
         value={selectedDeckId || ''}
         aria-label="Select iteration deck"
@@ -49,9 +49,13 @@ const DeckSelector: React.FC<{
         ))}
       </select>
       
-      <div className="flex items-center justify-between h-7 min-w-[120px] gap-3 px-3 bg-white border-2 border-gray-300 dark:bg-gray-800 dark:border-gray-600 rounded-3xl text-sm font-normal text-gray-700 dark:text-gray-200 cursor-pointer select-none hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
-        <span className="flex-1 overflow-hidden text-ellipsis whitespace-nowrap">{displayLabel}</span>
-        <span className="text-[8px] text-gray-500 dark:text-gray-400 pointer-events-none">▼</span>
+      <div className={iterationDeckStyles.selectorDisplay}>
+        <span className={iterationDeckStyles.selectorLabel}>
+          {displayLabel}
+        </span>
+        <span className={iterationDeckStyles.dropdownArrow}>
+          ▼
+        </span>
       </div>
     </div>
   );
@@ -66,15 +70,12 @@ const SlideNavigation: React.FC<{
   canGoPrevious: boolean;
   canGoNext: boolean;
 }> = ({ onPrevious, onNext, canGoPrevious, canGoNext }) => {
-  // Base button classes (shared by both buttons)
-  const baseButtonClass = "flex items-center justify-center w-8 h-full bg-white dark:bg-gray-800 transition-all duration-150 ease-out text-gray-600 dark:text-gray-300 text-sm cursor-pointer select-none hover:bg-gray-50 hover:text-gray-800 dark:hover:bg-gray-600 dark:hover:text-gray-100 active:bg-gray-100 active:scale-95 dark:active:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset dark:focus:ring-blue-400 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-gray-600 dark:disabled:hover:bg-gray-700 dark:disabled:hover:text-gray-300 disabled:active:scale-100";
-
   return (
-    <div className="flex items-center rounded-3xl border-2 border-gray-300 dark:border-gray-600 overflow-hidden h-7 bg-gray-200 dark:bg-gray-600">
+    <div className={iterationDeckStyles.navigationContainer}>
       <button
         onClick={onPrevious}
         disabled={!canGoPrevious}
-        className={`${baseButtonClass} rounded-l-3xl border-r-0`}
+        className={iterationDeckStyles.previousButton}
         aria-label="Previous slide (Ctrl/Cmd+Alt+[)"
         title="Previous slide (Ctrl/Cmd+Alt+[)"
       >
@@ -85,7 +86,7 @@ const SlideNavigation: React.FC<{
       <button
         onClick={onNext}
         disabled={!canGoNext}
-        className={`${baseButtonClass} rounded-r-3xl border-l-0`}
+        className={iterationDeckStyles.nextButton}
         aria-label="Next slide (Ctrl/Cmd+Alt+])"
         title="Next slide (Ctrl/Cmd+Alt+])"
       >
@@ -104,18 +105,18 @@ const SlideInfo: React.FC<{
   currentSlide?: { label?: string; index?: number };
   totalSlides: number;
 }> = ({ currentSlide, totalSlides }) => {
-  // Debug logging
-  
   return (
-    <div className="flex-1 flex flex-col gap-1 sm:px-2 sm:max-w-4xl lg:max-w-none lg:w-80">
-      <span className="text-gray-700 dark:text-gray-200 text-xs font-medium leading-4 overflow-hidden text-ellipsis whitespace-nowrap sm:text-sm">
+    <div className={iterationDeckStyles.slideInfo}>
+      <span className={iterationDeckStyles.slideLabel}>
         {currentSlide?.label || 'No slide selected'}
       </span>
       
-      {/* Slide indicators - show debug info when no dots */}
-      <div className="flex items-center justify-start gap-1 w-full">
+      {/* Slide indicators */}
+      <div className={iterationDeckStyles.slideIndicators}>
         {totalSlides === 0 ? (
-          <span className="text-[8px] text-red-500">No slides (totalSlides: {totalSlides})</span>
+          <span className={iterationDeckStyles.noSlides}>
+            No slides (totalSlides: {totalSlides})
+          </span>
         ) : (
           Array.from({ length: totalSlides }, (_, i) => {
             const isActive = i === (currentSlide?.index || 0);
@@ -123,9 +124,7 @@ const SlideInfo: React.FC<{
             return (
               <div
                 key={i}
-                className={`w-1 h-1 rounded-full bg-gray-400 transition-opacity duration-200 ${
-                  isActive ? 'opacity-90' : 'opacity-50'
-                }`}
+                className={isActive ? iterationDeckStyles.slideDotActive : iterationDeckStyles.slideDotInactive}
                 title={`Dot ${i} - ${isActive ? 'active' : 'inactive'}`}
               />
             );
@@ -136,6 +135,7 @@ const SlideInfo: React.FC<{
   );
 };
 
+
 /**
  * Main toolbar component
  */
@@ -145,6 +145,13 @@ export const IterationDeckToolbar: React.FC<IterationDeckToolbarProps> = ({
   const store = useIterationStore();
   const [isVisible, setIsVisible] = useState(false);
   const glowStylesInjected = useRef(false);
+
+  // Inject CSS styles automatically
+  React.useEffect(() => {
+    injectIterationDeckStyles();
+  }, []);
+
+  console.log('[IterationDeckToolbar DEBUG] Rendering toolbar:', { isVisible });
 
   // Get interactive decks and current selection
   const interactiveDecks = store.getInteractiveDecks().map(id => ({
@@ -249,7 +256,7 @@ export const IterationDeckToolbar: React.FC<IterationDeckToolbarProps> = ({
         }
         100% {
           box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.2), 0 0 25px rgba(236, 72, 153, 0.1);
-          outline: 2px solid rgba(236, 72, 153, 0);
+          outline: 2px solid rgba(236, 72, 153, 0.1);
         }
       }
       
@@ -325,7 +332,6 @@ export const IterationDeckToolbar: React.FC<IterationDeckToolbarProps> = ({
     }, 800);
   }, [ensureGlowStyles]);
 
-
   /**
    * Scroll to deck and add glow effect
    */
@@ -364,41 +370,44 @@ export const IterationDeckToolbar: React.FC<IterationDeckToolbarProps> = ({
   // Don't render if no interactive decks or in production without enable
   if (!isVisible) return null;
 
+  console.log('[IterationDeckToolbar DEBUG] Rendering visible toolbar with data:', {
+    interactiveDecks: interactiveDecks.length,
+    selectedDeckId,
+    totalSlides
+  });
+
   const toolbarContent = (
-    <div className={`fixed bottom-2 left-1/2 -translate-x-1/2 z-[9999] flex items-center min-w-80 sm:min-w-96 gap-1 px-2 py-1 sm:gap-2 sm:px-1 sm:py-1 sm:bottom-4 lg:p-3 rounded-[40px] backdrop-blur-md shadow-lg font-medium text-sm leading-none text-gray-700 bg-gray-200/80 dark:bg-gray-900/70 dark:text-gray-200 ${className || ''}`}>
-      {/* Inner container */}
-      <div className="flex items-center gap-2 w-full">
-        {/* Deck selector */}
-        <DeckSelector
-          decks={interactiveDecks}
-          selectedDeckId={selectedDeckId}
-          onSelect={handleDeckSelect}
-        />
+    <div className={`${iterationDeckStyles.toolbar} ${className || ''}`}>
+      {/* Deck selector */}
+      <DeckSelector
+        decks={interactiveDecks}
+        selectedDeckId={selectedDeckId}
+        onSelect={handleDeckSelect}
+      />
 
-        {/* Separator */}
-        {interactiveDecks.length > 1 && (
-          <div className="w-px h-5 bg-gray-400/60 dark:bg-gray-500/70 sm:h-4" />
-        )}
+      {/* Separator */}
+      {interactiveDecks.length > 1 && (
+        <div className={iterationDeckStyles.separator} />
+      )}
 
-        {/* Navigation controls */}
-        <div className="flex items-center gap-0">
-          <SlideNavigation
-            onPrevious={handlePrevious}
-            onNext={handleNext}
-            canGoPrevious={totalSlides > 1}
-            canGoNext={totalSlides > 1}
-          />
-        </div>
-
-        {/* Slide info */}
-        <SlideInfo
-          currentSlide={{
-            label: selectedDeck?.slideIds?.[currentSlideIndex],
-            index: currentSlideIndex
-          }}
-          totalSlides={totalSlides}
+      {/* Navigation controls */}
+      <div className={iterationDeckStyles.navContainer}>
+        <SlideNavigation
+          onPrevious={handlePrevious}
+          onNext={handleNext}
+          canGoPrevious={totalSlides > 1}
+          canGoNext={totalSlides > 1}
         />
       </div>
+
+      {/* Slide info */}
+      <SlideInfo
+        currentSlide={{
+          label: selectedDeck?.slideIds?.[currentSlideIndex],
+          index: currentSlideIndex
+        }}
+        totalSlides={totalSlides}
+      />
     </div>
   );
 

@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom components for iteration deck */
+@layer components {
+  .iteration-toolbar {
+    /* Base styles for toolbar */
+  }
+  
+  .iteration-deck-slide {
+    /* Base styles for slides */
+  }
+}
+
+/* Ensure iteration deck components have proper display */
+iteration-deck,
+iteration-deck-slide {
+  display: block;
+}

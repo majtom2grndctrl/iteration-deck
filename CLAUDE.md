@@ -35,15 +35,15 @@ pnpm lint         # Lint TypeScript code
 ## Implementation Guidelines
 
 ### Architecture Principles
-- **Lit Web Components Foundation**: Lit-based web components with excellent performance and developer experience
-- **Manual React Wrappers**: Thin React wrapper components for seamless React integration
+- **Pure React Primary**: Pure React implementation as the default export for maximum "vibe coder" compatibility
+- **Lit Web Components Secondary**: Lit-based web components available at `/wc` export for web standards enthusiasts  
+- **Single Package Dual Export**: One package, two implementations - React as default, web components as opt-in
 - **Zustand State Management**: Global state management with Zustand for cross-component reactivity
-- **Universal Compatibility**: Works with React, Astro, Vue, Angular, vanilla HTML, and any framework
-- **ShadowDOM Encapsulated Styling**: Lit CSS tagged template literals with design tokens and CSS custom properties
-  - **Design Tokens**: Use TypeScript constants for values that never change at runtime (colors, spacing, typography scales)
-  - **CSS Custom Properties**: Use for runtime-dynamic values (theme switching, user preferences, responsive behavior)
-  - **ShadowDOM Isolation**: All styling encapsulated within component shadow roots for universal compatibility
-  - **Mobile-First CSS**: Use progressive enhancement consistently to ensure performance across device types
+- **Universal Compatibility**: React works everywhere React works, web components work everywhere
+- **Shared Design System**: Common design tokens and types ensure visual/functional consistency
+  - **Design Tokens**: Shared TypeScript constants in `src/shared/` for consistent styling
+  - **CSS-in-JS**: React uses CSS-in-JS, web components use Lit CSS tagged template literals
+  - **ShadowDOM for WC**: Web components get ShadowDOM isolation, React gets standard CSS scoping
 
 ### Code Quality Standards
 - **Accessibility**: WCAG 2.2 AA compliance, proper ARIA attributes
@@ -59,17 +59,20 @@ pnpm lint         # Lint TypeScript code
 - **Auto theming**: `prefers-color-scheme` support for light/dark modes
 - **Type-safe CSS**: Lit CSS tagged template literals with TypeScript design tokens
 
-### Design System
-- **Design Tokens**: TypeScript constants in `src/tokens/` with automatic light/dark theming
-- **ShadowDOM Styling**: Lit CSS tagged template literals with semantic CSS custom properties
-- **Responsive Design**: Mobile-first breakpoints with touch-friendly interactions
-
 ### File Organization
 ```
 src/
-├── components/    # Lit web components with embedded CSS
-├── react/         # React wrapper components  
-├── tokens/        # Design tokens (colors, spacing, animation, breakpoints)
-├── store/         # Zustand state management
-└── core/          # Types and utilities
+├── index.ts            # Main entry: pure React components (default export)
+├── react/              # Pure React implementation
+│   ├── components/     # React components with CSS-in-JS styling
+│   └── dev/           # React development demo
+├── wc/                # Web Components implementation  
+│   ├── index.ts       # WC entry: Lit components (./wc export)
+│   ├── components/    # Lit web components with embedded CSS
+│   ├── store/         # Zustand store for WC state management
+│   └── utils/         # WC-specific utilities
+├── shared/            # Shared between React and WC
+│   ├── index.ts       # Environment detection utilities
+│   └── types.ts       # Common TypeScript interfaces
+└── styles/            # Global styling utilities (if needed)
 ```  

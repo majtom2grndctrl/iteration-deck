@@ -1,0 +1,1185 @@
+/**
+ * IterationDeck Component Tests
+ * 
+ * Tests the core functionality of the React IterationDeck component:
+ * - Component rendering with slides
+ * - Store integration and deck registration
+ * - Slide navigation via imperative handle
+ * - Production vs development mode behavior
+ * - Automatic toolbar creation
+ * - Environment detection and DOM attribute rendering issues
+ * - Client-side rendering guards and timing
+ * - Store registration lifecycle integration
+ */
+
+import React from 'react';
+import { render, screen, act, waitFor } from '@testing-library/react';
+import { describe, test, expect, beforeEach, afterEach, vi } from 'vitest';
+import { IterationDeck, type IterationDeckHandle } from './IterationDeck';
+import { IterationDeckSlide } from './IterationDeckSlide';
+import { useIterationStore } from './store';
+
+// Mock the toolbar hook to avoid DOM side effects in tests
+vi.mock('./useIterationDeckToolbar', () => ({
+  useEnsureToolbar: vi.fn()
+}));
+
+// Create mock store with functions
+const createMockStore = () => ({
+  activeDecks: {} as Record<string, string>,
+  deckMetadata: {} as Record<string, any>,
+  selectedDeckId: undefined as string | undefined,
+  isProduction: false,
+  registerDeck: vi.fn(),
+  removeDeck: vi.fn(),
+  setActiveSlide: vi.fn(),
+  getActiveSlide: vi.fn().mockReturnValue(undefined),
+  getDeckSlides: vi.fn().mockReturnValue([]),
+  getDeckMetadata: vi.fn().mockReturnValue(undefined),
+  setSelectedDeck: vi.fn(),
+  getRegisteredDecks: vi.fn(() => []),
+  getInteractiveDecks: vi.fn(() => [])
+});
+
+const createMockNavigation = () => ({
+  navigateNext: vi.fn(() => true),
+  navigatePrev: vi.fn(() => true),
+  setActiveSlide: vi.fn(),
+  activeSlide: 'test-deck-slide-0',
+  slideCount: 3
+});
+
+// Mock the store module
+vi.mock('./store', () => ({
+  useIterationStore: vi.fn(),
+  useDeckNavigation: vi.fn()
+}));
+
+describe('IterationDeck', () => {
+  let mockStore: ReturnType<typeof createMockStore>;
+  let mockNavigation: ReturnType<typeof createMockNavigation>;
+
+  beforeEach(async () => {
+    // Reset all mocks before each test
+    vi.clearAllMocks();
+    
+    // Create fresh mock instances
+    mockStore = createMockStore();
+    mockNavigation = createMockNavigation();
+    
+    // Import and configure the mocked modules
+    const storeModule = await import('./store');
+    vi.mocked(storeModule.useIterationStore).mockReturnValue(mockStore);
+    vi.mocked(storeModule.useDeckNavigation).mockReturnValue(mockNavigation);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  describe('Basic Rendering', () => {
+    test('renders with single slide', () => {
+      render(
+        <IterationDeck id="test-deck" label="Test Deck">
+          <IterationDeckSlide label="Slide 1">
+            <div>Content 1</div>
+          </IterationDeckSlide>
+        </IterationDeck>
+      );
+
+      // Should render the deck container
+      expect(screen.getByText('Content 1')).toBeInTheDocument();
+      expect(document.querySelector('[data-iteration-deck="test-deck"]')).toBeInTheDocument();
+    });
+
+    test('renders with multiple slides', () => {
+      render(
+        <IterationDeck id="test-deck" label="Test Deck">
+          <IterationDeckSlide label="Slide 1">
+            <div>Content 1</div>
+          </IterationDeckSlide>
+          <IterationDeckSlide label="Slide 2">
+            <div>Content 2</div>
+          </IterationDeckSlide>
+          <IterationDeckSlide label="Slide 3">
+            <div>Content 3</div>
+          </IterationDeckSlide>
+        </IterationDeck>
+      );
+
+      // Should render all slides (in development mode)
+      expect(screen.getByText('Content 1')).toBeInTheDocument();
+      expect(screen.getByText('Content 2')).toBeInTheDocument(); 
+      expect(screen.getByText('Content 3')).toBeInTheDocument();
+    });
+
+    test('applies className and style props', async () => {
+      const customStyle = { backgroundColor: 'red', padding: '20px' };
+      
+      render(
+        <IterationDeck 
+          id="test-deck" 
+          className="custom-class"
+          style={customStyle}
+        >
+          <IterationDeckSlide label="Slide 1">
+            <div>Content</div>
+          </IterationDeckSlide>
+        </IterationDeck>
+      );
+
+      // Wait for client-side rendering to complete
+      await waitFor(() => {
+        const deckElement = document.querySelector('[data-iteration-deck="test-deck"]') as HTMLElement;
+        expect(deckElement).toBeInTheDocument();
+        expect(deckElement).toHaveClass('custom-class');
+        expect(deckElement.style.backgroundColor).toBe('red');
+        expect(deckElement.style.padding).toBe('20px');
+      });
+    });
+  });
+
+  describe('Store Integration', () => {
+    test('registers deck with store on mount', () => {
+      render(
+        <IterationDeck id="test-deck" label="Test Label">
+          <IterationDeckSlide label="Slide 1">
+            <div>Content 1</div>
+          </IterationDeckSlide>
+          <IterationDeckSlide label="Slide 2">
+            <div>Content 2</div>
+          </IterationDeckSlide>
+        </IterationDeck>
+      );
+
+      // Should call registerDeck with correct parameters
+      expect(mockStore.registerDeck).toHaveBeenCalledWith(
+        'test-deck',
+        ['test-deck-slide-0', 'test-deck-slide-1'],
+        'Test Label',
+        true // isInteractive should be true in development
+      );
+    });
+
+    test('removes deck from store on unmount', () => {
+      const { unmount } = render(
+        <IterationDeck id="test-deck">
+          <IterationDeckSlide label="Slide 1">
+            <div>Content</div>
+          </IterationDeckSlide>
+        </IterationDeck>
+      );
+
+      unmount();
+
+      // Should call removeDeck on unmount
+      expect(mockStore.removeDeck).toHaveBeenCalledWith('test-deck');
+    });
+
+    test('calls onDeckRegistered callback when provided', async () => {
+      const onDeckRegistered = vi.fn();
+      
+      render(
+        <IterationDeck 
+          id="test-deck" 
+          label="Test Deck"
+          onDeckRegistered={onDeckRegistered}
+        >
+          <IterationDeckSlide label="Slide 1">
+            <div>Content</div>
+          </IterationDeckSlide>
+        </IterationDeck>
+      );
+
+      // Wait for all effects to complete
+      await waitFor(() => {
+        expect(onDeckRegistered).toHaveBeenCalled();
+      });
+
+      // Should call the callback with event-like object
+      expect(onDeckRegistered).toHaveBeenCalledWith(
+        expect.objectContaining({
+          detail: expect.objectContaining({
+            deckId: 'test-deck',
+            slideCount: 1,
+            slides: expect.arrayContaining([
+              expect.objectContaining({
+                id: 'test-deck-slide-0',
+                label: 'Slide 1'
+              })
+            ])
+          })
+        })
+      );
+    });
+
+    test('handles enableInProduction prop', () => {
+      render(
+        <IterationDeck 
+          id="test-deck" 
+          enableInProduction={true}
+        >
+          <IterationDeckSlide label="Slide 1">
+            <div>Content</div>
+          </IterationDeckSlide>
+        </IterationDeck>
+      );
+
+      // Should register deck as interactive even in production
+      expect(mockStore.registerDeck).toHaveBeenCalledWith(
+        'test-deck',
+        ['test-deck-slide-0'],
+        undefined,
+        true // Should be true due to enableInProduction
+      );
+    });
+  });
+
+  describe('Production Mode Behavior', () => {
+    beforeEach(() => {
+      // Set store to production mode
+      mockStore.isProduction = true;
+    });
+
+    test('renders only first slide in production mode', async () => {
+      render(
+        <IterationDeck id="test-deck">
+          <IterationDeckSlide label="Slide 1">
+            <div>Content 1</div>
+          </IterationDeckSlide>
+          <IterationDeckSlide label="Slide 2">
+            <div>Content 2</div>
+          </IterationDeckSlide>
+          <IterationDeckSlide label="Slide 3">
+            <div>Content 3</div>
+          </IterationDeckSlide>
+        </IterationDeck>
+      );
+
+      // Should only render first slide
+      expect(screen.getByText('Content 1')).toBeInTheDocument();
+      expect(screen.queryByText('Content 2')).not.toBeInTheDocument();
+      expect(screen.queryByText('Content 3')).not.toBeInTheDocument();
+
+      // Wait for production mode attributes to appear
+      await waitFor(() => {
+        const deckElement = document.querySelector('[data-iteration-deck="test-deck"]');
+        expect(deckElement).toHaveAttribute('data-production-mode', 'true');
+      });
+    });
+
+    test('renders all slides when enableInProduction is true', () => {
+      render(
+        <IterationDeck id="test-deck" enableInProduction={true}>
+          <IterationDeckSlide label="Slide 1">
+            <div>Content 1</div>
+          </IterationDeckSlide>
+          <IterationDeckSlide label="Slide 2">
+            <div>Content 2</div>
+          </IterationDeckSlide>
+        </IterationDeck>
+      );
+
+      // Should render all slides even in production
+      expect(screen.getByText('Content 1')).toBeInTheDocument();
+      expect(screen.getByText('Content 2')).toBeInTheDocument();
+
+      // Should have development mode data attribute
+      const deckElement = document.querySelector('[data-iteration-deck="test-deck"]');
+      expect(deckElement).toHaveAttribute('data-development-mode', 'true');
+    });
+  });
+
+  describe('Slide Navigation', () => {
+
+    test('calls onSlideChange when active slide changes', async () => {
+      const onSlideChange = vi.fn();
+      
+      // Initial render with slide 0 active
+      const { rerender } = render(
+        <IterationDeck 
+          id="test-deck"
+          onSlideChange={onSlideChange}
+        >
+          <IterationDeckSlide label="Slide 1">
+            <div>Content 1</div>
+          </IterationDeckSlide>
+          <IterationDeckSlide label="Slide 2">
+            <div>Content 2</div>
+          </IterationDeckSlide>
+        </IterationDeck>
+      );
+
+      // Wait for initial render to complete
+      await waitFor(() => {
+        expect(document.querySelector('[data-iteration-deck="test-deck"]')).toBeInTheDocument();
+      });
+
+      // Change active slide in store
+      mockStore.activeDecks = {
+        'test-deck': 'test-deck-slide-1'
+      };
+
+      // Re-render to trigger change
+      await act(async () => {
+        rerender(
+          <IterationDeck 
+            id="test-deck"
+            onSlideChange={onSlideChange}
+          >
+            <IterationDeckSlide label="Slide 1">
+              <div>Content 1</div>
+            </IterationDeckSlide>
+            <IterationDeckSlide label="Slide 2">
+              <div>Content 2</div>
+            </IterationDeckSlide>
+          </IterationDeck>
+        );
+      });
+
+      // Wait for callback to be called
+      await waitFor(() => {
+        expect(onSlideChange).toHaveBeenCalled();
+      });
+
+      // Should call onSlideChange with event details
+      expect(onSlideChange).toHaveBeenCalledWith(
+        expect.objectContaining({
+          detail: expect.objectContaining({
+            deckId: 'test-deck',
+            currentSlideId: 'test-deck-slide-1',
+            slideIndex: 1
+          })
+        })
+      );
+    });
+  });
+
+  describe('Imperative Handle', () => {
+    test('provides navigation methods via ref', () => {
+      const deckRef = React.createRef<IterationDeckHandle>();
+      
+      render(
+        <IterationDeck ref={deckRef} id="test-deck">
+          <IterationDeckSlide label="Slide 1">
+            <div>Content 1</div>
+          </IterationDeckSlide>
+          <IterationDeckSlide label="Slide 2">
+            <div>Content 2</div>
+          </IterationDeckSlide>
+        </IterationDeck>
+      );
+
+      const handle = deckRef.current;
+      expect(handle).toBeTruthy();
+
+      // Test navigation methods exist
+      expect(typeof handle?.navigateToSlide).toBe('function');
+      expect(typeof handle?.navigateToNext).toBe('function');
+      expect(typeof handle?.navigateToPrev).toBe('function');
+      expect(typeof handle?.getCurrentSlide).toBe('function');
+      expect(typeof handle?.getAllSlides).toBe('function');
+      expect(typeof handle?.getDeckInfo).toBe('function');
+    });
+
+    test('navigateToSlide works correctly', () => {
+      const deckRef = React.createRef<IterationDeckHandle>();
+      
+      render(
+        <IterationDeck ref={deckRef} id="test-deck">
+          <IterationDeckSlide label="Slide 1">
+            <div>Content 1</div>
+          </IterationDeckSlide>
+          <IterationDeckSlide label="Slide 2">
+            <div>Content 2</div>
+          </IterationDeckSlide>
+        </IterationDeck>
+      );
+
+      const handle = deckRef.current!;
+      
+      // Navigate to specific slide
+      const result = handle.navigateToSlide('test-deck-slide-1');
+      
+      expect(result).toBe(true);
+      expect(mockStore.setActiveSlide).toHaveBeenCalledWith('test-deck', 'test-deck-slide-1');
+    });
+
+    test('navigateToSlide returns false for invalid slide', () => {
+      const deckRef = React.createRef<IterationDeckHandle>();
+      
+      render(
+        <IterationDeck ref={deckRef} id="test-deck">
+          <IterationDeckSlide label="Slide 1">
+            <div>Content</div>
+          </IterationDeckSlide>
+        </IterationDeck>
+      );
+
+      const handle = deckRef.current!;
+      
+      // Try to navigate to non-existent slide
+      const result = handle.navigateToSlide('invalid-slide-id');
+      
+      expect(result).toBe(false);
+      expect(mockStore.setActiveSlide).not.toHaveBeenCalled();
+    });
+
+    test('getCurrentSlide returns correct slide info', () => {
+      const deckRef = React.createRef<IterationDeckHandle>();
+      
+      // Set up active slide
+      mockStore.activeDecks = {
+        'test-deck': 'test-deck-slide-1'
+      };
+      
+      render(
+        <IterationDeck ref={deckRef} id="test-deck">
+          <IterationDeckSlide label="First Slide">
+            <div>Content 1</div>
+          </IterationDeckSlide>
+          <IterationDeckSlide label="Second Slide">
+            <div>Content 2</div>
+          </IterationDeckSlide>
+        </IterationDeck>
+      );
+
+      const handle = deckRef.current!;
+      const currentSlide = handle.getCurrentSlide();
+      
+      expect(currentSlide).toEqual({
+        id: 'test-deck-slide-1',
+        index: 1,
+        label: 'Second Slide'
+      });
+    });
+
+    test('getAllSlides returns all slide info', () => {
+      const deckRef = React.createRef<IterationDeckHandle>();
+      
+      render(
+        <IterationDeck ref={deckRef} id="test-deck">
+          <IterationDeckSlide label="First">
+            <div>Content 1</div>
+          </IterationDeckSlide>
+          <IterationDeckSlide label="Second">
+            <div>Content 2</div>
+          </IterationDeckSlide>
+        </IterationDeck>
+      );
+
+      const handle = deckRef.current!;
+      const allSlides = handle.getAllSlides();
+      
+      expect(allSlides).toEqual([
+        { id: 'test-deck-slide-0', index: 0, label: 'First' },
+        { id: 'test-deck-slide-1', index: 1, label: 'Second' }
+      ]);
+    });
+
+    test('getDeckInfo returns deck metadata', () => {
+      const deckRef = React.createRef<IterationDeckHandle>();
+      
+      render(
+        <IterationDeck ref={deckRef} id="test-deck" label="My Deck">
+          <IterationDeckSlide label="Slide">
+            <div>Content</div>
+          </IterationDeckSlide>
+        </IterationDeck>
+      );
+
+      const handle = deckRef.current!;
+      const deckInfo = handle.getDeckInfo();
+      
+      expect(deckInfo).toEqual({
+        id: 'test-deck',
+        label: 'My Deck',
+        slideCount: 1,
+        activeSlideId: 'test-deck-slide-0' // Falls back to first slide when no active slide set
+      });
+    });
+  });
+
+  describe('Toolbar Integration', () => {
+    test('calls useEnsureToolbar hook', async () => {
+      const { useEnsureToolbar } = await import('./useIterationDeckToolbar');
+      
+      render(
+        <IterationDeck id="test-deck">
+          <IterationDeckSlide label="Slide">
+            <div>Content</div>
+          </IterationDeckSlide>
+        </IterationDeck>
+      );
+
+      // Should call the hook to ensure toolbar is created
+      expect(useEnsureToolbar).toHaveBeenCalled();
+    });
+  });
+
+  describe('Edge Cases', () => {
+    test('handles empty children gracefully', () => {
+      render(
+        <IterationDeck id="test-deck">
+          {/* No children */}
+        </IterationDeck>
+      );
+
+      // Should not crash and should not register deck
+      expect(mockStore.registerDeck).not.toHaveBeenCalled();
+    });
+
+    test('handles null children gracefully', () => {
+      render(
+        <IterationDeck id="test-deck">
+          {/* No children */}
+        </IterationDeck>
+      );
+
+      // Should not crash 
+      expect(mockStore.registerDeck).not.toHaveBeenCalled();
+    });
+
+    test('handles single child (not array)', () => {
+      render(
+        <IterationDeck id="test-deck">
+          <IterationDeckSlide label="Single Slide">
+            <div>Content</div>
+          </IterationDeckSlide>
+        </IterationDeck>
+      );
+
+      // Should handle single child correctly
+      expect(screen.getByText('Content')).toBeInTheDocument();
+      expect(mockStore.registerDeck).toHaveBeenCalledWith(
+        'test-deck',
+        ['test-deck-slide-0'],
+        undefined,
+        true
+      );
+    });
+  });
+
+  describe('Environment Detection Verification', () => {
+    test('isDevelopmentMode returns true in test environment', async () => {
+      // Import environment detection function directly
+      const { isDevelopmentMode } = await import('../../shared/index');
+      
+      // Should return true in test environment (NODE_ENV=test should trigger development behavior)
+      // This is the foundational requirement - if this fails, nothing else will work
+      const isDevMode = isDevelopmentMode();
+      expect(isDevMode).toBe(true);
+      
+      // Log diagnostic info for debugging
+      console.debug('Environment Detection:', {
+        isDevelopmentMode: isDevMode,
+        NODE_ENV: process.env.NODE_ENV,
+        hasProcess: typeof process !== 'undefined',
+        hasWindow: typeof window !== 'undefined',
+        windowLocation: typeof window !== 'undefined' ? window.location.href : 'N/A'
+      });
+    });
+
+    test('useIterationStore().isProduction returns false after lazy detection', async () => {
+      // Reset modules to ensure fresh environment detection
+      vi.resetModules();
+      
+      const { useIterationStore } = await import('./store');
+      let storeState: any;
+      let renderCount = 0;
+      
+      function TestComponent() {
+        renderCount++;
+        const store = useIterationStore();
+        storeState = store;
+        
+        // Log store state for debugging
+        React.useEffect(() => {
+          console.debug(`Store state (render ${renderCount}):`, {
+            isProduction: store.isProduction,
+            activeDecks: Object.keys(store.activeDecks).length,
+            deckMetadata: Object.keys(store.deckMetadata).length
+          });
+        });
+        
+        return <div>Test Component Render {renderCount}</div>;
+      }
+      
+      render(<TestComponent />);
+      
+      // Wait for all React updates to complete
+      await act(async () => {
+        await new Promise(resolve => setTimeout(resolve, 0));
+      });
+      
+      // Store should detect development mode and set isProduction to false
+      expect(storeState.isProduction).toBe(false);
+    });
+
+    test('environment detection triggers correctly on first store access', async () => {
+      // Clear any cached environment state by importing a fresh instance
+      vi.resetModules();
+      
+      // Import fresh store module to test lazy initialization
+      const { useIterationStore } = await import('./store');
+      
+      let detectedEnvironment: boolean | undefined;
+      let accessCount = 0;
+      
+      function TestComponent() {
+        const store = useIterationStore();
+        accessCount++;
+        
+        // Access isProduction to trigger lazy detection
+        React.useEffect(() => {
+          detectedEnvironment = store.isProduction;
+          console.debug(`Environment detection attempt ${accessCount}:`, {
+            isProduction: detectedEnvironment,
+            storeKeys: Object.keys(store)
+          });
+        }, [store]);
+        
+        return <div>Environment Test {accessCount}</div>;
+      }
+      
+      await act(async () => {
+        render(<TestComponent />);
+      });
+      
+      // Wait for all effects to complete
+      await waitFor(() => {
+        expect(detectedEnvironment).toBeDefined();
+      });
+      
+      // Environment should be detected as development (not production)
+      expect(detectedEnvironment).toBe(false);
+    });
+
+    test('environment detection is consistent across multiple store accesses', async () => {
+      vi.resetModules();
+      const { useIterationStore } = await import('./store');
+      
+      const environmentResults: boolean[] = [];
+      
+      function TestComponent({ iteration }: { iteration: number }) {
+        const store = useIterationStore();
+        
+        React.useEffect(() => {
+          environmentResults[iteration] = store.isProduction;
+        }, [store, iteration]);
+        
+        return <div>Iteration {iteration}</div>;
+      }
+      
+      // Test multiple renders with store access
+      for (let i = 0; i < 3; i++) {
+        const { unmount } = render(<TestComponent iteration={i} />);
+        await act(async () => {
+          await new Promise(resolve => setTimeout(resolve, 10));
+        });
+        unmount();
+      }
+      
+      // All accesses should return consistent environment detection
+      expect(environmentResults).toHaveLength(3);
+      expect(environmentResults.every(result => result === false)).toBe(true);
+    });
+  });
+
+  describe('Modern Hydration Testing', () => {
+    test('component renders immediately without client-side guards', () => {
+      // With the client-side guard removed, component should render immediately
+      const { container } = render(
+        <IterationDeck id="immediate-render-test" label="Immediate Test">
+          <IterationDeckSlide label="Slide 1">
+            <div>Immediate content</div>
+          </IterationDeckSlide>
+        </IterationDeck>
+      );
+
+      // Should render content immediately, no null render phase
+      expect(container.firstChild).not.toBeNull();
+      expect(screen.getByText('Immediate content')).toBeInTheDocument();
+      expect(document.querySelector('[data-iteration-deck="immediate-render-test"]')).toBeInTheDocument();
+      expect(document.querySelector('[data-development-mode="true"]')).toBeInTheDocument();
+    });
+
+    test('store-level lazy environment detection prevents hydration mismatches', async () => {
+      // Test that our store-level environment detection works correctly
+      let storeState: any;
+      
+      function TestComponent() {
+        const store = useIterationStore();
+        storeState = store;
+        
+        return (
+          <IterationDeck id="store-detection-test" label="Store Test">
+            <IterationDeckSlide label="Environment Test">
+              <div>Environment: {store.isProduction ? 'production' : 'development'}</div>
+            </IterationDeckSlide>
+          </IterationDeck>
+        );
+      }
+
+      render(<TestComponent />);
+
+      // Store should have consistent environment detection
+      await waitFor(() => {
+        expect(storeState.isProduction).toBe(false); // Should be false in test environment
+      });
+      
+      // Component should render with consistent environment
+      expect(screen.getByText('Environment: development')).toBeInTheDocument();
+      expect(document.querySelector('[data-development-mode="true"]')).toBeInTheDocument();
+    });
+
+    test('DOM attributes are applied synchronously with render', () => {
+      const startTime = Date.now();
+      let attributeDetectedTime: number | null = null;
+      
+      // Setup MutationObserver to catch attribute application
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.type === 'attributes' && 
+              mutation.target instanceof Element &&
+              mutation.target.hasAttribute('data-iteration-deck')) {
+            if (!attributeDetectedTime) {
+              attributeDetectedTime = Date.now();
+            }
+          }
+        });
+      });
+      
+      observer.observe(document.body, {
+        attributes: true,
+        subtree: true,
+        attributeFilter: ['data-iteration-deck']
+      });
+
+      render(
+        <IterationDeck id="sync-attributes-test" label="Sync Test">
+          <IterationDeckSlide label="Sync Slide">
+            <div>Synchronous content</div>
+          </IterationDeckSlide>
+        </IterationDeck>
+      );
+
+      const renderTime = Date.now() - startTime;
+      
+      // Attributes should be present immediately after render
+      const deckElement = document.querySelector('[data-iteration-deck="sync-attributes-test"]');
+      expect(deckElement).toBeInTheDocument();
+      expect(deckElement).toHaveAttribute('data-development-mode', 'true');
+      
+      observer.disconnect();
+      
+      // Timing should be immediate (within a few milliseconds)
+      if (attributeDetectedTime) {
+        const attributeDelay = attributeDetectedTime - startTime;
+        expect(attributeDelay).toBeLessThan(100); // Should be nearly instantaneous
+      }
+      
+      console.debug('Synchronous rendering verified:', {
+        renderTime,
+        attributeDetectedAt: attributeDetectedTime ? attributeDetectedTime - startTime : 'immediate',
+        success: true
+      });
+    });
+  });
+
+  describe('DOM Attribute Application Testing', () => {
+    test('component applies data-iteration-deck="[id]" attribute in development mode', async () => {
+      const deckId = 'test-deck-123';
+      let attributeFound = false;
+      let searchAttempts = 0;
+      
+      // Setup observer to detect attribute changes
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach(mutation => {
+          if (mutation.type === 'attributes' && 
+              mutation.attributeName === 'data-iteration-deck' &&
+              mutation.target instanceof Element) {
+            attributeFound = true;
+            console.debug('data-iteration-deck attribute detected on:', mutation.target.tagName);
+          }
+        });
+      });
+      
+      observer.observe(document.body, {
+        attributes: true,
+        subtree: true,
+        attributeFilter: ['data-iteration-deck']
+      });
+      
+      await act(async () => {
+        render(
+          <IterationDeck id={deckId} label="Test Deck">
+            <IterationDeckSlide label="Slide 1">
+              <div>Content</div>
+            </IterationDeckSlide>
+          </IterationDeck>
+        );
+      });
+
+      await waitFor(() => {
+        searchAttempts++;
+        const deckElement = document.querySelector(`[data-iteration-deck="${deckId}"]`);
+        expect(deckElement).toBeInTheDocument();
+        expect(deckElement).toHaveAttribute('data-iteration-deck', deckId);
+      }, { timeout: 5000 });
+      
+      observer.disconnect();
+      
+      console.debug('Attribute detection analysis:', {
+        deckId,
+        attributeFoundByObserver: attributeFound,
+        searchAttempts,
+        finalElementExists: !!document.querySelector(`[data-iteration-deck="${deckId}"]`)
+      });
+    });
+
+    test('component applies data-development-mode="true" attribute', async () => {
+      let developmentModeAttributeDetected = false;
+      
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach(mutation => {
+          if (mutation.type === 'attributes' && 
+              mutation.attributeName === 'data-development-mode') {
+            developmentModeAttributeDetected = true;
+          }
+        });
+      });
+      
+      observer.observe(document.body, {
+        attributes: true,
+        subtree: true,
+        attributeFilter: ['data-development-mode']
+      });
+      
+      await act(async () => {
+        render(
+          <IterationDeck id="test-deck" label="Test">
+            <IterationDeckSlide label="Slide 1">
+              <div>Content</div>
+            </IterationDeckSlide>
+          </IterationDeck>
+        );
+      });
+
+      await waitFor(() => {
+        const deckElement = document.querySelector('[data-iteration-deck="test-deck"]');
+        expect(deckElement).toBeInTheDocument();
+        expect(deckElement).toHaveAttribute('data-development-mode', 'true');
+      }, { timeout: 5000 });
+      
+      observer.disconnect();
+      
+      console.debug('Development mode attribute:', {
+        detected: developmentModeAttributeDetected,
+        finalValue: document.querySelector('[data-iteration-deck="test-deck"]')?.getAttribute('data-development-mode')
+      });
+    });
+
+
+
+  });
+
+  describe('Store Registration Timing', () => {
+    test('store.registerDeck() called during component mount', async () => {
+      // Simple approach: just check if the mock was called with the right parameters
+      await act(async () => {
+        render(
+          <IterationDeck id="timing-test" label="Timing Test">
+            <IterationDeckSlide label="Slide 1">
+              <div>Content</div>
+            </IterationDeckSlide>
+          </IterationDeck>
+        );
+      });
+
+      // registerDeck should be called during mount
+      await waitFor(() => {
+        expect(mockStore.registerDeck).toHaveBeenCalledWith(
+          'timing-test',
+          ['timing-test-slide-0'],
+          'Timing Test',
+          true
+        );
+      });
+      
+      console.debug('Store registration timing:', {
+        registrationCount: mockStore.registerDeck.mock.calls.length,
+        registeredDuringMount: mockStore.registerDeck.mock.calls.length > 0
+      });
+    });
+
+
+    test('interactive decks array includes registered deck ID', async () => {
+      // Set up mock to return the test deck ID in interactive decks
+      (mockStore.getInteractiveDecks as any).mockReturnValue(['interactive-test']);
+      
+      await act(async () => {
+        render(
+          <IterationDeck id="interactive-test" label="Interactive Test">
+            <IterationDeckSlide label="Slide 1">
+              <div>Content</div>
+            </IterationDeckSlide>
+          </IterationDeck>
+        );
+      });
+
+      // Wait for registration
+      await waitFor(() => {
+        expect(mockStore.registerDeck).toHaveBeenCalled();
+      });
+      
+      // Check that deck appears in interactive decks list
+      const interactiveDecks = (mockStore.getInteractiveDecks as any)();
+      expect(interactiveDecks).toContain('interactive-test');
+      
+      console.debug('Interactive deck registration:', {
+        registrationCompleted: mockStore.registerDeck.mock.calls.length > 0,
+        interactiveDecks,
+        containsTestDeck: interactiveDecks.includes('interactive-test')
+      });
+    });
+
+    test('store state updates trigger re-renders correctly', async () => {
+      let renderCount = 0;
+      const renderTimestamps: number[] = [];
+      const startTime = Date.now();
+      
+      function TestComponent() {
+        renderCount++;
+        renderTimestamps.push(Date.now() - startTime);
+        const store = mockStore;
+        
+        console.debug(`TestComponent render ${renderCount}:`, {
+          activeDecks: Object.keys(store.activeDecks),
+          currentActiveSlide: (store.activeDecks as Record<string, string>)['rerender-test']
+        });
+        
+        return (
+          <IterationDeck id="rerender-test">
+            <IterationDeckSlide label="Slide 1">
+              <div>Content 1</div>
+            </IterationDeckSlide>
+            <IterationDeckSlide label="Slide 2">
+              <div>Content 2</div>
+            </IterationDeckSlide>
+          </IterationDeck>
+        );
+      }
+
+      const { rerender } = render(<TestComponent />);
+      
+      const initialRenderCount = renderCount;
+      
+      // Simulate store state change
+      await act(async () => {
+        // Update the active decks state (mockStore.activeDecks is initialized as empty object)
+        mockStore.activeDecks = { 'rerender-test': 'rerender-test-slide-1' };
+        console.debug('Store state changed, triggering re-render');
+        // Force re-render to simulate store update
+        rerender(<TestComponent />);
+      });
+
+      // Should have triggered re-render
+      expect(renderCount).toBeGreaterThan(initialRenderCount);
+      
+      console.debug('Re-render analysis:', {
+        initialRenderCount,
+        finalRenderCount: renderCount,
+        renderTimestamps,
+        rerendersTriggered: renderCount - initialRenderCount
+      });
+    });
+
+    test('multiple deck registrations are handled correctly', async () => {
+      await act(async () => {
+        render(
+          <div>
+            <IterationDeck id="deck-1" label="First Deck">
+              <IterationDeckSlide label="Slide 1">
+                <div>Content 1</div>
+              </IterationDeckSlide>
+            </IterationDeck>
+            <IterationDeck id="deck-2" label="Second Deck">
+              <IterationDeckSlide label="Slide 2">
+                <div>Content 2</div>
+              </IterationDeckSlide>
+            </IterationDeck>
+          </div>
+        );
+      });
+
+      await waitFor(() => {
+        expect(mockStore.registerDeck).toHaveBeenCalledTimes(2);
+      });
+      
+      // Verify both decks are registered with correct parameters
+      expect(mockStore.registerDeck).toHaveBeenCalledWith(
+        'deck-1',
+        ['deck-1-slide-0'],
+        'First Deck',
+        true
+      );
+      expect(mockStore.registerDeck).toHaveBeenCalledWith(
+        'deck-2',
+        ['deck-2-slide-0'],
+        'Second Deck',
+        true
+      );
+      
+      console.debug('Multiple deck registration:', {
+        totalRegistrations: mockStore.registerDeck.mock.calls.length,
+        registeredDecks: mockStore.getRegisteredDecks()
+      });
+    });
+
+  });
+
+  describe('Component Lifecycle Integration', () => {
+    test('component behavior with Next.js SSR disabled ("use client")', async () => {
+      // Test that the component works in a typical Next.js client environment
+      render(
+        <IterationDeck id="nextjs-test">
+          <IterationDeckSlide label="Slide 1">
+            <div>NextJS Content</div>
+          </IterationDeckSlide>
+        </IterationDeck>
+      );
+      
+      // Should render properly in client environment
+      await waitFor(() => {
+        expect(document.querySelector('[data-iteration-deck="nextjs-test"]')).toBeInTheDocument();
+        expect(screen.getByText('NextJS Content')).toBeInTheDocument();
+      });
+      
+      console.debug('Next.js client environment test passed');
+    });
+
+    test('component renders correctly after React 18 concurrent features', async () => {
+      // Test with React StrictMode (which enables concurrent features)
+      render(
+        <React.StrictMode>
+          <IterationDeck id="concurrent-test">
+            <IterationDeckSlide label="Concurrent Slide">
+              <div>Concurrent Content</div>
+            </IterationDeckSlide>
+          </IterationDeck>
+        </React.StrictMode>
+      );
+
+      // Should render properly with concurrent features
+      await waitFor(() => {
+        expect(document.querySelector('[data-iteration-deck="concurrent-test"]')).toBeInTheDocument();
+        expect(screen.getByText('Concurrent Content')).toBeInTheDocument();
+      });
+      
+      console.debug('React 18 StrictMode test passed');
+    });
+
+    test('useEffect hooks fire in correct order (store setup → client detection → registration)', async () => {
+      // Test that the component registers properly with the store
+      render(
+        <IterationDeck id="lifecycle-test">
+          <IterationDeckSlide label="Lifecycle Slide">
+            <div>Lifecycle Content</div>
+          </IterationDeckSlide>
+        </IterationDeck>
+      );
+
+      await waitFor(() => {
+        expect(document.querySelector('[data-iteration-deck="lifecycle-test"]')).toBeInTheDocument();
+        expect(mockStore.registerDeck).toHaveBeenCalled();
+      });
+      
+      console.debug('Component lifecycle integration test passed');
+    });
+
+    test('component cleanup prevents memory leaks on unmount', async () => {
+      const { unmount } = render(
+        <IterationDeck id="cleanup-test">
+          <IterationDeckSlide label="Cleanup Slide">
+            <div>Cleanup Content</div>
+          </IterationDeckSlide>
+        </IterationDeck>
+      );
+      
+      // Wait for initial render and registration
+      await waitFor(() => {
+        expect(document.querySelector('[data-iteration-deck="cleanup-test"]')).toBeInTheDocument();
+      });
+      
+      // Unmount component
+      unmount();
+      
+      // Verify cleanup was called
+      expect(mockStore.removeDeck).toHaveBeenCalledWith('cleanup-test');
+      
+      console.debug('Component cleanup test passed');
+    });
+
+    test('rapid mount/unmount cycles handle cleanup correctly', async () => {
+      // Test rapid mount/unmount cycles
+      for (let i = 0; i < 3; i++) {
+        const deckId = `rapid-test-${i}`;
+        
+        const { unmount } = render(
+          <IterationDeck id={deckId}>
+            <IterationDeckSlide label={`Slide ${i}`}>
+              <div>Content {i}</div>
+            </IterationDeckSlide>
+          </IterationDeck>
+        );
+        
+        unmount();
+      }
+      
+      // Verify all registrations were paired with removals
+      expect(mockStore.registerDeck).toHaveBeenCalledTimes(3);
+      expect(mockStore.removeDeck).toHaveBeenCalledTimes(3);
+      
+      console.debug('Rapid lifecycle test passed');
+    });
+
+    test('error boundaries do not prevent attribute rendering', async () => {
+      // Test basic error boundary integration
+      class TestErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean }> {
+        state = { hasError: false };
+        
+        static getDerivedStateFromError() {
+          return { hasError: true };
+        }
+        
+        render() {
+          if (this.state.hasError) {
+            return <div>Error boundary fallback</div>;
+          }
+          return this.props.children;
+        }
+      }
+      
+      render(
+        <TestErrorBoundary>
+          <IterationDeck id="error-test">
+            <IterationDeckSlide label="Normal Slide">
+              <div>Normal content</div>
+            </IterationDeckSlide>
+          </IterationDeck>
+        </TestErrorBoundary>
+      );
+      
+      // Verify normal rendering with attributes
+      await waitFor(() => {
+        const deckElement = document.querySelector('[data-iteration-deck="error-test"]');
+        expect(deckElement).toBeInTheDocument();
+        expect(deckElement).toHaveAttribute('data-iteration-deck', 'error-test');
+        expect(deckElement).toHaveAttribute('data-development-mode', 'true');
+      });
+      
+      console.debug('Error boundary integration test passed');
+    });
+  });
+});

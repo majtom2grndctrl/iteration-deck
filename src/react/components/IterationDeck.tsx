@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useRef, useImperativeHandle, useMemo, Children } from 'react';
+import React, { forwardRef, useEffect, useRef, useImperativeHandle, useMemo, Children, useState } from 'react';
 import type { IterationDeckProps, IterationDeckSlideProps } from '../../shared/types';
 import { useIterationStore, useDeckNavigation } from './store';
 import { useEnsureToolbar } from './useIterationDeckToolbar';
@@ -60,18 +60,20 @@ export const IterationDeck = forwardRef<IterationDeckHandle, ReactIterationDeckP
     description,
     onSlideChange,
     onDeckRegistered,
-    enableInProduction = false,
     children,
     className,
     style,
     ...otherProps
   }, ref) {
+    // Client-side only guard to prevent SSR hydration mismatch
+    const [isClient, setIsClient] = useState(false);
     const store = useIterationStore();
     const navigation = useDeckNavigation(id);
     const deckRef = useRef<HTMLDivElement>(null);
-    
-    // Ensure toolbar is shown when decks are present
-    useEnsureToolbar();
+
+    useEffect(() => {
+      setIsClient(true);
+    }, []);
     
     // Parse children to extract slide count and labels (stable)
     const slideInfo = useMemo(() => {
@@ -103,14 +105,24 @@ export const IterationDeck = forwardRef<IterationDeckHandle, ReactIterationDeckP
     useEffect(() => {
       const slideIds = slideInfo.metadata.map(slide => slide.id);
       if (slideIds.length > 0) {
-        store.registerDeck(id, slideIds, label, !store.isProduction || enableInProduction);
+        console.log('[IterationDeck DEBUG] Registering deck:', { id, label, slideCount: slideIds.length });
+        store.registerDeck(id, slideIds, label, true); // Always interactive
+        console.log('[IterationDeck DEBUG] After registration - store state:', {
+          activeDecks: store.activeDecks,
+          deckMetadata: store.deckMetadata,
+          interactiveDecks: store.getInteractiveDecks()
+        });
       }
 
       // Cleanup on unmount
       return () => {
+        console.log('[IterationDeck DEBUG] Removing deck:', id);
         store.removeDeck(id);
       };
-    }, [id, label, slideInfo.count, slideInfo.labelsString, enableInProduction]);
+    }, [id, label, slideInfo.count, slideInfo.labelsString]);
+
+    // Ensure toolbar is shown - this will react to deck registration changes
+    useEnsureToolbar();
 
     // Fire onDeckRegistered callback (separate useEffect to avoid registration loop)
     useEffect(() => {
@@ -126,8 +138,9 @@ export const IterationDeck = forwardRef<IterationDeckHandle, ReactIterationDeckP
       }
     }, [onDeckRegistered, id, slideInfo.count, slideInfo.labelsString]);
 
-    // Get the current active slide
-    const activeSlideId = store.activeDecks[id];
+    // Get the current active slide - default to first slide if no active slide set
+    const storeActiveSlideId = store.activeDecks[id];
+    const activeSlideId = storeActiveSlideId || (slideElements.length > 0 ? slideElements[0].id : undefined);
     const activeSlideIndex = slideElements.findIndex(slide => slide.id === activeSlideId);
     const currentSlide = activeSlideIndex >= 0 ? slideElements[activeSlideIndex] : slideElements[0];
 
@@ -180,29 +193,12 @@ export const IterationDeck = forwardRef<IterationDeckHandle, ReactIterationDeckP
       })
     }), [id, label, slideElements, currentSlide, activeSlideId, navigation, store]);
 
-    // Production mode: render only the first slide
-    if (store.isProduction && !enableInProduction) {
-      const firstSlide = slideElements[0];
-      if (!firstSlide) return null;
-      
-      return (
-        <div 
-          ref={deckRef}
-          className={className}
-          style={style}
-          data-iteration-deck={id}
-          data-production-mode="true"
-          {...otherProps}
-        >
-          {React.cloneElement(firstSlide.element, {
-            ...firstSlide.element.props,
-            key: firstSlide.id
-          } as any)}
-        </div>
-      );
+    // Return null during SSR to prevent hydration mismatch
+    if (!isClient) {
+      return null;
     }
 
-    // Development mode: render all slides but show only the active one
+    // Always render all slides but show only the active one
     return (
       <div 
         ref={deckRef}
@@ -212,7 +208,6 @@ export const IterationDeck = forwardRef<IterationDeckHandle, ReactIterationDeckP
           ...style
         }}
         data-iteration-deck={id}
-        data-development-mode="true"
         {...otherProps}
       >
         {slideElements.map((slide) => {

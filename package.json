@@ -15,7 +15,9 @@
   },
   "license": "MIT",
   "type": "module",
-  "sideEffects": false,
+  "sideEffects": [
+    "**/*.css"
+  ],
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -92,6 +94,7 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
+    "@emotion/css": "^11.13.5",
     "lit": "^3.3.1",
     "zustand": "^5.0.7"
   },
