@@ -2,43 +2,7 @@
 
 Complete, working examples for AI agents. Copy these patterns when users request UI variations.
 
-## Essential Pattern
-
-**For React projects (use React wrappers):**
-```tsx
-import { IterationDeck, IterationDeckSlide } from '@iteration-deck/core/react';
-
-<IterationDeck id="unique-id" label="Descriptive Name">
-  <IterationDeckSlide label="Variation 1">
-    {/* React JSX Implementation 1 */}
-  </IterationDeckSlide>
-  <IterationDeckSlide label="Variation 2"> 
-    {/* React JSX Implementation 2 */}
-  </IterationDeckSlide>
-  <IterationDeckSlide label="Variation 3">
-    {/* React JSX Implementation 3 */}
-  </IterationDeckSlide>
-</IterationDeck>
-```
-
-**For all other projects (use web components):**
-```html
-<script type="module">
-  import '@iteration-deck/core';
-</script>
-
-<iteration-deck id="unique-id" label="Descriptive Name">
-  <iteration-deck-slide label="Variation 1">
-    <!-- HTML Implementation 1 -->
-  </iteration-deck-slide>
-  <iteration-deck-slide label="Variation 2">
-    <!-- HTML Implementation 2 -->
-  </iteration-deck-slide>
-  <iteration-deck-slide label="Variation 3">
-    <!-- HTML Implementation 3 -->
-  </iteration-deck-slide>
-</iteration-deck>
-```
+📖 **For imports, API reference, and framework setup, see README.md**
 
 ### Example 1: Button Component Variations
 
@@ -46,7 +10,7 @@ import { IterationDeck, IterationDeckSlide } from '@iteration-deck/core/react';
 
 **AI Implementation:**
 ```tsx
-import { IterationDeck, IterationDeckSlide } from '@iteration-deck/core/react';
+import { IterationDeck, IterationDeckSlide } from 'iteration-deck';
 
 function ButtonVariations() {
   return (
@@ -105,7 +69,7 @@ function ButtonVariations() {
 
 **AI Implementation:**
 ```tsx
-import { IterationDeck, IterationDeckSlide } from '@iteration-deck/core/react';
+import { IterationDeck, IterationDeckSlide } from 'iteration-deck';
 
 function HeroLayoutVariations() {
   return (
@@ -191,7 +155,7 @@ function HeroLayoutVariations() {
 
 **AI Implementation:**
 ```tsx  
-import { IterationDeck, IterationDeckSlide } from '@iteration-deck/core/react';
+import { IterationDeck, IterationDeckSlide } from 'iteration-deck';
 
 function CompletePageVariations() {
   return (
@@ -282,66 +246,94 @@ function CompletePageVariations() {
 }
 ```
 
-## Framework Support
+### Example 4: Adding Variations to Existing Deck
 
-### React  
+**User Request:** "Add a ghost style and disabled state to the existing button variations"
+
+**AI Implementation:**
 ```tsx
-import { IterationDeck, IterationDeckSlide } from '@iteration-deck/core/react';
-// Use as shown in examples above
-```
+import { IterationDeck, IterationDeckSlide } from 'iteration-deck';
 
-### Vue.js
-```vue
-<script setup>
-import '@iteration-deck/core';
-</script>
+function ButtonVariations() {
+  return (
+    <IterationDeck 
+      id="app-buttons" 
+      label="App Button Styles"
+      prompt="Create different button styles for our app"
+    >
+      {/* Existing variations preserved unchanged */}
+      <IterationDeckSlide 
+        label="Primary" 
+        aiPrompt="Main call-to-action style"
+        confidence={0.95}
+      >
+        <button 
+          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-200"
+          aria-label="Primary action button"
+        >
+          Click Me
+        </button>
+      </IterationDeckSlide>
+      
+      <IterationDeckSlide 
+        label="Secondary" 
+        aiPrompt="Supporting action style"
+        confidence={0.92}
+      >
+        <button 
+          className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-200"
+          aria-label="Secondary action button"
+        >
+          Click Me
+        </button>
+      </IterationDeckSlide>
+      
+      <IterationDeckSlide 
+        label="Outline" 
+        aiPrompt="Subtle, outline-only style"
+        confidence={0.88}
+        notes="Good for secondary actions that need less visual weight"
+      >
+        <button 
+          className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded transition-all duration-200"
+          aria-label="Outline style button"
+        >
+          Click Me
+        </button>
+      </IterationDeckSlide>
 
-<template>
-  <iteration-deck id="vue-buttons" label="Vue Button Styles">
-    <iteration-deck-slide label="Primary">
-      <button class="btn-primary">Click Me</button>
-    </iteration-deck-slide>
-    <iteration-deck-slide label="Secondary">
-      <button class="btn-secondary">Click Me</button>
-    </iteration-deck-slide>
-  </iteration-deck>
-</template>
-```
-
-### Angular
-```typescript
-// component.ts
-import '@iteration-deck/core';
-
-@Component({
-  template: `
-    <iteration-deck id="ng-buttons" label="Angular Button Styles">
-      <iteration-deck-slide label="Primary">
-        <button class="btn-primary">Click Me</button>
-      </iteration-deck-slide>
-      <iteration-deck-slide label="Secondary">
-        <button class="btn-secondary">Click Me</button>
-      </iteration-deck-slide>
-    </iteration-deck>
-  `
-})
-export class ButtonVariationsComponent { }
-```
-
-### Vanilla HTML
-```html
-<script type="module">
-  import '@iteration-deck/core';
-</script>
-
-<iteration-deck id="html-buttons" label="HTML Button Styles">
-  <iteration-deck-slide label="Primary">
-    <button class="btn-primary">Click Me</button>
-  </iteration-deck-slide>
-  <iteration-deck-slide label="Secondary">
-    <button class="btn-secondary">Click Me</button>
-  </iteration-deck-slide>
-</iteration-deck>
+      {/* New variations added to existing deck */}
+      <IterationDeckSlide 
+        label="Ghost" 
+        aiPrompt="Minimal text-only style for subtle interactions"
+        confidence={0.91}
+        notes="Added per user request for ghost style"
+      >
+        <button 
+          className="text-blue-600 hover:text-blue-800 font-semibold py-2 px-4 hover:bg-blue-50 rounded transition-colors duration-200"
+          aria-label="Ghost style button"
+        >
+          Click Me
+        </button>
+      </IterationDeckSlide>
+      
+      <IterationDeckSlide 
+        label="Disabled" 
+        aiPrompt="Disabled state showing non-interactive appearance"
+        confidence={0.89}
+        notes="Added per user request for disabled state"
+      >
+        <button 
+          className="bg-gray-300 text-gray-500 font-bold py-2 px-4 rounded cursor-not-allowed opacity-60"
+          aria-label="Disabled button"
+          disabled
+        >
+          Click Me
+        </button>
+      </IterationDeckSlide>
+    </IterationDeck>
+  );
+}
 ```
 
 ## Key Principles
@@ -352,3 +344,4 @@ export class ButtonVariationsComponent { }
 4. **Use descriptive labels** - Make slide labels clear ("Primary Button" not "Button 1")
 5. **Add AI context** - Use `aiPrompt` and `notes` props to document reasoning
 6. **Keep it functional** - All variations should be fully working implementations
+7. **Preserve existing variations** - When adding to decks, never modify or remove existing slides

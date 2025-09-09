@@ -1,19 +1,19 @@
 # Iteration Deck
 
-[![npm version](https://badge.fury.io/js/@iteration-deck%2Fcore.svg)](https://badge.fury.io/js/@iteration-deck%2Fcore)
+[![npm version](https://badge.fury.io/js/iteration-deck.svg)](https://badge.fury.io/js/iteration-deck)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 > AI-first prototyping tool that helps you rapidly compare iterations live in-browser.
 
 One thing that Figma does really well is: It makes it easy to iterate quickly and non-destructively. When we design in code, we don’t have good ways to do that quite like in Figma.
 
-Iteration Deck changes that, enabling designers and product managers to compare AI-generated UI variations in live, interactive prototypes. Built with Lit web components and manual React wrappers, it works with any framework while providing excellent developer experience.
+Iteration Deck changes that, enabling designers to compare AI-generated UI variations in live, interactive prototypes. With versions built with React and Lit, Iteration Deck supports a wide range of web-based projects.
 
 ## Features
 
 - 🎯 **AI-First Design**: Built specifically for AI-generated UI variation workflows
 - 🔧 **Universal Framework Support**: Works with React, Vue, Angular, Astro, and vanilla HTML
-- ⌨️ **Keyboard Navigation**: Cmd/Ctrl + [ ] keys for quick iteration switching
+- ⌨️ **Keyboard Navigation**: Cmd/Ctrl+Alt + [ ] keys for quick iteration switching
 
 ## Getting started
 
@@ -21,17 +21,23 @@ Iteration Deck changes that, enabling designers and product managers to compare 
 npm install iteration-deck
 ```
 
+## Keyboard shortcuts
+
+- **Cmd/Ctrl+Alt + [**: Previous slide in active deck
+- **Cmd/Ctrl+Alt + ]**: Next slide in active deck
+- **Click deck in toolbar**: Switch active deck (when multiple decks present)
+
 ## AI workflow examples
 
 ### Working with AI coding agents
 
-Iteration Deck is built for designers who use AI coding agents like Claude, ChatGPT, and others.
+Iteration Deck is built for designers who use AI coding agents like Claude Code, Cursor, Lovable, and others.
 
 #### Example 1: Creating button variations
 
 **Prompt to AI:**
 ```
-Create 3 button variations for a SaaS landing page using iteration-deck. 
+Create 3 versions of a button for a SaaS landing page using iteration-deck. 
 Make them: primary (bold), secondary (outline), and gradient styles. 
 Include hover states and accessibility features.
 ```
@@ -238,10 +244,70 @@ function DashboardCards({ data, isLoading }) {
 }
 ```
 
+#### Example 4: Adding more variations to existing deck
+
+**Prompt to AI:**
+```
+Add 2 more button variations to the existing CTA buttons deck: 
+a ghost/text-only style and a loading state version.
+```
+
+**Expected AI Output:**
+```tsx
+// AI should add new IterationDeckSlide components to existing deck
+<IterationDeck id="cta-buttons" label="CTA Buttons">
+  {/* Existing slides remain unchanged */}
+  <IterationDeckSlide label="Primary">...</IterationDeckSlide>
+  <IterationDeckSlide label="Secondary">...</IterationDeckSlide>
+  <IterationDeckSlide label="Gradient">...</IterationDeckSlide>
+  
+  {/* New slides added */}
+  <IterationDeckSlide 
+    label="Ghost" 
+    aiPrompt="Minimal text-only style for subtle actions"
+    confidence={0.90}
+  >
+    <button className="text-blue-600 hover:text-blue-800 font-semibold py-2 px-4 hover:bg-blue-50 rounded transition-colors">
+      Get Started
+    </button>
+  </IterationDeckSlide>
+  
+  <IterationDeckSlide 
+    label="Loading State" 
+    aiPrompt="Primary button with loading spinner"
+    confidence={0.93}
+  >
+    <button 
+      className="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold opacity-75 cursor-not-allowed flex items-center gap-2"
+      disabled
+    >
+      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+      Loading...
+    </button>
+  </IterationDeckSlide>
+</IterationDeck>
+```
+
 ## **🤖 For AI Coding Agents:** See the included instruction files:
 - [`AI_INSTRUCTIONS.md`](./AI_INSTRUCTIONS.md) - Complete guidance on when and how to use iteration-deck
 - [`AI_EXAMPLES.md`](./AI_EXAMPLES.md) - Working code examples for common use cases  
-- [`AI_QUICK_REFERENCE.md`](./AI_QUICK_REFERENCE.md) - Quick reference for trigger phrases and patterns
+
+### Adding Variations to Existing Decks
+When users want to add more designs to an existing iteration deck:
+1. **Keep the same IterationDeck wrapper** with the same `id` and `label`
+2. **Preserve all existing IterationDeckSlide components** unchanged
+3. **Add new IterationDeckSlide components** at the end
+4. **Use meaningful labels** that distinguish the new variations
+5. **Include `aiPrompt` documentation** for the new variations
+
+### Designer Selection Workflow
+When a designer chooses a variation (e.g., "I like the second option", "Use the gradient version"):
+1. **Remove the IterationDeck wrapper** completely
+2. **Extract only the selected variation's content**
+3. **Clean up development props** (`aiPrompt`, `confidence`, `notes`)
+4. **Ask for confirmation** before making changes
+
+This converts the prototyping tool back into clean production code. See [`AI_INSTRUCTIONS.md`](./AI_INSTRUCTIONS.md) for detailed cleanup examples.
 
 ## API reference
 
@@ -311,29 +377,6 @@ function DesignSystemDemo() {
 }
 ```
 
-### Production behavior
-
-In production builds, only the first slide of each deck renders:
-
-```tsx
-// Development: Shows toolbar with all variations
-// Production: Renders only the first slide (Version 1)
-<IterationDeck id="hero" label="Hero Variations">
-  <IterationDeckSlide label="Version 1">
-    <HeroV1 />  {/* Only this renders in production */}
-  </IterationDeckSlide>
-  <IterationDeckSlide label="Version 2">
-    <HeroV2 />  
-  </IterationDeckSlide>
-</IterationDeck>
-```
-
-### Keyboard shortcuts
-
-- **Cmd/Ctrl + [**: Previous slide in active deck
-- **Cmd/Ctrl + ]**: Next slide in active deck
-- **Click deck in toolbar**: Switch active deck (when multiple decks present)
-
 ## Framework support
 
 ### React
@@ -341,53 +384,14 @@ In production builds, only the first slide of each deck renders:
 import { IterationDeck, IterationDeckSlide } from 'iteration-deck';
 ```
 
-### Vue
-```vue
-<script setup>
+### Web Components (Alpha)
+A web components version is also available for alpha testing in frameworks like Vue, Nuxt, Astro, Angular, Svelte, and any other framework that supports web components:
+
+```javascript
 import 'iteration-deck/wc';
-</script>
-
-<template>
-  <iteration-deck id="components" label="Variations">
-    <iteration-deck-slide label="Version 1">
-      <MyComponent />
-    </iteration-deck-slide>
-  </iteration-deck>
-</template>
 ```
 
-### Angular
-```typescript
-// app.module.ts
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import 'iteration-deck/wc';
-
-@NgModule({
-  schemas: [CUSTOM_ELEMENTS_SCHEMA]
-})
-```
-
-```html
-<!-- component.html -->
-<iteration-deck id="components" label="Variations">
-  <iteration-deck-slide label="Version 1">
-    <app-my-component></app-my-component>
-  </iteration-deck-slide>
-</iteration-deck>
-```
-
-### Astro
-```astro
----
-import 'iteration-deck/wc';
----
-
-<iteration-deck id="components" label="Variations" client:load>
-  <iteration-deck-slide label="Version 1">
-    <MyComponent />
-  </iteration-deck-slide>
-</iteration-deck>
-```
+Then use `<iteration-deck>` and `<iteration-deck-slide>` as standard HTML elements. See your framework's documentation for examples of how to integrate web components into your project.
 
 ## Development
 

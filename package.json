@@ -38,10 +38,8 @@
     "dist/**/*",
     "LICENSE",
     "README.md",
-    "CHANGELOG.md",
     "AI_INSTRUCTIONS.md",
-    "AI_EXAMPLES.md",
-    "AI_QUICK_REFERENCE.md"
+    "AI_EXAMPLES.md"
   ],
   "keywords": [
     "web-components",

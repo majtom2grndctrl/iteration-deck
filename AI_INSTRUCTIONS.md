@@ -2,8 +2,6 @@
 
 **When users ask for UI variations, alternatives, or multiple approaches - automatically use iteration-deck!**
 
-This file provides complete guidance for AI coding agents (Claude, ChatGPT, Copilot, Cursor, Lovable, Replit, etc.) when working with the `@iteration-deck/core` package.
-
 ## When to Use Iteration Deck
 
 **Automatically use iteration-deck components when:**
@@ -11,7 +9,6 @@ This file provides complete guidance for AI coding agents (Claude, ChatGPT, Copi
 - User asks to "compare different approaches" or "try different styles"
 - User mentions "A/B testing," "prototyping," or "design exploration"
 - User wants to see "different layouts," "styling options," or "design patterns"
-- User asks for "3 button styles," "header variations," "card layouts," etc.
 - Any request that implies creating multiple implementations of similar functionality
 
 **Trigger phrases that should prompt iteration-deck usage:**
@@ -19,41 +16,21 @@ This file provides complete guidance for AI coding agents (Claude, ChatGPT, Copi
 - "Build different versions of..." / "Generate alternatives for..." / "Compare different styles of..."
 - "What are some options for..." / "A/B test this component..." / "Try different layouts..."
 
-## Required Imports - Framework Detection
+**Trigger phrases for adding to existing iteration decks:**
+- "Add another variation to..." / "Create one more version of..." / "Add a [style] variation to the existing deck..."
+- "Can you make another [component] for the deck?" / "Add [description] to the button variations..."
+- "I need one more option in the [deck name]..." / "Include a [style] version in the existing iterations..."
 
-**IMPORTANT: Always detect the project type first, then use the correct import:**
+## Imports and Setup
 
-### React Projects (use React wrappers)
-```tsx
-import { IterationDeck, IterationDeckSlide } from '@iteration-deck/core/react';
+**📖 See README.md for complete import examples, API reference, and framework integration guides.**
 
-// Use JSX syntax with React components
-<IterationDeck id="unique-id" label="Label">
-  <IterationDeckSlide label="Variation 1">
-    {/* React JSX content */}
-  </IterationDeckSlide>
-</IterationDeck>
-```
+**Quick Reference:**
+- **React**: `import { IterationDeck, IterationDeckSlide } from 'iteration-deck';`
+- **Other frameworks**: `import 'iteration-deck/wc';` then use `<iteration-deck>` elements
+- **Framework detection**: Look for React imports, .tsx/.jsx files, or JSX syntax
 
-### All Other Projects (use web components)
-```javascript
-import '@iteration-deck/core';
-
-// Use web component syntax
-<iteration-deck id="unique-id" label="Label">
-  <iteration-deck-slide label="Variation 1">
-    <!-- HTML content -->
-  </iteration-deck-slide>
-</iteration-deck>
-```
-
-**How to detect React projects:**
-- Look for React imports in the file
-- Check if file extension is `.tsx` or `.jsx`
-- Look for JSX syntax in existing code
-- Check package.json for React dependencies
-
-## Basic Pattern
+## Basic Implementation Pattern
 
 **Always wrap variations in IterationDeck:**
 ```tsx
@@ -70,101 +47,9 @@ import '@iteration-deck/core';
 </IterationDeck>
 ```
 
-## Required Props
+📖 **For complete examples and API reference, see README.md and AI_EXAMPLES.md**
 
-### IterationDeck
-- `id` (required): Unique string identifier (e.g., "button-variants", "hero-layouts")
-- `label` (recommended): Human-readable name for the toolbar (e.g., "Button Styles", "Header Layouts")
-- `prompt` (optional): Include the original user prompt for context
-- `description` (optional): Additional context for stakeholders
-
-### IterationDeckSlide  
-- `label` (required): Short, descriptive name for this variation (e.g., "Primary", "Outline", "Gradient")
-- `aiPrompt` (optional): Specific instruction used for this variation
-- `notes` (optional): Design rationale or implementation notes
-- `confidence` (optional): Your confidence in this implementation (0-1, development only)
-
-## Common Use Cases and Patterns
-
-### 1. Component Variations (Buttons, Cards, etc.)
-```tsx
-// User: "Create 3 button styles for our CTA"
-<IterationDeck id="cta-buttons" label="CTA Button Styles" prompt="Create 3 button styles for our CTA">
-  <IterationDeckSlide label="Primary" aiPrompt="Bold, high-contrast style">
-    <Button className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700">
-      Get Started
-    </Button>
-  </IterationDeckSlide>
-  <IterationDeckSlide label="Outline" aiPrompt="Subtle, professional outline">
-    <Button className="border-2 border-blue-600 text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50">
-      Get Started  
-    </Button>
-  </IterationDeckSlide>
-  <IterationDeckSlide label="Gradient" aiPrompt="Eye-catching gradient background">
-    <Button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold">
-      Get Started
-    </Button>
-  </IterationDeckSlide>
-</IterationDeck>
-```
-
-### 2. Layout Variations
-```tsx
-// User: "Show me different ways to layout this hero section"
-<IterationDeck id="hero-layouts" label="Hero Section Layouts" prompt="Show me different ways to layout this hero section">
-  <IterationDeckSlide label="Centered" aiPrompt="Center-aligned with single column">
-    <div className="text-center max-w-2xl mx-auto">
-      <h1>Hero Title</h1>
-      <p>Hero description</p>
-      <button>CTA Button</button>
-    </div>
-  </IterationDeckSlide>
-  <IterationDeckSlide label="Split" aiPrompt="Two-column layout with text and image">
-    <div className="grid grid-cols-2 gap-8 items-center">
-      <div>
-        <h1>Hero Title</h1>
-        <p>Hero description</p>
-        <button>CTA Button</button>
-      </div>
-      <img src="/hero.jpg" alt="Hero" />
-    </div>
-  </IterationDeckSlide>
-</IterationDeck>
-```
-
-### 3. Multiple Decks on Same Page
-```tsx
-// User: "Design variations for both the header and footer"
-function DesignSystem() {
-  return (
-    <div>
-      <IterationDeck id="headers" label="Header Designs">
-        <IterationDeckSlide label="Standard">
-          <HeaderStandard />
-        </IterationDeckSlide>
-        <IterationDeckSlide label="Minimal">
-          <HeaderMinimal />
-        </IterationDeckSlide>
-      </IterationDeck>
-      
-      <main>
-        {/* Page content */}
-      </main>
-      
-      <IterationDeck id="footers" label="Footer Designs">
-        <IterationDeckSlide label="Full">
-          <FooterFull />
-        </IterationDeckSlide>
-        <IterationDeckSlide label="Compact">
-          <FooterCompact />
-        </IterationDeckSlide>
-      </IterationDeck>
-    </div>
-  );
-}
-```
-
-## Important Implementation Rules
+## Implementation Rules
 
 1. **Always create actual working implementations** - Don't use placeholder comments or empty divs
 2. **Make meaningful variations** - Each slide should offer a genuinely different approach, not just color changes
@@ -172,6 +57,17 @@ function DesignSystem() {
 4. **Use semantic HTML** - Maintain good HTML structure across all variations
 5. **Make variations realistic** - Each should be production-ready, not just proof-of-concept
 6. **Keep consistent functionality** - All variations should have the same core behavior, just different presentation
+
+## Adding New Variations to Existing Decks
+
+**When users request additional variations for existing iteration decks:**
+
+1. **Preserve existing structure** - Keep the same IterationDeck wrapper with identical `id` and `label` props
+2. **Keep all existing slides** - Never remove or modify existing IterationDeckSlide components
+3. **Add new slides at the end** - Append new IterationDeckSlide components after existing ones
+4. **Use distinctive labels** - Give new variations clear, descriptive labels that differentiate them
+5. **Include AI context** - Add `aiPrompt` and optional `confidence`/`notes` props for new variations
+6. **Maintain consistency** - New variations should follow the same component patterns and styling approach
 
 ## Don't Use Iteration Deck When:
 
@@ -190,84 +86,7 @@ function DesignSystem() {
 - Not providing meaningful `label` props
 - Wrapping non-UI content (data fetching, business logic, etc.)
 
-## Framework-Specific Implementation
-
-### React Projects
-```tsx
-// ALWAYS use React wrappers for React projects
-import { IterationDeck, IterationDeckSlide } from '@iteration-deck/core/react';
-
-function MyComponent() {
-  return (
-    <IterationDeck id="react-example" label="React Variations">
-      <IterationDeckSlide label="Version 1">
-        <MyReactComponent variant="primary" />
-      </IterationDeckSlide>
-      <IterationDeckSlide label="Version 2">
-        <MyReactComponent variant="secondary" />
-      </IterationDeckSlide>
-    </IterationDeck>
-  );
-}
-```
-
-### Vue.js Projects
-```vue
-<script setup>
-// Use web components for Vue
-import '@iteration-deck/core';
-</script>
-
-<template>
-  <iteration-deck id="vue-example" label="Vue Variations">
-    <iteration-deck-slide label="Version 1">
-      <MyVueComponent variant="primary" />
-    </iteration-deck-slide>
-    <iteration-deck-slide label="Version 2">
-      <MyVueComponent variant="secondary" />
-    </iteration-deck-slide>
-  </iteration-deck>
-</template>
-```
-
-### Angular Projects
-```typescript
-// Use web components for Angular
-import '@iteration-deck/core';
-
-@Component({
-  template: `
-    <iteration-deck id="ng-example" label="Angular Variations">
-      <iteration-deck-slide label="Version 1">
-        <app-my-component variant="primary"></app-my-component>
-      </iteration-deck-slide>
-      <iteration-deck-slide label="Version 2">
-        <app-my-component variant="secondary"></app-my-component>
-      </iteration-deck-slide>
-    </iteration-deck>
-  `
-})
-export class MyComponent { }
-```
-
-### Vanilla HTML/JavaScript
-```html
-<script type="module">
-  // Use web components for vanilla HTML
-  import '@iteration-deck/core';
-</script>
-
-<iteration-deck id="html-example" label="HTML Variations">
-  <iteration-deck-slide label="Version 1">
-    <div class="my-component variant-1">Content 1</div>
-  </iteration-deck-slide>
-  <iteration-deck-slide label="Version 2">
-    <div class="my-component variant-2">Content 2</div>
-  </iteration-deck-slide>
-</iteration-deck>
-```
-
-## Example Revised Prompts
+## Interpreting User Requests
 
 Instead of the user saying:
 > "Create 3 button styles for our landing page"
@@ -276,6 +95,29 @@ You should interpret this as:
 > "I need to create multiple button style variations using iteration-deck to compare different approaches for the landing page CTA"
 
 And implement accordingly with IterationDeck wrapping the variations.
+
+### Adding to Existing Decks
+
+When the user says:
+> "Add a loading state version to the button deck"
+
+You should interpret this as:
+> "I need to add a new IterationDeckSlide to the existing button IterationDeck, preserving all current slides and adding the loading state as a new variation"
+
+**Example implementation pattern:**
+```tsx
+// Find the existing deck and add new slides while preserving existing ones
+<IterationDeck id="existing-deck-id" label="Existing Label">
+  {/* Keep all existing slides unchanged */}
+  <IterationDeckSlide label="Existing Slide 1">...</IterationDeckSlide>
+  <IterationDeckSlide label="Existing Slide 2">...</IterationDeckSlide>
+  
+  {/* Add new slide */}
+  <IterationDeckSlide label="New Variation" aiPrompt="Description of new design">
+    {/* New implementation */}
+  </IterationDeckSlide>
+</IterationDeck>
+```
 
 ## After Designer Selection - Critical Workflow Step
 
