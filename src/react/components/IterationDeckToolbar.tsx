@@ -168,6 +168,9 @@ export const IterationDeckToolbar: React.FC<IterationDeckToolbarProps> = ({
   const currentSlideIndex = currentSlideId ? slideIds.indexOf(currentSlideId) : 0;
   const totalSlides = slideIds.length;
   
+  // Get current slide label from metadata
+  const currentSlideLabel = selectedDeck?.slides?.find(slide => slide.id === currentSlideId)?.label;
+  
 
   // Show toolbar if we have interactive decks
   useEffect(() => {
@@ -403,7 +406,7 @@ export const IterationDeckToolbar: React.FC<IterationDeckToolbarProps> = ({
       {/* Slide info */}
       <SlideInfo
         currentSlide={{
-          label: selectedDeck?.slideIds?.[currentSlideIndex],
+          label: currentSlideLabel,
           index: currentSlideIndex
         }}
         totalSlides={totalSlides}

@@ -735,9 +735,10 @@ export class IterationDeckToolbar extends LitElement {
       return 'No slide active';
     }
 
-    // Use the slide ID as the label for now
-    // This will be enhanced when we have full slide metadata
-    return metadata.activeSlideId;
+    // Get current slide label from metadata
+    const currentSlideLabel = metadata.slides?.find(slide => slide.id === metadata.activeSlideId)?.label;
+    
+    return currentSlideLabel || 'No slide selected';
   }
 
   /**

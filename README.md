@@ -38,7 +38,7 @@ Include hover states and accessibility features.
 
 **Expected AI Output:**
 ```tsx
-import { IterationDeck, IterationDeckSlide } from 'iteration-deck/react';
+import { IterationDeck, IterationDeckSlide } from 'iteration-deck';
 
 function ButtonVariations() {
   return (
@@ -93,7 +93,7 @@ Include responsive behavior and proper accessibility.
 
 **Expected AI Output:**
 ```tsx
-import { IterationDeck, IterationDeckSlide } from '@iteration-deck/core/react';
+import { IterationDeck, IterationDeckSlide } from 'iteration-deck';
 
 function NavigationLayouts() {
   return (
@@ -168,7 +168,7 @@ Make them responsive and include loading states.
 
 **Expected AI Output:**
 ```tsx
-import { IterationDeck, IterationDeckSlide } from '@iteration-deck/core/react';
+import { IterationDeck, IterationDeckSlide } from 'iteration-deck';
 
 function DashboardCards({ data, isLoading }) {
   return (
@@ -338,13 +338,13 @@ In production builds, only the first slide of each deck renders:
 
 ### React
 ```tsx
-import { IterationDeck, IterationDeckSlide } from '@iteration-deck/core/react';
+import { IterationDeck, IterationDeckSlide } from 'iteration-deck';
 ```
 
 ### Vue
 ```vue
 <script setup>
-import '@iteration-deck/core';
+import 'iteration-deck/wc';
 </script>
 
 <template>
@@ -360,7 +360,7 @@ import '@iteration-deck/core';
 ```typescript
 // app.module.ts
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import '@iteration-deck/core';
+import 'iteration-deck/wc';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
@@ -379,7 +379,7 @@ import '@iteration-deck/core';
 ### Astro
 ```astro
 ---
-import '@iteration-deck/core';
+import 'iteration-deck/wc';
 ---
 
 <iteration-deck id="components" label="Variations" client:load>

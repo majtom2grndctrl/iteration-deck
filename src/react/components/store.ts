@@ -6,11 +6,23 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
 
 /**
+ * Slide metadata for store management
+ */
+export interface SlideMetadata {
+  /** Unique slide ID */
+  id: string;
+  /** Human-readable slide label */
+  label: string;
+}
+
+/**
  * Deck metadata for store management
  */
 export interface DeckMetadata {
   /** All slide IDs in this deck */
   slideIds: string[];
+  /** Slide metadata with labels */
+  slides: SlideMetadata[];
   /** Currently active slide ID */
   activeSlideId: string;
   /** Optional deck label */
@@ -41,7 +53,7 @@ export interface StoreActions {
   setActiveSlide: (deckId: string, slideId: string) => void;
   
   /** Registers a deck with all its slides */
-  registerDeck: (deckId: string, slideIds: string[], label?: string, isInteractive?: boolean) => void;
+  registerDeck: (deckId: string, slideIds: string[], label?: string, isInteractive?: boolean, slides?: SlideMetadata[]) => void;
   
   /** Removes a deck from the store */
   removeDeck: (deckId: string) => void;
@@ -103,18 +115,27 @@ export const storeActions: StoreActions = {
     if (globalState.deckMetadata[deckId]) {
       globalState.deckMetadata[deckId].activeSlideId = slideId;
     } else {
-      globalState.deckMetadata[deckId] = { slideIds: [slideId], activeSlideId: slideId, isInteractive: true };
+      globalState.deckMetadata[deckId] = { 
+        slideIds: [slideId], 
+        slides: [{ id: slideId, label: slideId }],
+        activeSlideId: slideId, 
+        isInteractive: true 
+      };
     }
     notifyListeners();
   },
 
-  registerDeck: (deckId: string, slideIds: string[], label?: string, isInteractive: boolean = true) => {
+  registerDeck: (deckId: string, slideIds: string[], label?: string, isInteractive: boolean = true, slides?: SlideMetadata[]) => {
     const currentActive = globalState.activeDecks[deckId];
     const validActiveSlide = slideIds.includes(currentActive) ? currentActive : slideIds[0];
+    
+    // Create slide metadata if not provided
+    const slideMetadata = slides || slideIds.map(id => ({ id, label: id }));
     
     globalState.activeDecks[deckId] = validActiveSlide;
     globalState.deckMetadata[deckId] = {
       slideIds: [...slideIds],
+      slides: slideMetadata,
       activeSlideId: validActiveSlide,
       label,
       isInteractive
