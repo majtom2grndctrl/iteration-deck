@@ -1,6 +1,6 @@
 {
   "name": "iteration-deck",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "AI-first prototyping web components for comparing interactive UI variations. Perfect for designers working with AI coding agents to create multiple design iterations in prototypes.",
   "homepage": "https://github.com/MajTom2GrndCtrl/iteration-deck",
   "repository": {
