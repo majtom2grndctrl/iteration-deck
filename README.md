@@ -44,7 +44,7 @@ Include hover states and accessibility features.
 
 **Expected AI Output:**
 ```tsx
-import { IterationDeck, IterationDeckSlide } from 'iteration-deck/react';
+import { IterationDeck, IterationDeckSlide } from 'iteration-deck';
 
 function ButtonVariations() {
   return (
@@ -99,7 +99,7 @@ Include responsive behavior and proper accessibility.
 
 **Expected AI Output:**
 ```tsx
-import { IterationDeck, IterationDeckSlide } from '@iteration-deck/core/react';
+import { IterationDeck, IterationDeckSlide } from 'iteration-deck';
 
 function NavigationLayouts() {
   return (
@@ -174,7 +174,7 @@ Make them responsive and include loading states.
 
 **Expected AI Output:**
 ```tsx
-import { IterationDeck, IterationDeckSlide } from '@iteration-deck/core/react';
+import { IterationDeck, IterationDeckSlide } from 'iteration-deck';
 
 function DashboardCards({ data, isLoading }) {
   return (
@@ -381,7 +381,7 @@ function DesignSystemDemo() {
 
 ### React
 ```tsx
-import { IterationDeck, IterationDeckSlide } from '@iteration-deck/core/react';
+import { IterationDeck, IterationDeckSlide } from 'iteration-deck';
 ```
 
 ### Web Components (Alpha)

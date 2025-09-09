@@ -68,7 +68,7 @@ describe('IterationDeck - Simplified Architecture', () => {
     expect(screen.getByText('Content 1')).toBeInTheDocument();
   });
 
-  test('registers deck with store', async () => {
+  test('registers deck with store including slide metadata', async () => {
     render(
       <IterationDeck id="test-deck" label="Test Deck">
         <IterationDeckSlide label="Slide 1">
@@ -82,7 +82,38 @@ describe('IterationDeck - Simplified Architecture', () => {
         'test-deck',
         ['test-deck-slide-0'],
         'Test Deck',
-        true // Always interactive now
+        true, // Always interactive now
+        [{ id: 'test-deck-slide-0', label: 'Slide 1' }] // Slide metadata
+      );
+    });
+  });
+
+  test('registers deck with multiple slides and their labels', async () => {
+    render(
+      <IterationDeck id="multi-deck" label="Multi Deck">
+        <IterationDeckSlide label="Hero Layout">
+          <div>Hero content</div>
+        </IterationDeckSlide>
+        <IterationDeckSlide label="Card Layout">
+          <div>Card content</div>
+        </IterationDeckSlide>
+        <IterationDeckSlide label="List Layout">
+          <div>List content</div>
+        </IterationDeckSlide>
+      </IterationDeck>
+    );
+
+    await waitFor(() => {
+      expect(mockStore.registerDeck).toHaveBeenCalledWith(
+        'multi-deck',
+        ['multi-deck-slide-0', 'multi-deck-slide-1', 'multi-deck-slide-2'],
+        'Multi Deck',
+        true,
+        [
+          { id: 'multi-deck-slide-0', label: 'Hero Layout' },
+          { id: 'multi-deck-slide-1', label: 'Card Layout' },
+          { id: 'multi-deck-slide-2', label: 'List Layout' }
+        ]
       );
     });
   });

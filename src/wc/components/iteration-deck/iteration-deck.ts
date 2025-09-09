@@ -350,8 +350,14 @@ export class IterationDeck extends LitElement {
     // Calculate if this deck should be interactive
     const isInteractive = this._shouldActivate();
     
-    // Register deck with all slide IDs, label, and interactive state
-    store.registerDeck(this.id, slideIds, this.label, isInteractive);
+    // Create slide metadata array for the store
+    const slideMetadata = this._slides.map(slide => ({
+      id: slide.id,
+      label: slide.label
+    }));
+    
+    // Register deck with all slide IDs, label, interactive state, and slide metadata
+    store.registerDeck(this.id, slideIds, this.label, isInteractive, slideMetadata);
     
     // Get the active slide that was set during registration and update properties safely
     const activeSlideId = store.getActiveSlide(this.id) || slideIds[0];

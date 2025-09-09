@@ -44,7 +44,12 @@ describe('IterationStore - Production Mode Override', () => {
         slideIds: slideIds,
         activeSlideId: 'slide-1',
         label: label,
-        isInteractive: true
+        isInteractive: true,
+        slides: [
+          { id: 'slide-1', label: 'slide-1' },
+          { id: 'slide-2', label: 'slide-2' },
+          { id: 'slide-3', label: 'slide-3' }
+        ]
       });
 
       // Verify active slide is set
@@ -89,6 +94,50 @@ describe('IterationStore - Production Mode Override', () => {
       expect(store.getRegisteredDecks()).not.toContain(deckId);
       expect(store.getActiveSlide(deckId)).toBeUndefined();
       expect(store.getDeckMetadata(deckId)).toBeUndefined();
+    });
+
+    test('store properly handles slide metadata registration', () => {
+      const deckId = 'test-deck';
+      const slideIds = ['test-deck-slide-0', 'test-deck-slide-1', 'test-deck-slide-2'];
+      const slideMetadata = [
+        { id: 'test-deck-slide-0', label: 'Hero Layout' },
+        { id: 'test-deck-slide-1', label: 'Card Layout' },
+        { id: 'test-deck-slide-2', label: 'List Layout' }
+      ];
+
+      // Register deck with slide metadata
+      store.registerDeck(deckId, slideIds, 'Test Deck', true, slideMetadata);
+
+      // Verify deck is registered with correct metadata
+      const metadata = store.getDeckMetadata(deckId);
+      expect(metadata).toMatchObject({
+        slideIds: slideIds,
+        activeSlideId: 'test-deck-slide-0',
+        label: 'Test Deck',
+        isInteractive: true,
+        slides: slideMetadata
+      });
+
+      // Verify slide metadata is accessible
+      expect(metadata?.slides).toHaveLength(3);
+      expect(metadata?.slides[0]).toEqual({ id: 'test-deck-slide-0', label: 'Hero Layout' });
+      expect(metadata?.slides[1]).toEqual({ id: 'test-deck-slide-1', label: 'Card Layout' });
+      expect(metadata?.slides[2]).toEqual({ id: 'test-deck-slide-2', label: 'List Layout' });
+    });
+
+    test('store falls back to slide IDs as labels when no metadata provided', () => {
+      const deckId = 'test-deck';
+      const slideIds = ['slide-1', 'slide-2'];
+
+      // Register deck without slide metadata
+      store.registerDeck(deckId, slideIds, 'Test Deck', true);
+
+      // Verify deck is registered with fallback slide metadata
+      const metadata = store.getDeckMetadata(deckId);
+      expect(metadata?.slides).toEqual([
+        { id: 'slide-1', label: 'slide-1' },
+        { id: 'slide-2', label: 'slide-2' }
+      ]);
     });
   });
 

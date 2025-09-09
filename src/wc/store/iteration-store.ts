@@ -7,11 +7,23 @@
 import { isDevelopment } from '../utils/index.js';
 
 /**
+ * Slide metadata for store management
+ */
+export interface SlideMetadata {
+  /** Unique slide ID */
+  id: string;
+  /** Human-readable slide label */
+  label: string;
+}
+
+/**
  * Deck metadata for store management
  */
 export interface DeckMetadata {
   /** All slide IDs in this deck */
   slideIds: string[];
+  /** Slide metadata with labels */
+  slides: SlideMetadata[];
   /** Currently active slide ID */
   activeSlideId: string;
   /** Optional deck label */
@@ -34,7 +46,7 @@ export interface IterationStore {
   setActiveSlide: (deckId: string, slideId: string) => void;
   
   /** Registers a deck with all its slides */
-  registerDeck: (deckId: string, slideIds: string[], label?: string, isInteractive?: boolean) => void;
+  registerDeck: (deckId: string, slideIds: string[], label?: string, isInteractive?: boolean, slides?: SlideMetadata[]) => void;
   
   /** Removes a deck from the store */
   removeDeck: (deckId: string) => void;
@@ -131,10 +143,14 @@ class SimpleStore implements IterationStore {
   
   private listeners: Set<(state: IterationStore) => void> = new Set();
   
-  registerDeck(deckId: string, slideIds: string[], label?: string, isInteractive: boolean = true): void {
+  registerDeck(deckId: string, slideIds: string[], label?: string, isInteractive: boolean = true, slides?: SlideMetadata[]): void {
+    // Create slide metadata if not provided
+    const slideMetadata = slides || slideIds.map(id => ({ id, label: id }));
+    
     // Store deck metadata
     this.deckMetadata[deckId] = {
       slideIds: [...slideIds],
+      slides: slideMetadata,
       activeSlideId: slideIds[0] || '',
       label,
       isInteractive

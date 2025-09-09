@@ -106,7 +106,7 @@ export const IterationDeck = forwardRef<IterationDeckHandle, ReactIterationDeckP
       const slideIds = slideInfo.metadata.map(slide => slide.id);
       if (slideIds.length > 0) {
         console.log('[IterationDeck DEBUG] Registering deck:', { id, label, slideCount: slideIds.length });
-        store.registerDeck(id, slideIds, label, true); // Always interactive
+        store.registerDeck(id, slideIds, label, true, slideInfo.metadata); // Pass slide metadata
         console.log('[IterationDeck DEBUG] After registration - store state:', {
           activeDecks: store.activeDecks,
           deckMetadata: store.deckMetadata,
