@@ -12,6 +12,7 @@ import type { DeckMetadata } from './store';
 vi.mock('../utils/injectCSS', () => ({
   injectIterationDeckStyles: vi.fn(),
   iterationDeckStyles: {
+    toolbarContainer: 'toolbar-container-class',
     toolbar: 'toolbar-class',
     selectorContainer: 'selector-class',
     hiddenSelect: 'hidden-select-class',

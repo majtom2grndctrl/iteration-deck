@@ -8,7 +8,10 @@
 // Export main components (toolbar automatically managed by IterationDeck)
 export { IterationDeck } from './IterationDeck';
 export { IterationDeckSlide } from './IterationDeckSlide';
-import { IterationDeck } from './IterationDeck';
+
+// Export toolbar components for external consumption
+export { IterationDeckToolbar } from './IterationDeckToolbar';
+export { IterationDeckToolbarView } from './IterationDeckToolbarView';
 
 // Export React-specific types
 export type {
@@ -21,6 +24,14 @@ export type {
   IterationDeckSlideRef,
 } from './IterationDeckSlide';
 
+export type {
+  IterationDeckToolbarProps,
+} from './IterationDeckToolbar';
+
+export type {
+  IterationDeckToolbarViewProps,
+} from './IterationDeckToolbarView';
+
 // Export store hooks for advanced usage
 export {
   useIterationStore,
@@ -32,4 +43,4 @@ export {
 } from './store';
 
 // Default export for convenience
-export default IterationDeck;
+export { IterationDeck as default } from './IterationDeck';

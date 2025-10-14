@@ -1,14 +1,17 @@
 /**
  * IterationDeckToolbar component
- * 
- * Global toolbar component that provides navigation controls for iteration decks.
- * Uses standard React + Tailwind CSS patterns for maintainability and hot reload.
+ *
+ * Smart toolbar component that provides navigation controls for iteration decks.
+ * Integrates with Zustand store for state management, keyboard shortcuts, and portal mounting.
+ *
+ * This component wraps IterationDeckToolbarView (presentational) with application logic.
  */
 
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useIterationStore } from './store';
-import { iterationDeckStyles, injectIterationDeckStyles } from '../utils/injectCSS';
+import { injectIterationDeckStyles, iterationDeckStyles } from '../utils/injectCSS';
+import { IterationDeckToolbarView } from './IterationDeckToolbarView';
 
 /**
  * Toolbar component props
@@ -18,129 +21,12 @@ export interface IterationDeckToolbarProps {
   className?: string;
 }
 
-/**
- * Deck selector dropdown component
- */
-const DeckSelector: React.FC<{
-  decks: { id: string; label?: string }[];
-  selectedDeckId?: string;
-  onSelect: (deckId: string) => void;
-}> = ({ decks, selectedDeckId, onSelect }) => {
-  const selectedDeck = decks.find(d => d.id === selectedDeckId);
-  const displayLabel = selectedDeck ? (selectedDeck.label || selectedDeck.id) : 'Select Deck';
-
-  if (decks.length <= 1) return null;
-
-  return (
-    <div className={iterationDeckStyles.selectorContainer}>
-      <select 
-        className={iterationDeckStyles.hiddenSelect}
-        onChange={(e) => onSelect(e.target.value)}
-        value={selectedDeckId || ''}
-        aria-label="Select iteration deck"
-      >
-        {decks.map(deck => (
-          <option 
-            key={deck.id}
-            value={deck.id}
-          >
-            {deck.label || deck.id}
-          </option>
-        ))}
-      </select>
-      
-      <div className={iterationDeckStyles.selectorDisplay}>
-        <span className={iterationDeckStyles.selectorLabel}>
-          {displayLabel}
-        </span>
-        <span className={iterationDeckStyles.dropdownArrow}>
-          ▼
-        </span>
-      </div>
-    </div>
-  );
-};
 
 /**
- * Slide navigation buttons component
+ * Main toolbar component - integrates ToolbarView with Zustand store
  */
-const SlideNavigation: React.FC<{
-  onPrevious: () => void;
-  onNext: () => void;
-  canGoPrevious: boolean;
-  canGoNext: boolean;
-}> = ({ onPrevious, onNext, canGoPrevious, canGoNext }) => {
-  return (
-    <div className={iterationDeckStyles.navigationContainer}>
-      <button
-        onClick={onPrevious}
-        disabled={!canGoPrevious}
-        className={iterationDeckStyles.previousButton}
-        aria-label="Previous slide (Ctrl/Cmd+Alt+[)"
-        title="Previous slide (Ctrl/Cmd+Alt+[)"
-      >
-        <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor" aria-hidden="true">
-          <path d="M7 6l6-4v8l-6-4z" />
-        </svg>
-      </button>
-      <button
-        onClick={onNext}
-        disabled={!canGoNext}
-        className={iterationDeckStyles.nextButton}
-        aria-label="Next slide (Ctrl/Cmd+Alt+])"
-        title="Next slide (Ctrl/Cmd+Alt+])"
-      >
-        <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor" aria-hidden="true">
-          <path d="M11 6l-6 4V2l6 4z" />
-        </svg>
-      </button>
-    </div>
-  );
-};
-
-/**
- * Slide info display component
- */
-const SlideInfo: React.FC<{
-  currentSlide?: { label?: string; index?: number };
-  totalSlides: number;
-}> = ({ currentSlide, totalSlides }) => {
-  return (
-    <div className={iterationDeckStyles.slideInfo}>
-      <span className={iterationDeckStyles.slideLabel}>
-        {currentSlide?.label || 'No slide selected'}
-      </span>
-      
-      {/* Slide indicators */}
-      <div className={iterationDeckStyles.slideIndicators}>
-        {totalSlides === 0 ? (
-          <span className={iterationDeckStyles.noSlides}>
-            No slides (totalSlides: {totalSlides})
-          </span>
-        ) : (
-          Array.from({ length: totalSlides }, (_, i) => {
-            const isActive = i === (currentSlide?.index || 0);
-            
-            return (
-              <div
-                key={i}
-                className={isActive ? iterationDeckStyles.slideDotActive : iterationDeckStyles.slideDotInactive}
-                title={`Dot ${i} - ${isActive ? 'active' : 'inactive'}`}
-              />
-            );
-          })
-        )}
-      </div>
-    </div>
-  );
-};
-
-
-/**
- * Main toolbar component
- */
-export const IterationDeckToolbar: React.FC<IterationDeckToolbarProps> = ({ 
-  className 
+export const IterationDeckToolbar: React.FC<IterationDeckToolbarProps> = ({
+  className
 }) => {
   const store = useIterationStore();
   const [isVisible, setIsVisible] = useState(false);
@@ -161,16 +47,16 @@ export const IterationDeckToolbar: React.FC<IterationDeckToolbarProps> = ({
 
   const selectedDeckId = store.selectedDeckId || interactiveDecks[0]?.id;
   const selectedDeck = store.deckMetadata[selectedDeckId];
-  
+
   // Get current slide info
   const currentSlideId = selectedDeckId ? store.activeDecks[selectedDeckId] : undefined;
   const slideIds = selectedDeck?.slideIds || [];
   const currentSlideIndex = currentSlideId ? slideIds.indexOf(currentSlideId) : 0;
   const totalSlides = slideIds.length;
-  
+
   // Get current slide label from metadata
   const currentSlideLabel = selectedDeck?.slides?.find(slide => slide.id === currentSlideId)?.label;
-  
+
 
   // Show toolbar if we have interactive decks
   useEffect(() => {
@@ -181,10 +67,10 @@ export const IterationDeckToolbar: React.FC<IterationDeckToolbarProps> = ({
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (!selectedDeckId || !isVisible) return;
-      
+
       const isCmd = event.metaKey || event.ctrlKey;
       const isAlt = event.altKey;
-      
+
       if (isCmd && isAlt) {
         if (event.code === 'BracketLeft') { // Cmd+Alt+[
           event.preventDefault();
@@ -379,37 +265,23 @@ export const IterationDeckToolbar: React.FC<IterationDeckToolbarProps> = ({
     totalSlides
   });
 
+  // Render toolbar view with all state and callbacks mapped
+  // Wrap in a positioned container for fixed bottom positioning
   const toolbarContent = (
-    <div className={`${iterationDeckStyles.toolbar} ${className || ''}`}>
-      {/* Deck selector */}
-      <DeckSelector
+    <div className={iterationDeckStyles.toolbarContainer}>
+      <IterationDeckToolbarView
         decks={interactiveDecks}
         selectedDeckId={selectedDeckId}
-        onSelect={handleDeckSelect}
-      />
-
-      {/* Separator */}
-      {interactiveDecks.length > 1 && (
-        <div className={iterationDeckStyles.separator} />
-      )}
-
-      {/* Navigation controls */}
-      <div className={iterationDeckStyles.navContainer}>
-        <SlideNavigation
-          onPrevious={handlePrevious}
-          onNext={handleNext}
-          canGoPrevious={totalSlides > 1}
-          canGoNext={totalSlides > 1}
-        />
-      </div>
-
-      {/* Slide info */}
-      <SlideInfo
         currentSlide={{
           label: currentSlideLabel,
           index: currentSlideIndex
         }}
         totalSlides={totalSlides}
+        onPrevious={handlePrevious}
+        onNext={handleNext}
+        onDeckSelect={handleDeckSelect}
+        canNavigate={totalSlides > 1}
+        className={className}
       />
     </div>
   );
