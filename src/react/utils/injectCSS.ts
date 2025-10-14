@@ -7,13 +7,17 @@ import { css } from '@emotion/css';
 
 let stylesInjected = false;
 
-// Base toolbar styles with responsive design and dark mode support
-const toolbarStyles = css`
+// Fixed positioning container for toolbar (used by smart wrapper)
+const toolbarContainerStyles = css`
   position: fixed;
   bottom: 16px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 9999;
+`;
+
+// Base toolbar styles (presentational only - no positioning)
+const toolbarStyles = css`
   display: flex;
   align-items: center;
   min-width: 320px;
@@ -259,6 +263,7 @@ const slideDotInactiveStyles = css`
 
 // Export all styles
 export const iterationDeckStyles = {
+  toolbarContainer: toolbarContainerStyles,
   toolbar: toolbarStyles,
   separator: separatorStyles,
   navContainer: navContainerStyles,
