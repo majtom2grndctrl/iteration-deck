@@ -13,6 +13,9 @@ dist-ssr
 *.local.*
 *.tgz
 
+# Iteration Deck CLI state
+.iteration-deck-state.json
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
