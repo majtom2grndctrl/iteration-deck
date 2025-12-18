@@ -2,6 +2,49 @@
 
 **When users ask for UI variations, alternatives, or multiple approaches - automatically use iteration-deck!**
 
+## ⚡ Quick Start Workflow
+
+**BEFORE implementing any IterationDeck:**
+
+### Option 1: Using the CLI (Recommended)
+
+```bash
+# 1. Create worktree for iterations
+npx iteration-deck worktree:create [name]
+cd ../iteration-deck-[name]
+
+# 2. Implement IterationDeck with variations here
+# [your code work happens in worktree]
+
+# 3. After designer chooses a variation:
+cd [original-directory]
+# Copy chosen variation content (without wrapper) to original branch
+
+# 4. Cleanup
+npx iteration-deck worktree:cleanup [name]
+```
+
+### Option 2: Using Git Commands Manually
+
+```bash
+# 1. Create worktree for iterations
+git worktree add ../iteration-deck-[name] -b iterations/[name]
+cd ../iteration-deck-[name]
+
+# 2. Implement IterationDeck with variations here
+# [your code work happens in worktree]
+
+# 3. After designer chooses a variation:
+cd [original-directory]
+# Copy chosen variation content (without wrapper) to original branch
+
+# 4. Cleanup
+git worktree remove ../iteration-deck-[name]
+git branch -D iterations/[name]
+```
+
+**The CLI handles state tracking and provides helpful feedback. See "Git Worktree Workflow for Iterations" section below for complete details.**
+
 ## When to Use Iteration Deck
 
 **Automatically use iteration-deck components when:**
@@ -20,6 +63,136 @@
 - "Add another variation to..." / "Create one more version of..." / "Add a [style] variation to the existing deck..."
 - "Can you make another [component] for the deck?" / "Add [description] to the button variations..."
 - "I need one more option in the [deck name]..." / "Include a [style] version in the existing iterations..."
+
+## Git Worktree Workflow for Iterations
+
+**CRITICAL: Before creating any IterationDeck, set up a git worktree for exploration:**
+
+### 1. Creating the Iteration Worktree
+
+When a user requests UI variations, **before implementing any code:**
+
+**Using the CLI (Recommended):**
+```bash
+# Create a worktree for iteration exploration
+npx iteration-deck worktree:create [component-name]
+
+# Move to the worktree
+cd ../iteration-deck-[component-name]
+```
+
+**Or using git commands directly:**
+```bash
+# Create a worktree for iteration exploration
+git worktree add ../iteration-deck-[component-name] -b iterations/[component-name]
+
+# Move to the worktree
+cd ../iteration-deck-[component-name]
+```
+
+**Example:**
+```bash
+# User asks: "Create button variations"
+npx iteration-deck worktree:create buttons
+cd ../iteration-deck-buttons
+# Now implement the IterationDeck with button variations
+```
+
+### 2. Working in the Iteration Worktree
+
+- All IterationDeck implementation happens in the worktree
+- Commit each variation as you build it (optional but recommended)
+- Designer can preview and test all variations live
+- Worktree remains active as long as IterationDeck exists in the code
+
+### 3. Bringing Back the Chosen Variation
+
+When designer selects their preferred variation:
+
+```bash
+# Return to original branch
+cd [original-working-directory]
+
+# Create a patch of just the chosen variation (without IterationDeck wrapper)
+# or manually copy the selected implementation
+
+# Cherry-pick specific commits if you committed variations separately
+git cherry-pick [commit-hash-of-chosen-variation]
+
+# OR manually integrate the chosen code
+```
+
+### 4. Cleanup After Selection
+
+**Using the CLI (Recommended):**
+```bash
+# Remove the worktree when done (handles branch deletion too)
+npx iteration-deck worktree:cleanup [component-name]
+```
+
+**Or using git commands directly:**
+```bash
+# Remove the worktree when done
+git worktree remove ../iteration-deck-[component-name]
+
+# Delete the iteration branch
+git branch -D iterations/[component-name]
+```
+
+### Complete Workflow Example
+
+**Using the CLI:**
+```bash
+# User: "Create 3 different hero section layouts"
+
+# Step 1: Create worktree
+npx iteration-deck worktree:create hero-layouts
+cd ../iteration-deck-hero-layouts
+
+# Step 2: Implement IterationDeck with variations
+# [Create React component with IterationDeck wrapper]
+
+# Step 3: Designer reviews, chooses "Split Layout"
+# Return to main branch
+cd [original-directory]
+
+# Step 4: Extract chosen variation (without IterationDeck)
+# Copy the selected slide's content to the main branch
+
+# Step 5: Clean up
+npx iteration-deck worktree:cleanup hero-layouts
+```
+
+**Or using git commands:**
+```bash
+# User: "Create 3 different hero section layouts"
+
+# Step 1: Create worktree
+git worktree add ../iteration-deck-hero -b iterations/hero-layouts
+cd ../iteration-deck-hero
+
+# Step 2: Implement IterationDeck with variations
+# [Create React component with IterationDeck wrapper]
+
+# Step 3: Designer reviews, chooses "Split Layout"
+# Return to main branch
+cd [original-directory]
+
+# Step 4: Extract chosen variation (without IterationDeck)
+# Copy the selected slide's content to the main branch
+
+# Step 5: Clean up
+git worktree remove ../iteration-deck-hero
+git branch -D iterations/hero-layouts
+```
+
+### Benefits of Worktree Approach
+
+- **Isolated exploration**: Iterations don't pollute main branch history
+- **Easy comparison**: All variations exist simultaneously in worktree
+- **Clean integration**: Only chosen variation merges back
+- **No IterationDeck in production**: Wrapper stays in worktree, only final code comes back
+- **Temporary by design**: Worktree lifecycle matches IterationDeck lifecycle
 
 ## Imports and Setup
 
@@ -123,16 +296,89 @@ You should interpret this as:
 
 **When a designer indicates they've chosen a variation (e.g., "I like the second option", "Use the gradient version", "Go with the minimal design"):**
 
-1. **Remove the IterationDeck wrapper** completely
-2. **Extract only the selected IterationDeckSlide content** 
-3. **Clean up development-specific props** (remove `aiPrompt`, `confidence`, `notes`)
-4. **Preserve all functionality** of the selected variation
-5. **Remove unused imports** if no other iteration-decks remain on the page
-6. **Ask for confirmation** before making the cleanup changes
+### Complete Selection & Integration Workflow
 
-### Example Cleanup Process
+1. **Switch back to original branch**
+   ```bash
+   cd [original-working-directory]
+   git checkout [original-branch]
+   ```
+
+2. **Extract and integrate only the selected variation**
+   - Copy the chosen IterationDeckSlide content (WITHOUT the wrapper)
+   - Paste into the appropriate file in the original branch
+   - Remove all IterationDeck wrapper code
+   - Clean up development-specific props (`aiPrompt`, `confidence`, `notes`)
+   - Preserve all functionality of the selected variation
+
+3. **Remove unused imports** if no other iteration-decks remain on the page
+
+4. **Clean up the worktree**
+
+   Using the CLI:
+   ```bash
+   npx iteration-deck worktree:cleanup [component-name]
+   ```
+
+   Or using git commands:
+   ```bash
+   # Remove the iteration worktree
+   git worktree remove ../iteration-deck-[component-name]
+
+   # Delete the iteration branch
+   git branch -D iterations/[component-name]
+   ```
+
+5. **Commit the final implementation**
+   ```bash
+   git add [modified-files]
+   git commit -m "Add [component-name] using [variation-label] design"
+   ```
+
+### Example Complete Workflow
+
+**Using the CLI:**
+```bash
+# Designer says: "I like the Gradient button"
+
+# Step 1: Return to original branch
+cd /Users/you/project
+git checkout main
+
+# Step 2: Copy the Gradient variation content to your file
+# (Extract only the button code, not the IterationDeck wrapper)
+
+# Step 3: Remove worktree
+npx iteration-deck worktree:cleanup buttons
+
+# Step 4: Commit
+git add src/components/Button.tsx
+git commit -m "Add CTA button using gradient design"
+```
+
+**Or using git commands:**
+```bash
+# Designer says: "I like the Gradient button"
+
+# Step 1: Return to original branch
+cd /Users/you/project
+git checkout main
+
+# Step 2: Copy the Gradient variation content to your file
+# (Extract only the button code, not the IterationDeck wrapper)
+
+# Step 3: Remove worktree
+git worktree remove ../iteration-deck-buttons
+git branch -D iterations/buttons
+
+# Step 4: Commit
+git add src/components/Button.tsx
+git commit -m "Add CTA button using gradient design"
+```
+
+### Code Cleanup Example
 ```tsx
-// Before cleanup (what you created initially):
+// In worktree (what you created initially):
 <IterationDeck id="cta-buttons" label="CTA Button Styles">
   <IterationDeckSlide label="Primary">
     <Button className="bg-blue-600 text-white px-6 py-3">Get Started</Button>
@@ -142,10 +388,14 @@ You should interpret this as:
   </IterationDeckSlide>
 </IterationDeck>
 
-// After cleanup (designer chose "Gradient"):
+// In original branch (after designer chose "Gradient"):
 <Button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3">
   Get Started
 </Button>
 ```
 
-**This cleanup step is essential** - it converts the development/prototyping tool back into clean production code.
+**This workflow ensures:**
+- ✅ Clean production code without IterationDeck wrappers
+- ✅ No iteration history in main branch
+- ✅ Isolated exploration in temporary worktree
+- ✅ Only chosen design makes it to production

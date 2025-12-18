@@ -300,14 +300,49 @@ When users want to add more designs to an existing iteration deck:
 4. **Use meaningful labels** that distinguish the new variations
 5. **Include `aiPrompt` documentation** for the new variations
 
+### Recommended Git Worktree Workflow
+
+**For the cleanest workflow, use git worktrees to isolate iteration exploration:**
+
+```bash
+# 1. Before creating IterationDeck: Create worktree
+git worktree add ../iteration-deck-[component] -b iterations/[component]
+cd ../iteration-deck-[component]
+
+# 2. Implement all variations in the worktree
+# [Create your IterationDeck with multiple slides]
+
+# 3. Designer reviews and chooses preferred variation
+
+# 4. Return to main branch and extract chosen variation
+cd [original-directory]
+git checkout main
+# Copy only the chosen variation content (without IterationDeck wrapper)
+
+# 5. Cleanup the worktree
+git worktree remove ../iteration-deck-[component]
+git branch -D iterations/[component]
+
+# 6. Commit the final implementation
+git add [files]
+git commit -m "Add [component] using [chosen-variation] design"
+```
+
+**Benefits:**
+- ✅ Clean main branch history without iteration experiments
+- ✅ All variations exist simultaneously for live comparison
+- ✅ Only chosen design makes it to production
+- ✅ No IterationDeck wrappers in production code
+
 ### Designer Selection Workflow
 When a designer chooses a variation (e.g., "I like the second option", "Use the gradient version"):
-1. **Remove the IterationDeck wrapper** completely
-2. **Extract only the selected variation's content**
+1. **Switch back to original branch** from worktree
+2. **Extract only the selected variation's content** (without IterationDeck wrapper)
 3. **Clean up development props** (`aiPrompt`, `confidence`, `notes`)
-4. **Ask for confirmation** before making changes
+4. **Remove the worktree** and iteration branch
+5. **Commit clean production code** to main branch
 
-This converts the prototyping tool back into clean production code. See [`AI_INSTRUCTIONS.md`](./AI_INSTRUCTIONS.md) for detailed cleanup examples.
+This converts the prototyping tool back into clean production code. See [`AI_INSTRUCTIONS.md`](./AI_INSTRUCTIONS.md) for detailed workflow examples.
 
 ## API reference
 

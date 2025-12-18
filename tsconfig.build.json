@@ -11,7 +11,8 @@
   },
   "files": [
     "src/index.ts",
-    "src/wc/index.ts"
+    "src/wc/index.ts",
+    "src/cli/index.ts"
   ],
   "exclude": [
     "src/**/*.test.ts",

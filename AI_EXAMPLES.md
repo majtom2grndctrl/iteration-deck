@@ -336,12 +336,177 @@ function ButtonVariations() {
 }
 ```
 
+## Example 5: Complete Git Worktree Workflow
+
+**User Request:** "Create 3 different card layout variations for the product page"
+
+**AI Complete Workflow:**
+
+### Step 1: Create Worktree Before Any Code
+```bash
+# FIRST: Set up isolated worktree for iterations
+git worktree add ../iteration-deck-product-cards -b iterations/product-cards
+cd ../iteration-deck-product-cards
+```
+
+### Step 2: Implement Variations in Worktree
+```tsx
+// File: src/components/ProductCard.tsx (in worktree)
+import { IterationDeck, IterationDeckSlide } from 'iteration-deck';
+
+function ProductCardVariations() {
+  return (
+    <IterationDeck
+      id="product-cards"
+      label="Product Card Layouts"
+      prompt="Create 3 different card layout variations for the product page"
+    >
+      <IterationDeckSlide
+        label="Vertical"
+        aiPrompt="Traditional vertical card with image on top"
+        confidence={0.94}
+      >
+        <div className="bg-white rounded-lg shadow-md overflow-hidden max-w-sm">
+          <img
+            src="/product.jpg"
+            alt="Product"
+            className="w-full h-48 object-cover"
+          />
+          <div className="p-6">
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Product Name</h3>
+            <p className="text-gray-600 mb-4">Product description goes here</p>
+            <div className="flex justify-between items-center">
+              <span className="text-2xl font-bold text-blue-600">$99</span>
+              <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
+      </IterationDeckSlide>
+
+      <IterationDeckSlide
+        label="Horizontal"
+        aiPrompt="Horizontal layout with image on left"
+        confidence={0.89}
+      >
+        <div className="bg-white rounded-lg shadow-md overflow-hidden max-w-2xl flex">
+          <img
+            src="/product.jpg"
+            alt="Product"
+            className="w-1/3 object-cover"
+          />
+          <div className="p-6 flex-1">
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Product Name</h3>
+            <p className="text-gray-600 mb-4">Product description goes here</p>
+            <div className="flex justify-between items-center">
+              <span className="text-2xl font-bold text-blue-600">$99</span>
+              <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
+      </IterationDeckSlide>
+
+      <IterationDeckSlide
+        label="Minimal"
+        aiPrompt="Clean minimal design with subtle borders"
+        confidence={0.91}
+        notes="Great for modern, content-focused layouts"
+      >
+        <div className="border border-gray-200 rounded-lg p-6 max-w-sm hover:border-blue-300 transition-colors">
+          <img
+            src="/product.jpg"
+            alt="Product"
+            className="w-full h-40 object-cover rounded mb-4"
+          />
+          <h3 className="text-lg font-semibold text-gray-900 mb-1">Product Name</h3>
+          <p className="text-sm text-gray-500 mb-3">Product description</p>
+          <div className="flex justify-between items-center">
+            <span className="text-xl font-medium text-gray-900">$99</span>
+            <button className="text-blue-600 font-medium hover:underline">
+              Add to Cart →
+            </button>
+          </div>
+        </div>
+      </IterationDeckSlide>
+    </IterationDeck>
+  );
+}
+
+export default ProductCardVariations;
+```
+
+### Step 3: Designer Reviews and Chooses
+```
+Designer: "I really like the Minimal card design. Let's go with that one."
+```
+
+### Step 4: Return to Original Branch and Extract
+```bash
+# Switch back to original branch
+cd /Users/you/project
+git checkout main
+
+# Now copy ONLY the Minimal slide content (without wrappers)
+# into the original branch files
+```
+
+### Step 5: Clean Production Code in Main Branch
+```tsx
+// File: src/components/ProductCard.tsx (in main branch - clean version)
+function ProductCard() {
+  return (
+    <div className="border border-gray-200 rounded-lg p-6 max-w-sm hover:border-blue-300 transition-colors">
+      <img
+        src="/product.jpg"
+        alt="Product"
+        className="w-full h-40 object-cover rounded mb-4"
+      />
+      <h3 className="text-lg font-semibold text-gray-900 mb-1">Product Name</h3>
+      <p className="text-sm text-gray-500 mb-3">Product description</p>
+      <div className="flex justify-between items-center">
+        <span className="text-xl font-medium text-gray-900">$99</span>
+        <button className="text-blue-600 font-medium hover:underline">
+          Add to Cart →
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export default ProductCard;
+```
+
+### Step 6: Cleanup Worktree
+```bash
+# Remove the iteration worktree
+git worktree remove ../iteration-deck-product-cards
+
+# Delete the iteration branch
+git branch -D iterations/product-cards
+
+# Commit the final implementation
+git add src/components/ProductCard.tsx
+git commit -m "Add product card component using minimal design"
+```
+
+### Workflow Summary
+1. ✅ **Worktree created** before any code → isolated exploration
+2. ✅ **All variations** implemented in worktree → designer can test live
+3. ✅ **Designer chooses** → "Minimal" design selected
+4. ✅ **Clean extraction** → only chosen code (no wrapper) copied to main
+5. ✅ **Worktree removed** → temporary exploration cleaned up
+6. ✅ **Production ready** → clean component committed to main branch
+
 ## Key Principles
 
 1. **Always use meaningful variations** - Each slide should offer a genuinely different approach
-2. **Include realistic content** - Use actual text, images, and interactive elements  
+2. **Include realistic content** - Use actual text, images, and interactive elements
 3. **Make it accessible** - Include proper ARIA labels, semantic HTML, and keyboard navigation
 4. **Use descriptive labels** - Make slide labels clear ("Primary Button" not "Button 1")
 5. **Add AI context** - Use `aiPrompt` and `notes` props to document reasoning
 6. **Keep it functional** - All variations should be fully working implementations
 7. **Preserve existing variations** - When adding to decks, never modify or remove existing slides
+8. **Use git worktrees** - Always create worktree before IterationDeck, clean up after selection
