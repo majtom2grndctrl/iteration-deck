@@ -33,6 +33,8 @@ npm install iteration-deck
 
 Iteration Deck is built for designers who use AI coding agents like Claude Code, Cursor, Lovable, and others.
 
+**Worktree first:** Before generating or choosing variations, create a git worktree so iteration code stays isolated and easy to discard. See [`AI_INSTRUCTIONS.md`](./AI_INSTRUCTIONS.md) for the full workflow.
+
 #### Example 1: Creating button variations
 
 **Prompt to AI:**
@@ -299,40 +301,6 @@ When users want to add more designs to an existing iteration deck:
 3. **Add new IterationDeckSlide components** at the end
 4. **Use meaningful labels** that distinguish the new variations
 5. **Include `aiPrompt` documentation** for the new variations
-
-### Recommended Git Worktree Workflow
-
-**For the cleanest workflow, use git worktrees to isolate iteration exploration:**
-
-```bash
-# 1. Before creating IterationDeck: Create worktree
-git worktree add ../iteration-deck-[component] -b iterations/[component]
-cd ../iteration-deck-[component]
-
-# 2. Implement all variations in the worktree
-# [Create your IterationDeck with multiple slides]
-
-# 3. Designer reviews and chooses preferred variation
-
-# 4. Return to main branch and extract chosen variation
-cd [original-directory]
-git checkout main
-# Copy only the chosen variation content (without IterationDeck wrapper)
-
-# 5. Cleanup the worktree
-git worktree remove ../iteration-deck-[component]
-git branch -D iterations/[component]
-
-# 6. Commit the final implementation
-git add [files]
-git commit -m "Add [component] using [chosen-variation] design"
-```
-
-**Benefits:**
-- ✅ Clean main branch history without iteration experiments
-- ✅ All variations exist simultaneously for live comparison
-- ✅ Only chosen design makes it to production
-- ✅ No IterationDeck wrappers in production code
 
 ### Designer Selection Workflow
 When a designer chooses a variation (e.g., "I like the second option", "Use the gradient version"):

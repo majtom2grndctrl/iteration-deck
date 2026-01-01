@@ -5,6 +5,7 @@
 ## ⚡ Quick Start Workflow
 
 **BEFORE implementing any IterationDeck:**
+Always create a git worktree so iteration exploration and selection stay isolated from the main branch.
 
 ### Option 1: Using the CLI (Recommended)
 
