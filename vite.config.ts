@@ -17,13 +17,25 @@ export default defineConfig(({ command }) => {
       entry: {
         index: resolve(__dirname, 'src/index.ts'), // React as default export
         wc: resolve(__dirname, 'src/wc/index.ts'), // Web components at /wc
+        'cli/index': resolve(__dirname, 'src/cli/index.ts'), // CLI tool
       },
       name: 'IterationDeck'
     },
     rollupOptions: {
       external: (id) => {
         // External modules - these won't be bundled
-        return ['react', 'react-dom', 'react/jsx-runtime', 'lit', 'zustand'].some(dep => 
+        const externalModules = [
+          'react',
+          'react-dom',
+          'react/jsx-runtime',
+          'lit',
+          'zustand',
+          'commander', // CLI dependency
+          'fs',        // Node.js built-ins for CLI
+          'path',
+          'child_process'
+        ];
+        return externalModules.some(dep =>
           id === dep || id.startsWith(dep + '/')
         );
       },
@@ -70,13 +82,12 @@ export default defineConfig(({ command }) => {
     cssCodeSplit: false,
     outDir: 'dist',
     emptyOutDir: true,
-    // Production optimizations
+    // Production optimizations (but preserve console for CLI)
     minify: 'terser',
     terserOptions: {
       compress: {
-        drop_console: true,
+        drop_console: false, // Keep console for CLI output
         drop_debugger: true,
-        pure_funcs: ['console.log', 'console.debug']
       },
       mangle: {
         safari10: true

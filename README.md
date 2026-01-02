@@ -33,6 +33,8 @@ npm install iteration-deck
 
 Iteration Deck is built for designers who use AI coding agents like Claude Code, Cursor, Lovable, and others.
 
+**Worktree first:** Before generating or choosing variations, create a git worktree so iteration code stays isolated and easy to discard. See [`AI_INSTRUCTIONS.md`](./AI_INSTRUCTIONS.md) for the full workflow.
+
 #### Example 1: Creating button variations
 
 **Prompt to AI:**
@@ -302,12 +304,13 @@ When users want to add more designs to an existing iteration deck:
 
 ### Designer Selection Workflow
 When a designer chooses a variation (e.g., "I like the second option", "Use the gradient version"):
-1. **Remove the IterationDeck wrapper** completely
-2. **Extract only the selected variation's content**
+1. **Switch back to original branch** from worktree
+2. **Extract only the selected variation's content** (without IterationDeck wrapper)
 3. **Clean up development props** (`aiPrompt`, `confidence`, `notes`)
-4. **Ask for confirmation** before making changes
+4. **Remove the worktree** and iteration branch
+5. **Commit clean production code** to main branch
 
-This converts the prototyping tool back into clean production code. See [`AI_INSTRUCTIONS.md`](./AI_INSTRUCTIONS.md) for detailed cleanup examples.
+This converts the prototyping tool back into clean production code. See [`AI_INSTRUCTIONS.md`](./AI_INSTRUCTIONS.md) for detailed workflow examples.
 
 ## API reference
 
