@@ -30,6 +30,22 @@
 - **Other frameworks**: `import 'iteration-deck/wc';` then use `<iteration-deck>` elements
 - **Framework detection**: Look for React imports, .tsx/.jsx files, or JSX syntax
 
+## Recommended Git Workflow (Temp Prototyping Sub-Branch)
+
+To prevent accidentally shipping `IterationDeck` usage to production, keep deck-based exploration on a temporary sub-branch off your feature branch:
+
+1. Create (or switch to) your feature branch: `git checkout -b feature/my-feature`
+2. Create a temporary prototyping sub-branch: `git checkout -b feature/my-feature--iterations`
+3. Add `IterationDeck` + `IterationDeckSlide` and iterate freely (commit as often as you want on `--iterations`)
+4. When you choose a winner:
+   - Switch back to the feature branch: `git checkout feature/my-feature`
+   - Bring over only the commit(s) you want: `git cherry-pick -n <sha>` (repeat as needed)
+   - Remove the `IterationDeck` wrapper/imports and keep only the selected implementation
+   - Commit the cleaned result on your feature branch
+5. Delete the temporary branch when done: `git branch -D feature/my-feature--iterations`
+
+This keeps prototyping history available locally without merging it into your production-bound branch.
+
 ## Basic Implementation Pattern
 
 **Always wrap variations in IterationDeck:**

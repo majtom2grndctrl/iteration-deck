@@ -309,6 +309,21 @@ When a designer chooses a variation (e.g., "I like the second option", "Use the 
 
 This converts the prototyping tool back into clean production code. See [`AI_INSTRUCTIONS.md`](./AI_INSTRUCTIONS.md) for detailed cleanup examples.
 
+### Recommended Git Workflow (Temp Prototyping Sub-Branch)
+To safeguard against shipping `IterationDeck` to production, keep all deck-based exploration on a temporary sub-branch off your feature branch:
+
+1. Create (or switch to) your feature branch: `git checkout -b feature/my-feature`
+2. Create a temporary iterations sub-branch: `git checkout -b feature/my-feature--iterations`
+3. Add `IterationDeck` + `IterationDeckSlide` and iterate freely (commit as often as you want on `--iterations`)
+4. When you choose a winner:
+   - Switch back to the feature branch: `git checkout feature/my-feature`
+   - Bring over only the commit(s) you want: `git cherry-pick -n <sha>` (repeat as needed)
+   - Remove the `IterationDeck` wrapper/imports and keep only the selected implementation
+   - Commit the cleaned result on your feature branch
+5. Delete the temporary branch when done: `git branch -D feature/my-feature--iterations`
+
+This keeps prototyping history available locally without merging it into your production-bound branch.
+
 ## API reference
 
 ### IterationDeck
